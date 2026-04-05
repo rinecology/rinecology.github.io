@@ -1,0 +1,31 @@
+/* Tool card screenshots */
+.quarto-figure img,
+article img {
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  max-width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+/* Tool section headings */
+h3 {
+  margin-top: 1.5rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 2px solid #2c7be5;
+}
+
+/* Publication entries */
+.publications-list p {
+  margin-bottom: 1rem;
+}
+
+/* Navbar brand */
+.navbar-brand {
+  font-weight: 600;
+}
+
+/* Footer */
+.nav-footer {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
