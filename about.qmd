@@ -1,0 +1,67 @@
+---
+title: "About"
+---
+
+## Mark (Yu) Zhang, PhD, RPF
+
+I am a Registered Professional Forester (RPF) and forest analyst with over 15 years
+of combined experience in academic ecological research and applied forest management
+in Ontario. My career spans from peer-reviewed global-scale ecological research to
+frontline forest management planning across three Ontario MNR districts.
+
+Since joining the Ontario public service in 2017, I have been a member of FMP
+planning teams for seven Forest Management Units across Northwest, Northeast, and
+Southern Ontario — covering base model setup, yield curve fitting, long-term
+management direction, and stakeholder consultation including Indigenous community
+engagement. My current focus is on wood supply modeling, spatial data tool
+development, and analytical automation to support upcoming FMP planning cycles
+in the northeast GLSL forest region.
+
+The tools on this site were built out of practical necessity — to fill gaps in
+existing workflows for data validation, yield curve modeling, LiDAR analysis, and
+forest unit classification.
+
+## Education
+
+| Degree | Institution | Year |
+|---|---|---|
+| PhD, Forest Sciences | Lakehead University, Thunder Bay, ON | 2014 |
+| MSc, Forestry | Lakehead University, Thunder Bay, ON | 2010 |
+| HBSc, Agriculture (Horticulture) | University of Guelph, ON | 2008 |
+
+## Professional Registration
+
+- **Registered Professional Forester (RPF)** — Ontario Professional Foresters Association (OPFA), Member 
+
+## Research Background (2008–2017)
+
+Prior to joining the Ontario public service, I was an active researcher in boreal
+forest ecosystem dynamics, with a focus on biodiversity–productivity relationships
+across global forest biomes. My postdoctoral work was conducted at Lakehead
+University and the South China Botanical Garden, Chinese Academy of Sciences.
+
+My **5 first-author papers** have accumulated **1,259 citations** (as of April 2026,
+per Semantic Scholar), averaging ~252 citations per paper. The 2012 *Journal of
+Ecology* meta-analysis alone has been cited by primary research papers published
+in *Science* (2016) and *Nature* (2017).
+
+## Areas of Technical Expertise
+
+- Forest inventory analysis (FRI/PCI/BMI/OPI — Ontario MNRF standards)
+- Explicit spatial forest estate modeling (e.g., Woodstock and FSOS)
+- LiDAR data processing and 3D visualization
+- Yield curve modeling (Advanced user of SLYM & BMI-based fitting)
+- Interactive web application development (R/Shiny, JavaScript)
+- Spatial data workflows and GIS automation (ArcGIS Pro, Python, R)
+- Data visualization and reporting (Power BI, Quarto, Leaflet)
+
+## Tools & Technologies
+
+| Category | Technologies |
+|---|---|
+| Languages | R, JavaScript (ES2020+), PowerShell, Python |
+| Frameworks | Shiny, Quarto, Leaflet, terra, lidR |
+| Forest Modeling | SFMM/FSOS, Patchworks, Woodstock, SLYM, MIST |
+| Spatial | ArcGIS Pro, QGIS, Ontario GeoHub APIs, WebGL |
+| Visualization | Power BI (DAX, Power Query), ggplot2, Leaflet |
+| Workflow | Git, GitHub, CSV/Shapefile/LiDAR pipelines |

@@ -1,0 +1,117 @@
+---
+title: "Publications"
+---
+
+All citation counts sourced from Semantic Scholar (April 2026).
+
+## Peer-Reviewed Journal Articles
+
+### First-Author Publications
+
+**5 papers · 1,259 total citations · ~252 citations / paper**
+
+---
+
+**Zhang, Y.**, H.Y.H. Chen, P.B. Reich. 2012.  
+Forest productivity increases with evenness, species richness and trait variation:
+a global meta-analysis.  
+*Journal of Ecology*, 100:742–749.  
+DOI: [10.1111/j.1365-2745.2011.01944.x](https://doi.org/10.1111/j.1365-2745.2011.01944.x)  
+**744 citations** — cited by primary research in *Science* (2016) and *Nature* (2017)
+
+---
+
+**Zhang, Y.**, H.Y.H. Chen, A. Taylor. 2014.  
+Multiple drivers of plant diversity in forest ecosystems.  
+*Global Ecology and Biogeography*, 23:885–893.  
+DOI: [10.1111/geb.12188](https://doi.org/10.1111/geb.12188)  
+**52 citations**
+
+---
+
+**Zhang, Y.**, H.Y.H. Chen, A. Taylor. 2015.  
+Individual size inequality links forest diversity and above-ground biomass.  
+*Journal of Ecology*, 103:1245–1252.  
+DOI: [10.1111/1365-2745.12425](https://doi.org/10.1111/1365-2745.12425)  
+**263 citations**
+
+---
+
+**Zhang, Y.**, H.Y.H. Chen, A. Taylor. 2016.  
+Aboveground biomass of understorey vegetation has a negligible or negative
+association with overstorey tree species diversity in natural forests.  
+*Global Ecology and Biogeography*, 25:141–150.  
+DOI: [10.1111/geb.12392](https://doi.org/10.1111/geb.12392)  
+**55 citations**
+
+---
+
+**Zhang, Y.**, H.Y.H. Chen, A. Taylor. 2017.  
+Positive species diversity and above-ground biomass relationships are ubiquitous
+across forest strata despite interference from overstorey trees.  
+*Functional Ecology*, 31:419–426.  
+DOI: [10.1111/1365-2435.12699](https://doi.org/10.1111/1365-2435.12699)  
+**145 citations**
+
+---
+
+### Co-Author Publications
+
+Huang, J., H. Yu, H. Lin, **Zhang, Y.**, E.B. Searle, Z. Yuan. 2016.  
+Phosphorus amendment mitigates nitrogen addition-induced phosphorus limitation
+in two plant species in a desert steppe, China.  
+*Plant and Soil*, 399(1-2):221–232.
+
+Xu, Y., **Zhang, Y.**, M. Shi, Z. Lu. 2020.  
+Environmental variation, functional diversity and identity predicting community
+biomass in an old-growth subtropical broad-leaved forest.  
+*Global Ecology and Conservation*.  
+DOI: [10.1016/j.gecco.2020.e01093](https://doi.org/10.1016/j.gecco.2020.e01093)
+
+Xu, Y., **Zhang, Y.**, J. Yang, Z. Lu. 2019.  
+Influence of tree functional diversity and stand environment on fine root biomass
+and necromass in four types of evergreen broad-leaved forests.  
+*Global Ecology and Conservation*.  
+DOI: [10.1016/j.gecco.2019.e00832](https://doi.org/10.1016/j.gecco.2019.e00832)
+
+Xu, Y., **Zhang, Y.**, W. Li, W. Liu, X. Gu, Z. Guan, J. Yang, Z. Lu. 2019.  
+Effects of tree functional diversity and environmental gradients on belowground
+biomass in a natural old-growth forest ecosystem.  
+*Canadian Journal of Forest Research*.  
+DOI: [10.1139/cjfr-2019-0254](https://doi.org/10.1139/cjfr-2019-0254)
+
+### Technical Notes
+
+**Zhang, Y.** 2007. Negative effects of copper on hydroponically grown cucumbers.
+*Greenhouse Canada*.
+
+Schuyler, Y. & **Zhang, Y.** 2007. Easter lilies height control by removing
+immature flower buds. *Greenhouse Canada*.
+
+---
+
+## Peer Review Service
+
+Ad hoc reviewer for: *Oecologia* (×4), *Journal of Ecology* (×2), *PLOS ONE*,
+*Journal of Plant Ecology*, *Oikos*, *European Journal of Forest Research*,
+*Functional Ecology*.
+
+---
+
+## Conference Presentations
+
+- Zhang, Y. 2017. Plant biodiversity and ecosystem functioning relationships in
+  boreal and subtropical forests. Young Ecologists' Forum of Terrestrial Ecosystems.
+- Zhang, Y. 2016. Plant biodiversity and ecosystem functioning relationships in
+  boreal forests. Ecological Society of China Conference.
+- Zhang, Y. 2013. Environmental drivers of species diversity differ with vegetation
+  strata in natural forests. Ecological Society of America Annual Meeting.
+- Zhang, Y. 2012. Quantifying the relative importance of climate and local conditions
+  on tree species richness and evenness. Forest Ecosystem Science Co-operative Inc.,
+  Thunder Bay, ON.
+- Zhang, Y. 2010. The complexity of diversity–productivity relationship in natural
+  forests. CONFOR Graduate Student Conference, Thunder Bay, ON.
+- Zhang, Y. 2009. The extent of life-history traits drives diversity–productivity
+  relationship in forest ecosystems. Sustainable Forestry Management Network
+  Conference, Poster Session, Gatineau, QC.
+

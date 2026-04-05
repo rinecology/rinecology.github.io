@@ -1,0 +1,77 @@
+---
+title: "Tools & Applications"
+---
+
+A collection of open-source tools developed for forest inventory analysis,
+data quality validation, and spatial decision-support. Each tool is available
+as a distribution package — see individual repository links below.
+
+---
+
+## JavaScript Applications
+
+### ForestUnit JS — Forest Unit Analysis Tool
+
+![](images/screenshots/forest-unit.png)
+
+**Description:**  
+A fully client-side forest unit analysis tool that runs entirely in the browser.
+No server or installation required. Designed for non-technical forest analysts
+on Windows government workstations.
+
+**Tech:** JavaScript (ES2020+), HTML, CSS  
+**Live Demo:** [rinecology.github.io/forest-unit-js/](https://rinecology.github.io/forest-unit-js/)  
+**Source:** Hosted in this portfolio repo under `/forest-unit-js/`
+
+---
+
+## R / Shiny Applications
+
+### LOGIC_CHECKER — Forest Inventory Data Quality Reporting System
+
+![](images/screenshots/logic-checker.png)
+
+**Description:**  
+Comprehensive validation and reporting system for Ontario forest inventory data
+(FRI/PCI/BMI/OPI). Implements 156 production-ready validation rules with
+spatial mapping integration. Supports CSV and Shapefile ZIP upload, severity-colored
+centroid mapping, and both an interactive Shiny app and a PowerShell batch mode.
+
+**Tech:** R, Shiny, Leaflet, PowerShell  
+**Version:** 6.2 (March 2026)  
+**Source:** [github.com/rinecology/logic-checker-dist](https://github.com/rinecology/logic-checker-dist)  
+**Download:** Available as a zip via GitHub Releases in the above repo
+
+---
+
+### FRI LiDAR Toolkit
+
+![](images/screenshots/fri-lidar.png)
+
+**Description:**  
+R-based toolkit for processing and visualizing LiDAR-derived datasets from
+Ontario's FRI Leaf-ON LiDAR program. Features batch CHM tile download from
+Ontario GeoHub, virtual mosaic clipping (no ArcGIS), side-by-side FRI vs LiDAR
+comparison, crown delineation, and 3D point cloud visualization via WebGL.
+
+**Tech:** R, Shiny, terra, lidR, WebGL  
+**Source:** [github.com/rinecology/fri-lidar-dist](https://github.com/rinecology/fri-lidar-dist)  
+**Download:** Available as a zip via GitHub Releases in the above repo
+
+---
+
+## R Pipeline Frameworks
+
+### SLYM Companion — Stand Level Yield Curve Modeling Suite
+
+![](images/screenshots/slym.png)
+
+**Description:**  
+An integrated suite of five specialized tools for forest inventory analysis and
+yield curve modeling: SLYM Processor, NER Managed Template Generator, SLYM Runner,
+SLYM Auto Runner, and SLYM Cutter. Automates data preparation, parameter estimation,
+model execution, and result visualization.
+
+**Tech:** R, Shiny, PowerShell  
+**Source:** [github.com/rinecology/slym-companion-dist](https://github.com/rinecology/slym-companion-dist)  
+**Download:** Available as a zip via GitHub Releases in the above repo

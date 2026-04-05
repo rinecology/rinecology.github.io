@@ -1,0 +1,29 @@
+project:
+  type: website
+
+website:
+  title: "Mark Zhang"
+  description: "Forest Analyst | Spatial Tools | R & JavaScript"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Tools
+      - href: about.qmd
+        text: About
+      - href: publications.qmd
+        text: Publications
+      - href: contact.qmd
+        text: Contact
+    right:
+      - icon: github
+        href: https://github.com/rinecology
+
+  page-footer:
+    left: "© Mark Zhang"
+    right: "Built with [Quarto](https://quarto.org)"
+
+format:
+  html:
+    theme: flatly
+    css: styles.css
+    toc: false

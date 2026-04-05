@@ -1,0 +1,18 @@
+---
+title: "Contact"
+---
+
+The best way to reach me is through the channels below.
+
+For questions or issues with a specific tool, please open a GitHub Issue in the
+relevant repository — that keeps the conversation visible and searchable for
+other users.
+
+---
+
+- **GitHub:** [github.com/rinecology](https://github.com/rinecology)
+- **LinkedIn:** [linkedin.com/in/zhangyuplantecologist](https://www.linkedin.com/in/zhangyuplantecologist/)
+
+---
+
+*Note: I do not post a personal email address on public pages.*
