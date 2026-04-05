@@ -147,6 +147,19 @@ ul.task-list li input[type="checkbox"] {
 
 
 <p>A collection of open-source tools developed for forest inventory analysis, data quality validation, and spatial decision-support. Each tool is available as a distribution package — see individual repository links below.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Distribution repositories are under construction.</strong> The tools are functional but the public repos and download links are not yet active. Check back soon, or <a href="https://github.com/rinecology">open a GitHub Issue</a> to be notified.</p>
+</div>
+</div>
 <hr>
 <section id="javascript-applications" class="level2">
 <h2 class="anchored" data-anchor-id="javascript-applications">JavaScript Applications</h2>
@@ -273,7 +286,7 @@ An integrated suite of five specialized tools for forest inventory analysis and 
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/rinecology\.github\.io\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
