@@ -163,12 +163,12 @@ Note
 <hr>
 <section id="javascript-applications" class="level2">
 <h2 class="anchored" data-anchor-id="javascript-applications">JavaScript Applications</h2>
-<section id="forestunit-js-forest-unit-analysis-tool" class="level3">
-<h3 class="anchored" data-anchor-id="forestunit-js-forest-unit-analysis-tool">ForestUnit JS — Forest Unit Analysis Tool</h3>
+<section id="forestunit-js-ontario-forest-unit-analysis-tool" class="level3">
+<h3 class="anchored" data-anchor-id="forestunit-js-ontario-forest-unit-analysis-tool">ForestUnit JS — Ontario Forest Unit Analysis Tool</h3>
 <p><img src="images/screenshots/forest-unit.png" class="img-fluid"></p>
 <p><strong>Description:</strong><br>
-A fully client-side forest unit analysis tool that runs entirely in the browser. No server or installation required. Designed for non-technical forest analysts on Windows government workstations.</p>
-<p><strong>Tech:</strong> JavaScript (ES2020+), HTML, CSS<br>
+SQL-style forest unit assignment running 100% in the browser — no server, no installation. Ships with 7 bundled YAML rule sets (122+ rules): NER Boreal (TN021 2006, 2017–2019, ROD2023, SRNV2023, SRNV SPCOMP ONLY, SRNV2024) and GLSL SFU v1.03.01.23. Parses raw SPCOMP strings, assigns SFUs, and produces CSV + HTML reports. Key feature: cross-rule-set comparison mode with a diverging bar chart showing area delta vs a chosen baseline. ~330KB bundle, works offline.</p>
+<p><strong>Tech:</strong> JavaScript (ES2020+), Vite, Chart.js<br>
 <strong>Live Demo:</strong> <a href="https://rinecology.github.io/forest-unit-js/">rinecology.github.io/forest-unit-js/</a><br>
 <strong>Source:</strong> Hosted in this portfolio repo under <code>/forest-unit-js/</code></p>
 <hr>
@@ -176,6 +176,17 @@ A fully client-side forest unit analysis tool that runs entirely in the browser.
 </section>
 <section id="r-shiny-applications" class="level2">
 <h2 class="anchored" data-anchor-id="r-shiny-applications">R / Shiny Applications</h2>
+<section id="forest-classification-analyzer" class="level3">
+<h3 class="anchored" data-anchor-id="forest-classification-analyzer">Forest Classification Analyzer</h3>
+<p><img src="images/screenshots/forest-unit-shiny.png" class="img-fluid"></p>
+<p><strong>Description:</strong><br>
+R/Shiny companion to ForestUnit JS, built for batch and multi-scenario work. Killer feature: simultaneously compare 2–5 classification scenarios side-by-side with confusion matrices, agreement analysis, and area impact assessment — immediately surface which records disagree and why. Supports NER, NWR, and GLSL regions; SFU, FMG, and PLANFU output types; First/Best/All Match modes. Accepts CSV, DBF, and Shapefile uploads up to 500 MB. Custom YAML upload enables testing experimental rule sets before committing them.</p>
+<p><strong>Tech:</strong> R, Shiny<br>
+<strong>Version:</strong> 1.0.0<br>
+<strong>Source:</strong> <a href="https://github.com/rinecology/forest-unit-shiny-dist">github.com/rinecology/forest-unit-shiny-dist</a><br>
+<strong>Download:</strong> Available as a zip via GitHub Releases in the above repo</p>
+<hr>
+</section>
 <section id="logic_checker-forest-inventory-data-quality-reporting-system" class="level3">
 <h3 class="anchored" data-anchor-id="logic_checker-forest-inventory-data-quality-reporting-system">LOGIC_CHECKER — Forest Inventory Data Quality Reporting System</h3>
 <p><img src="images/screenshots/logic-checker.png" class="img-fluid"></p>
@@ -204,7 +215,7 @@ R-based toolkit for processing and visualizing LiDAR-derived datasets from Ontar
 <h3 class="anchored" data-anchor-id="slym-companion-stand-level-yield-curve-modeling-suite">SLYM Companion — Stand Level Yield Curve Modeling Suite</h3>
 <p><img src="images/screenshots/slym.png" class="img-fluid"></p>
 <p><strong>Description:</strong><br>
-An integrated suite of five specialized tools for forest inventory analysis and yield curve modeling: SLYM Processor, NER Managed Template Generator, SLYM Runner, SLYM Auto Runner, and SLYM Cutter. Automates data preparation, parameter estimation, model execution, and result visualization.</p>
+An integrated suite of four specialized tools for yield curve modeling and result processing: SLYM Processor, SLYM Runner, SLYM Auto Runner, and SLYM Cutter. Covers model parameter setup, batch execution, and output visualization. Managed template preparation (FGS/PRSNT subsetting, SI imputation, BA enrichment) is handled upstream by FRI DataKit.</p>
 <p><strong>Tech:</strong> R, Shiny, PowerShell<br>
 <strong>Source:</strong> <a href="https://github.com/rinecology/slym-companion-dist">github.com/rinecology/slym-companion-dist</a><br>
 <strong>Download:</strong> Available as a zip via GitHub Releases in the above repo</p>
