@@ -1,5 +1,7 @@
 project:
   type: website
+  resources:
+    - forest-unit-js/
 
 website:
   title: "Mark Zhang"
