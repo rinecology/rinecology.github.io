@@ -2,6 +2,7 @@ project:
   type: website
   resources:
     - forest-unit-js/
+    - slym-companion/
 
 website:
   title: "Mark Zhang"

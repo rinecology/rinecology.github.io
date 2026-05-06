@@ -6,26 +6,57 @@ A collection of open-source tools developed for forest inventory analysis,
 data quality validation, and spatial decision-support. Each tool is available
 as a distribution package — see individual repository links below.
 
+::: {.callout-note}
+**Distribution repositories are under construction.** The tools are functional
+but the public repos and download links are not yet active. Check back soon,
+or [open a GitHub Issue](https://github.com/rinecology) to be notified.
+:::
+
+
 ---
 
 ## JavaScript Applications
 
-### ForestUnit JS — Forest Unit Analysis Tool
+### ForestUnit JS — Ontario Forest Unit Analysis Tool
 
 ![](images/screenshots/forest-unit.png)
 
 **Description:**  
-A fully client-side forest unit analysis tool that runs entirely in the browser.
-No server or installation required. Designed for non-technical forest analysts
-on Windows government workstations.
+SQL-style forest unit assignment running 100% in the browser — no server, no
+installation. Ships with 7 bundled YAML rule sets (122+ rules): NER Boreal
+(TN021 2006, 2017–2019, ROD2023, SRNV2023, SRNV SPCOMP ONLY, SRNV2024) and
+GLSL SFU v1.03.01.23. Parses raw SPCOMP strings, assigns SFUs, and produces
+CSV + HTML reports. Key feature: cross-rule-set comparison mode with a
+diverging bar chart showing area delta vs a chosen baseline. ~330KB bundle,
+works offline.
 
-**Tech:** JavaScript (ES2020+), HTML, CSS  
+**Tech:** JavaScript (ES2020+), Vite, Chart.js  
 **Live Demo:** [rinecology.github.io/forest-unit-js/](https://rinecology.github.io/forest-unit-js/)  
 **Source:** Hosted in this portfolio repo under `/forest-unit-js/`
 
 ---
 
 ## R / Shiny Applications
+
+### Forest Classification Analyzer
+
+![](images/screenshots/forest-unit-shiny.png)
+
+**Description:**  
+R/Shiny companion to ForestUnit JS, built for batch and multi-scenario work.
+Killer feature: simultaneously compare 2–5 classification scenarios side-by-side
+with confusion matrices, agreement analysis, and area impact assessment —
+immediately surface which records disagree and why. Supports NER, NWR, and
+GLSL regions; SFU, FMG, and PLANFU output types; First/Best/All Match modes.
+Accepts CSV, DBF, and Shapefile uploads up to 500 MB. Custom YAML upload
+enables testing experimental rule sets before committing them.
+
+**Tech:** R, Shiny  
+**Version:** 1.0.0  
+**Source:** [github.com/rinecology/forest-unit-shiny-dist](https://github.com/rinecology/forest-unit-shiny-dist)  
+**Download:** Available as a zip via GitHub Releases in the above repo
+
+---
 
 ### LOGIC_CHECKER — Forest Inventory Data Quality Reporting System
 
@@ -67,11 +98,34 @@ comparison, crown delineation, and 3D point cloud visualization via WebGL.
 ![](images/screenshots/slym.png)
 
 **Description:**  
-An integrated suite of five specialized tools for forest inventory analysis and
-yield curve modeling: SLYM Processor, NER Managed Template Generator, SLYM Runner,
-SLYM Auto Runner, and SLYM Cutter. Automates data preparation, parameter estimation,
-model execution, and result visualization.
+An integrated suite of four specialized tools for yield curve modeling and result
+processing: SLYM Processor, SLYM Runner, SLYM Auto Runner, and SLYM Cutter.
+Covers model parameter setup, batch execution, and output visualization. Managed
+template preparation (FGS/PRSNT subsetting, SI imputation, BA enrichment) is
+handled upstream by FRI DataKit.
 
 **Tech:** R, Shiny, PowerShell  
+**Live Demo — SLYM Visualization and Reporting:** [rinecology.github.io/slym-companion/slym_cutter_fastball.html](https://rinecology.github.io/slym-companion/slym_cutter_fastball.html)  
+**Live Demo — SLYM-READY Data Processor:** [rinecology.github.io/slym-companion/slym_processor_fastball.html](https://rinecology.github.io/slym-companion/slym_processor_fastball.html)  
 **Source:** [github.com/rinecology/slym-companion-dist](https://github.com/rinecology/slym-companion-dist)  
+**Download:** Available as a zip via GitHub Releases in the above repo
+
+---
+
+### FRI DataKit — Forest Inventory Data Preparation Suite
+
+![](images/screenshots/fri-datakit.png)
+
+**Description:**  
+A multi-function Shiny app for forest inventory data wrangling and pre-modeling
+preparation. Started as an NER managed yield curve template builder and grew into
+a comprehensive toolkit: silviculture-based subsetting (FGS/PRSNT/PRSNT_NAT),
+area-weighted attribute analysis, SI imputation, STKG and BA enrichment, leading
+species / AU_YC parsing with hierarchical fallback logic, and multi-region forest
+unit classification (NER/NWR/GLSL for SFU/FMG/PLANFU). Outputs feed directly into
+SLYM managed template generation.
+
+**Tech:** R, Shiny, YAML-driven rules  
+**Version:** 0.2.0 (February 2026)  
+**Source:** [github.com/rinecology/fri-datakit-dist](https://github.com/rinecology/fri-datakit-dist)  
 **Download:** Available as a zip via GitHub Releases in the above repo
