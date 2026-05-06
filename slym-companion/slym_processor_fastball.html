@@ -2158,7 +2158,11 @@ class SLYMProcessor {
         // If keepYfu is checked and rawData has yFU* columns, append them
         const keepYfu = document.getElementById('keepYfuCheckbox')?.checked || false;
         if (keepYfu && this.rawData && this.rawData.length > 0) {
-            const yfuColumns = Object.keys(this.rawData[0]).filter(c => c.startsWith('yFU'));
+            // Exclude any yFU* column that was promoted to PLANFU via the override dropdown
+            const planfuOverride = this.planfuColumnOverride || '';
+            const yfuColumns = Object.keys(this.rawData[0]).filter(c =>
+                c.startsWith('yFU') && c !== planfuOverride
+            );
             if (yfuColumns.length > 0) {
                 console.log(`📋 Adding yFU columns from raw data: ${yfuColumns.join(', ')}`);
                 exportData = exportData.map((row, index) => {
