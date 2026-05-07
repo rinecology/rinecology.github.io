@@ -1,0 +1,81 @@
+# Forest Unit (SFU) Classification Rules
+# NER Boreal SFU - Ken Lennon version with ELC ecosites
+
+name: "NER Boreal SFU"
+description: "NER Boreal SFU (Ken Lennon version with ELC ecosites)"
+region: "NER"
+version: "KL_ELC"
+
+rules:
+  1:
+    sfu: "PR1"
+    rule: '("Pr" >= 70)'
+    description: "Red pine, plantations"
+  2:
+    sfu: "PW1"
+    rule: '("Pw" + "Pr" + ("Sw" + "Sx") + "He" >= 40 && "Pw" >= 30)'
+    description: "White pine, shelterwood"
+  3:
+    sfu: "PRW"
+    rule: '("Pw" + "Pr" >= 40)'
+    description: "Red and white pine"
+  4:
+    sfu: "LH1"
+    rule: '((("Ab" + "Ew" + "Pb") >= 30 || "Pb" >= 40))'
+    description: "Lowland Hardwood"
+  5:
+    sfu: "TH1"
+    rule: '(("Ab" + "Ew" + "Pb") + "Mh" + ("Pl" + "_By" + "Mr") + "He" >= 30)'
+    description: "Tolerant Hardwoods"
+  6:
+    sfu: "SBOG"
+    rule: '(("Sb" + "La" + ("Ce" + "Cw") >= 70) && "OSC" == 4)'
+    description: "Black spruce, bog"
+  7:
+    sfu: "SB1"
+    rule: '(("Sb" >= 70))'
+    description: "Black spruce, lowland"
+  8:
+    sfu: "PJ1"
+    rule: '(("Pj" >= 70))'
+    description: "Jack pine, pure"
+  9:
+    sfu: "LC1"
+    rule: '((("Ce" + "Cw") + "La" + "Sb" >= 70))'
+    description: "Lowland conifer"
+  10:
+    sfu: "PJ2"
+    rule: '(("Pj" + "Sb" + "Pr" >= 70 || ("Pj" >= 50 && "Pj" + "Sb" + "Bf" + ("Sw" + "Sx") + "He" + "Pw" + "Pr" + ("Ce" + "Cw") + "La" >= 70)) && "Pj" >= "Sb")'
+    description: "Jack pine black spruce"
+  11:
+    sfu: "SP1"
+    rule: '("Sb" + ("Sw" + "Sx") + "Bf" + ("Ce" + "Cw") + "La" + "Pw" + "Pj" + "Pr" + "He" >= 70 && (("Bf" + ("Ce" + "Cw") + "Pw" + "La" + ("Sw" + "Sx") + "He" <= 20) || "Pj" >= 30))'
+    description: "Spruce, upland"
+  12:
+    sfu: "SF1"
+    rule: '("Sb" + ("Sw" + "Sx") + "Bf" + ("Ce" + "Cw") + "La" + "Pw" + "Pj" + "Pr" + "He" >= 70)'
+    description: "Spruce Fir"
+  13:
+    sfu: "PO1"
+    rule: '(("Po" + "Pt") + "Bw" + "Mh" + ("Pl" + "_By" + "Mr") + ("Ab" + "Ew" + "Pb") >= 70 && ("Po" + "Pt") >= 50)'
+    description: "Poplar"
+  14:
+    sfu: "BW1"
+    rule: '(("Po" + "Pt") + "Bw" + "Mh" + ("Pl" + "_By" + "Mr") + ("Ab" + "Ew" + "Pb") >= 70)'
+    description: "White birch"
+  15:
+    sfu: "MH1"
+    rule: '((("Bf" <= 20 && ("Sw" + "Sx") <= 20 && ("Ce" + "Cw") <= 20) && ("Po" + "Pt") + "Bw" + "Mh" + ("Pl" + "_By" + "Mr") + ("Ab" + "Ew" + "Pb") >= 50))'
+    description: "Mixedwood hardwood fresh coarse"
+  16:
+    sfu: "MC1"
+    rule: '(("Bf" <= 20 && ("Sw" + "Sx") <= 20 && ("Ce" + "Cw") <= 20))'
+    description: "Mixedwood conifer fresh coarse"
+  17:
+    sfu: "MH2"
+    rule: '(("Po" + "Pt") + "Bw" + "Mh" + ("Pl" + "_By" + "Mr") + ("Ab" + "Ew" + "Pb") >= 50)'
+    description: "Mixedwood hardwood moist fine"
+  18:
+    sfu: "MC2"
+    rule: '("POLYTYPE" == "FOR")'
+    description: "Mixedwood conifer moist fine"

@@ -1,0 +1,109 @@
+# Forest Unit (SFU) Classification Rules
+# Great Lakes - St. Lawrence (GLSL) SFU SQL V1.03.01.23
+
+name: "GLSL SFU SQL V1.03.01.23"
+description: "Great Lakes - St. Lawrence Forest Units"
+region: "GLSL"
+version: "V1.03.01.23"
+
+rules:
+  1:
+    sfu: "PR"
+    rule: '("Pr" >= 70 && "Pw" <= 30)'
+    description: "Red Pine"
+  2:
+    sfu: "PWUS4"
+    rule: '("Pw" + "Pr" >= 50 && "Pw" > "Pr" && (("Pw" + "Pr") * "OSTKG" >= 30) && ("_Or" + "Ob" + "Ow") < 20)'
+    description: "White Pine 4 Cut Uniform Shelterwood"
+  3:
+    sfu: "PWOR"
+    rule: '(("Pw" + "Pr" + "_Or" + "Ob" + "Ow" >= 50) && "Pw" >= ("_Or" + "Ob" + "Ow") && ("Pw" + "Pr" + "_Or" + "Ob" + "Ow") * "OSTKG" >= 30 && ("_Or" + "Ob" + "Ow") >= 20)'
+    description: "White Pine Red Oak"
+  4:
+    sfu: "PWUSC"
+    rule: '(("Pw" + "Pr" >= 30 && ("Pw" + "Pr") * "OSTKG" >= 30) || ("Pw" >= "He" && "Pw" >= "Sw" && "Pw" > ("Ce" + "Cw") && "Pw" >= "_Or" && "Pw" + "Pr" >= 30 && ("Pw" + "Pr" + "Sw" + "He" + "_Or" + "Pj" + "Ce" + "Cw") * "OSTKG" >= 30 && ("Pw" + "Pr" + "Pj" + "Sw" + "Sb" + "Sr" + "Sx" + "He" + "Bf" + "Ce" + "Cw" + "La") >= 80))'
+    description: "White Pine Conifer Shelterwood"
+  5:
+    sfu: "PWUSH"
+    rule: '(("Pw" >= "Pr" && "Pw" + "Pr" >= 30 && ("Pw" + "Pr") * "OSTKG" >= 30) || ("Pw" >= "Pr" && "Pw" >= "He" && "Pw" >= "Sw" && "Pw" > ("Ce" + "Cw") && "Pw" >= "_Or" && ("Pw" + "Pr") >= 30 && ("Pw" + "Pr" + "Sw" + "He" + "_Or" + "Pj" + "Ce" + "Cw") * "OSTKG" >= 30 && ("Pw" + "Pr" + "Pj" + "Sw" + "Sr" + "Sx" + "Sb" + "He" + "Bf" + "Ce" + "Cw" + "La") < 80))'
+    description: "White Pine Hardwood Shelterwood"
+  6:
+    sfu: "PWST"
+    rule: '(("Pw" + "Pr" >= 30) && ("Pw" + "Pr" >= "He") && ("Pw" + "Pr" >= "Sw") && ("Pw" + "Pr" >= "Sb" + "Sr" + "Sx") && ("Pw" + "Pr" >= ("Ce" + "Cw")) && ("Pw" + "Pr" >= "_OR"))'
+    description: "White Pine Seed Tree"
+  7:
+    sfu: "PJ1"
+    rule: '(("Pj" >= 70) && ("Mh" + "Ab" + "Aw" + "Bd" + "Be" + "Ch" + "Ew" + "Iw" + "_Or" + "_By" + "Ow" + "Ob" + "Po" + "Pt" + "Pb" + "Pl" + "Bw" + "Mr" + "Ms" + "Ax" + "Cb" + "Ex" + "Hi" + "Bn" <= 20))'
+    description: "Jack Pine Pure"
+  8:
+    sfu: "PJ2"
+    rule: '(((("Pj" + "Sb" + "Sr" + "Sx" + "Pr" >= 70) || (("Pj" >= 50) && ("Pj" + "Sb" + "Sr" + "Sx" + "Bf" + "Sw" + "He" + "Pw" + "Pr" + "Ce" + "Cw" + "La" >= 70) && ("Bf" + "Sw" + "He" + "Pw" + "Ce" + "Cw" + "La" <= 20))) && ("Pj" >= "Sb" + "Sr" + "Sx"))'
+    description: "Jack Pine Conifer"
+  9:
+    sfu: "HE"
+    rule: '("He" >= 40)'
+    description: "Hemlock"
+  10:
+    sfu: "CE"
+    rule: '(("Ce" + "Cw" >= 40) && (("Ce" + "Cw") >= "Sb" + "Sr" + "Sx" + "La" + "Bf") && ("Ow" + "Ob" + "Ew" + "Iw" + "Ch" + "Mh" + "Ab" + "Aw" + "Bd" + "Be" + "_Or" + "_By" + "Po" + "Pb" + "Pt" + "Pl" + "Bw" + "Mr" + "Ms" + "Ex" + "Cb" + "Ax" + "Hi" + "Bn" < 30))'
+    description: "Cedar"
+  11:
+    sfu: "SB"
+    rule: '(("Sb" + "Sr" + "Sx" >= 80) && ("Mh" + "Aw" + "Bd" + "Be" + "Ch" + "Iw" + "_Or" + "Ow" + "Ob" + "_By" + "Pr" + "Bn" + "Hi" + "Cb" == 0) && ("Pw" + "Pj" <= 10))'
+    description: "Black Spruce"
+  12:
+    sfu: "LC"
+    rule: '(("Sb" + "Sx" + "Sr" + "Ce" + "Cw" + "La" >= 80) && ("Mh" + "Aw" + "Bd" + "Be" + "Ch" + "Iw" + "_Or" + "Ow" + "Ob" + "_By" + "Pr" + "Cb" + "Hi" + "Bn" == 0) && ("Pw" + "Pj" <= 10))'
+    description: "Lowland Conifer Mixedwood"
+  13:
+    sfu: "SP1"
+    rule: '(("Sb" + "Sw" + "Sr" + "Sx" + "Bf" + "Ce" + "Cw" + "La" + "Pw" + "Pj" + "Pr" + "He" >= 70) && (("Bf" + "Ce" + "Cw" + "Pw" + "La" + "Sw" + "He" <= 20) || ("Pj" >= 30)))'
+    description: "Upland Spruce"
+  14:
+    sfu: "SF"
+    rule: '(("Sw" + "Sr" + "Sb" + "Sx" + "Pw" + "Pr" + "Pj" + "Bf" + "Ce" + "Cw" + "La" + "He" >= 70))'
+    description: "Spruce Fir"
+  15:
+    sfu: "BY"
+    rule: '("_By" >= 40)'
+    description: "Yellow Birch"
+  16:
+    sfu: "OAK"
+    rule: '(("_Or" >= "Mh" + "Be") && ("_Or" >= 30) && ("_Or" + "Mh" + "Aw" + "Ab" + "Be" + "Bd" + "_By" + "Pw" + "Pr" + "Sw" + "He" + "Ax" >= 40))'
+    description: "Red Oak"
+  17:
+    sfu: "HDSL2"
+    rule: '((("Bd" + "Aw" + "Ch" + "_Or" + "Ow" + "Ob" + "Cb" >= 30) || (("Be" + "_Or" + "Ow" + "Ob" >= 30) || ("Be" >= 20))))'
+    description: "Hardwood Selection South"
+  18:
+    sfu: "HDSL1"
+    rule: '(("Mh" + "Aw" + "Bd" + "Be" + "Ch" + "Ew" + "Iw" + "_Or" + "_By" + "Ow" + "Ob" + "He" + "Ex" + "Cb" >= 50) && ("Po" + "Pt" + "Pb" + "Pl" + "Bw" + "Bf" <= 30) && ("OSC" <= 2))'
+    description: "Hardwood Selection North"
+  19:
+    sfu: "LWMW"
+    rule: '(("Ce" + "Cw" + "Ab" + "La" + "Sb" + "Ax" + "Sr" + "Sx" >= 30) && (("Ab" + "Ax" >= 20) || ("Ab" + "Ax" + "Mr" + "Ms" + "_By" >= 30)))'
+    description: "Lowland Mixedwood"
+  20:
+    sfu: "HDUS"
+    rule: '(("Mh" + "Aw" + "Bd" + "Be" + "Ch" + "Ew" + "Iw" + "_Or" + "_By" + "Ow" + "Ob" + "He" + "Cb" + "Hi" + "Ex" + "Bn" >= 50))'
+    description: "Hardwood Shelterwood"
+  21:
+    sfu: "PO"
+    rule: '(("Po" + "Pt" + "Pb" + "Pl" >= 50) && ("Mh" + "Ab" + "Aw" + "Bd" + "Be" + "Ch" + "Ew" + "Iw" + "_Or" + "_By" + "Ow" + "Ob" + "Po" + "Pb" + "Pt" + "Pl" + "Bw" + "Mr" + "Ms" + "Ax" + "Bn" + "Cb" + "Ex" + "Hi" >= 70))'
+    description: "Poplar"
+  22:
+    sfu: "BW"
+    rule: '(("Po" + "Pt" + "Pb" + "Pl" + "Bw" >= 50) && ("Mh" + "Ab" + "Aw" + "Bd" + "Be" + "Ch" + "Ew" + "Iw" + "_Or" + "_By" + "Ow" + "Ob" + "Po" + "Pt" + "Pb" + "Pl" + "Bw" + "Mr" + "Ms" + "Ax" + "Bn" + "Cb" + "Ex" + "Hi" >= 70))'
+    description: "White Birch"
+  23:
+    sfu: "MWUS"
+    rule: '((("Sw" + "Pw" + "Pr" + "Ce" + "Cw" + "Mh" + "_By" + "Aw" + "Ch" + "Bd" + "_Or" + "Ow" + "Ob" + "Iw" + "Be" + "He" + "Cb" + "Hi" + "Bn") * "OSTKG" >= 30))'
+    description: "Mixedwood Shelterwood"
+  24:
+    sfu: "MWD"
+    rule: '("Pj" + "Pw" + "Pr" >= 20)'
+    description: "Mixedwood Dry"
+  25:
+    sfu: "MWR"
+    rule: '("POLYTYPE" == "FOR")'
+    description: "Mixedwood Rich"

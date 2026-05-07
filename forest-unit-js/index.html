@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ontario Forest Unit Analysis Tool</title>
+  <script type="module" crossorigin src="./assets/index-DqczXKxP.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/vendor-C5Clm1IL.js">
+  <link rel="stylesheet" crossorigin href="./assets/index-DXt1tPEG.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header>
+            <div class="header-content">
+                <img src="./ON_POS_LOGO_MAGENTA_RGB.PNG" alt="Ontario Logo" class="ontario-logo">
+                <div class="header-text">
+                    <h1>🌲 Forest Unit Analysis Tool</h1>
+                    <p>Parse SPCOMP strings and assign forest units based on rule sets</p>
+                </div>
+                <button id="yaml-tools-btn" class="btn-about btn-yaml-tools" title="YAML Rule Set Tools">⚙️ YAML Tools</button>
+                <button id="about-btn" class="btn-about" title="About this application">ℹ️ About</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <!-- File Upload Section -->
+            <section id="upload-section" class="section">
+                <h2>1. Upload CSV File</h2>
+                <div id="drop-zone" class="drop-zone">
+                    <p>📁 Drag and drop your CSV file here</p>
+                    <p>or</p>
+                    <button id="browse-btn" class="btn btn-primary">Browse Files</button>
+                    <input type="file" id="file-input" accept=".csv" style="display: none;">
+                </div>
+                <div id="file-info" class="file-info" style="display: none;"></div>
+            </section>
+
+            <!-- Configuration Section -->
+            <section id="config-section" class="section" style="display: none;">
+                <h2>2. Configure Processing</h2>
+                <div class="config-form">
+                    <div class="form-group">
+                        <label>Forest Unit Rule Sets <small>(select 2+ to compare)</small>:</label>
+                        <div class="rule-set-controls">
+                            <button type="button" id="select-all-rs" class="btn-link">Select All</button>
+                            <span>|</span>
+                            <button type="button" id="deselect-all-rs" class="btn-link">Deselect All</button>
+                        </div>
+                        <div id="rule-set-list" class="rule-set-checklist">
+                            <!-- Populated dynamically from YAML rule files -->
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Load Custom Rule Set (YAML):</label>
+                        <div class="yaml-upload-row">
+                            <button id="load-yaml-btn" class="btn btn-secondary">📂 Load YAML File</button>
+                            <input type="file" id="yaml-file-input" accept=".yml,.yaml" style="display: none;">
+                            <span id="yaml-status" class="yaml-status"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="area-column">Area Column:</label>
+                        <select id="area-column" class="form-control">
+                            <option value="">None (use record count)</option>
+                        </select>
+                        <small id="area-column-hint" class="form-hint"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="spcomp-field">SPCOMP Field Name:</label>
+                        <input type="text" id="spcomp-field" class="form-control" value="SPCOMP">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sfu-column">Prior SFU Column <small>(optional, for AU rule sets)</small>:</label>
+                        <input type="text" id="sfu-column" class="form-control" placeholder="e.g. SFU or PLANFU">
+                        <small class="form-hint">If running an AU rule set (e.g. NER_Boreal_AU_SUCC), enter the CSV column that holds the previously-assigned Forest Unit. Leave blank if the column is already named SFU.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ecosite-column">Ecosite Column <small>(optional)</small>:</label>
+                        <input type="text" id="ecosite-column" class="form-control" placeholder="e.g. PRI_ECO">
+                        <small class="form-hint">If your rules use Ecosite conditions and your CSV has a MNR FIM ecosite column (e.g. PRI_ECO), enter it here. The first 4 characters (e.g. B127) will be extracted automatically as Ecosite_GeoRangeAndNumber. Leave blank if your CSV already has an Ecosite_GeoRangeAndNumber column.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="all-matches-mode">
+                            Show all matching rules <small>(adds AllMatches &amp; MatchCount columns)</small>
+                        </label>
+                    </div>
+                    
+                    <button id="process-btn" class="btn btn-success">🚀 Process Data</button>
+                </div>
+            </section>
+
+            <!-- Processing Section -->
+            <section id="processing-section" class="section" style="display: none;">
+                <h2>⏳ Processing...</h2>
+                <div class="progress-bar">
+                    <div id="progress" class="progress-fill"></div>
+                </div>
+                <p id="status-text">Starting processing...</p>
+            </section>
+
+            <!-- Results Section -->
+            <section id="results-section" class="section" style="display: none;">
+                <h2>✅ Results</h2>
+                
+                <div class="results-summary">
+                    <div class="summary-card">
+                        <h3>Total Records</h3>
+                        <p id="total-records" class="stat">0</p>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Successfully Assigned</h3>
+                        <p id="assigned-records" class="stat">0</p>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Unassigned</h3>
+                        <p id="unassigned-records" class="stat">0</p>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Anomalies</h3>
+                        <p id="anomaly-count" class="stat">0</p>
+                    </div>
+                </div>
+
+                <div class="results-actions">
+                    <button id="download-csv-btn" class="btn btn-primary">📊 Download Results CSV</button>
+                    <button id="download-report-btn" class="btn btn-primary">📄 Download HTML Report</button>
+                    <button id="reset-btn" class="btn btn-secondary">🔄 Process Another File</button>
+                </div>
+
+                <!-- Results Table -->
+                <div id="results-table-container" class="table-container">
+                    <h3>Preview (First 100 rows)</h3>
+                    <div id="results-table"></div>
+                </div>
+            </section>
+            <!-- Comparison Section -->
+            <section id="comparison-section" class="section" style="display: none;">
+                <h2>📊 Rule Set Comparison</h2>
+
+                <div class="results-summary">
+                    <div class="summary-card">
+                        <h3>Total Records</h3>
+                        <p id="comp-total-records" class="stat">0</p>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Rule Sets</h3>
+                        <p id="comp-ruleset-count" class="stat">0</p>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Forest Units</h3>
+                        <p id="comp-sfu-count" class="stat">0</p>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Area Unit</h3>
+                        <p id="comp-area-unit" class="stat">ha</p>
+                    </div>
+                </div>
+
+                <div class="comparison-controls">
+                    <div class="form-group">
+                        <label for="baseline-select">Baseline Rule Set:</label>
+                        <select id="baseline-select" class="form-control"></select>
+                    </div>
+                </div>
+
+                <div class="comparison-chart-container">
+                    <canvas id="comparison-chart"></canvas>
+                </div>
+
+                <div id="comparison-table-container" class="table-container"></div>
+
+                <div class="results-actions">
+                    <button id="download-comparison-csv" class="btn btn-primary">📊 Download Comparison CSV</button>
+                    <button id="download-merged-csv" class="btn btn-primary">📋 Download Full Results CSV</button>
+                    <button id="comparison-reset-btn" class="btn btn-secondary">🔄 Process Another File</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <p>Ontario Ministry of Natural Resources | Forest Unit Analysis Tool v2.0</p>
+            <p>💡 All processing happens in your browser - no data is sent to any server</p>
+        </footer>
+    </div>
+
+    <!-- About Modal -->
+    <div id="about-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div class="about-header">
+                <img src="./ON_POS_LOGO_MAGENTA_RGB.PNG" alt="Ontario Logo" class="about-logo">
+                <h2>Forest Unit Analysis Tool</h2>
+            </div>
+            
+            <div class="about-body">
+                <p class="version"><strong>Version 2.0.0</strong></p>
+                
+                <h3>Development Team:</h3>
+                <ul>
+                    <li><strong>Regional Analyst:</strong> Mark Zhang</li>
+                    <li>Resource Planning Unit, Regional Operations Division (ROD), MNR</li>
+                </ul>
+                
+                <h3>Collaborators:</h3>
+                <ul>
+                    <li>To be added later</li>
+                </ul>
+                
+                <h3>License Information:</h3>
+                <p>This application is built with modern web technologies and open-source components.</p>
+                
+                <h4>Web Technologies:</h4>
+                <ul>
+                    <li>Vite (MIT License)</li>
+                    <li>Papa Parse (MIT License)</li>
+                    <li>Chart.js (MIT License)</li>
+                    <li>Lodash (MIT License)</li>
+                    <li>js-yaml (MIT License)</li>
+                </ul>
+                
+                <h4>Application License: MIT License</h4>
+                <p><strong>Copyright © 2024–2026 Government of Ontario</strong></p>
+                
+                <p class="license-text">
+                    Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+                    and associated documentation files (the "Software"), to deal in the Software without
+                    restriction, including without limitation the rights to use, copy, modify, merge, publish,
+                    distribute, sublicense, and/or sell copies of the Software.
+                </p>
+                
+                <div class="about-features">
+                    <h3>Features:</h3>
+                    <ul>
+                        <li>✅ Parse Ontario SPCOMP format (flexible and strict parsing)</li>
+                        <li>✅ YAML-based rule sets loaded at startup</li>
+                        <li>✅ Upload custom YAML rule files at runtime</li>
+                        <li>✅ Cross-rule-set comparison with diverging bar chart</li>
+                        <li>✅ Area column auto-detection (m², ha, record count)</li>
+                        <li>✅ Comprehensive HTML reports with charts</li>
+                        <li>✅ CSV export functionality</li>
+                        <li>✅ 100% browser-based — no server required</li>
+                        <li>✅ All data processing happens locally (privacy guaranteed)</li>
+                    </ul>
+                </div>
+                
+                <p class="about-footer">
+                    <strong>Ontario Ministry of Natural Resources</strong><br>
+                    Regional Operations Division (ROD) | Resource Planning Unit
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- YAML Tools Modal -->
+    <div id="yaml-tools-modal" class="modal" style="display: none;">
+        <div class="modal-content yaml-tools-modal-content">
+            <span class="modal-close" id="yaml-tools-close">&times;</span>
+
+            <!-- Modal Header -->
+            <div class="yaml-tools-header">
+                <h2>⚙️ YAML Rule Set Tools</h2>
+                <p>Edit bundled rule sets, validate custom YAML, or convert SQL dictionaries</p>
+            </div>
+
+            <!-- Tab Bar -->
+            <div class="yaml-tools-tabs">
+                <button class="yaml-tab-btn active" data-tab="editor">✏️ YAML Editor</button>
+                <button class="yaml-tab-btn" data-tab="converter">🔄 SQL Converter</button>
+            </div>
+
+            <!-- ── YAML Editor panel ─────────────────────────────── -->
+            <div class="yaml-tab-panel" data-panel="editor">
+
+                <div class="yaml-editor-toolbar">
+                    <select id="yaml-load-select" class="form-control yaml-load-select">
+                        <option value="">— select a bundled rule set —</option>
+                    </select>
+                    <button id="yaml-load-into-editor" class="btn btn-secondary btn-sm">📥 Load</button>
+                </div>
+
+                <textarea
+                    id="yaml-editor-text"
+                    class="yaml-editor-textarea"
+                    spellcheck="false"
+                    placeholder="Paste or load YAML here…"></textarea>
+
+                <div class="yaml-editor-actions">
+                    <button id="yaml-validate-btn" class="btn btn-secondary">✓ Validate</button>
+                    <button id="yaml-use-btn" class="btn btn-success" disabled>✅ Use as Rule Set</button>
+                    <button id="yaml-download-btn" class="btn btn-secondary">💾 Download YAML</button>
+                </div>
+
+                <div id="yaml-editor-status" class="yaml-tools-status"></div>
+
+                <p class="conv-hint">The <strong>Use as Rule Set</strong> button loads the validated rule set into the classifier — it will appear in the rule set checklist automatically.</p>
+            </div>
+
+            <!-- ── SQL Converter panel ───────────────────────────── -->
+            <div class="yaml-tab-panel" data-panel="converter" style="display: none;">
+
+                <div class="conv-hint" style="margin-bottom: 14px;">
+                    Convert ArcGIS-style SQL rule sets to YAML.
+                    Supports <strong>Python dict</strong> files (the <code>.py</code> source) and
+                    <strong>CSV / Excel-export</strong> two-column tables (SFU | SQL).
+                </div>
+
+                <!-- Format selector -->
+                <div class="radio-group" style="margin-bottom: 16px;">
+                    <label><input type="radio" name="conv-format" value="python" checked> Python dict (<code>.py</code>)</label>
+                    <label style="margin-left: 20px;"><input type="radio" name="conv-format" value="csv"> CSV / Excel table (<code>.csv</code>)</label>
+                </div>
+
+                <!-- Python panel -->
+                <div id="conv-python-panel" class="conv-panel">
+                    <div class="yaml-editor-toolbar" style="margin-bottom: 8px;">
+                        <span class="conv-hint">Paste Python source, or upload a <code>.py</code> file:</span>
+                        <label class="btn btn-secondary btn-sm" style="cursor:pointer; margin-bottom:0;">
+                            📂 Upload .py
+                            <input type="file" id="conv-python-file" accept=".py,.txt" style="display:none;">
+                        </label>
+                    </div>
+                    <textarea
+                        id="conv-python-text"
+                        class="yaml-editor-textarea"
+                        style="min-height: 180px;"
+                        spellcheck="false"
+                        placeholder="NER_Boreal_SRNV2024 = {
+    1:  ['PR1',     &quot;&quot;&quot; (&quot;Pr&quot; >= 70) And &lt;user_defined_sfu_field_name&gt; Is Null &quot;&quot;&quot;, &quot;&quot;, &quot;&quot;&quot;Red pine, plantations&quot;&quot;&quot;],
+    ...
+}"></textarea>
+                    <div class="yaml-editor-actions" style="margin-top: 8px;">
+                        <button id="conv-parse-btn" class="btn btn-secondary">🔍 Parse Dicts</button>
+                    </div>
+                    <div id="conv-dict-row" class="yaml-editor-toolbar" style="margin-top: 10px; display: none;">
+                        <select id="conv-select-dict" class="form-control yaml-load-select"></select>
+                        <button id="conv-convert-py-btn" class="btn btn-primary btn-sm">⚡ Convert</button>
+                    </div>
+                </div>
+
+                <!-- CSV panel -->
+                <div id="conv-csv-panel" class="conv-panel" style="display: none;">
+                    <div class="yaml-editor-toolbar" style="margin-bottom: 8px;">
+                        <span class="conv-hint">Paste CSV rows, or upload a <code>.csv</code> / <code>.txt</code> file:</span>
+                        <label class="btn btn-secondary btn-sm" style="cursor:pointer; margin-bottom:0;">
+                            📂 Upload CSV
+                            <input type="file" id="conv-csv-file" accept=".csv,.txt" style="display:none;">
+                        </label>
+                    </div>
+                    <textarea
+                        id="conv-csv-text"
+                        class="yaml-editor-textarea"
+                        style="min-height: 160px;"
+                        spellcheck="false"
+                        placeholder="[FU DESCRIPTION]
+Forest Unit SQL for EcoRegion 4e...
+[FU DEFINITIONS]
+PR1,Pr>=70 and Pw&lt;30
+PW1,Pw>=70 and Pr&lt;30
+..."></textarea>
+                    <div class="yaml-editor-toolbar" style="margin-top: 10px;">
+                        <label class="conv-hint" style="white-space:nowrap;">Rule set name:</label>
+                        <input type="text" id="conv-csv-name" class="form-control"
+                               placeholder="My_Custom_Rules" style="flex:1; margin: 0 8px;">
+                        <button id="conv-convert-csv-btn" class="btn btn-primary btn-sm">⚡ Convert</button>
+                    </div>
+                </div>
+
+                <div id="conv-status" class="yaml-tools-status" style="margin-top: 10px;"></div>
+
+                <!-- Conversion result -->
+                <div id="conv-result-panel" style="display: none; margin-top: 16px;">
+                    <hr style="border-color: #e0e0e0; margin-bottom: 14px;">
+                    <div id="conv-warnings" class="conv-warnings" style="display: none;"></div>
+                    <textarea
+                        id="conv-result-yaml"
+                        class="yaml-editor-textarea"
+                        style="min-height: 220px;"
+                        spellcheck="false"
+                        readonly></textarea>
+                    <div class="yaml-editor-actions" style="margin-top: 8px;">
+                        <button id="conv-edit-btn" class="btn btn-secondary">✏️ Edit in YAML Editor</button>
+                        <button id="conv-use-btn" class="btn btn-success">✅ Use Directly</button>
+                        <button id="conv-download-btn" class="btn btn-secondary">💾 Download</button>
+                    </div>
+                </div>
+
+            </div><!-- /converter panel -->
+
+        </div><!-- /modal-content -->
+    </div><!-- /yaml-tools-modal -->
+
+    <!-- Main application script -->
+</body>
+</html>
