@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ontario Forest Unit Analysis Tool</title>
-  <script type="module" crossorigin src="./assets/index-D4-1dAFX.js"></script>
+  <script type="module" crossorigin src="./assets/index-DqczXKxP.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/vendor-C5Clm1IL.js">
   <link rel="stylesheet" crossorigin href="./assets/index-DXt1tPEG.css">
 </head>
@@ -73,6 +73,18 @@
                     <div class="form-group">
                         <label for="spcomp-field">SPCOMP Field Name:</label>
                         <input type="text" id="spcomp-field" class="form-control" value="SPCOMP">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sfu-column">Prior SFU Column <small>(optional, for AU rule sets)</small>:</label>
+                        <input type="text" id="sfu-column" class="form-control" placeholder="e.g. SFU or PLANFU">
+                        <small class="form-hint">If running an AU rule set (e.g. NER_Boreal_AU_SUCC), enter the CSV column that holds the previously-assigned Forest Unit. Leave blank if the column is already named SFU.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ecosite-column">Ecosite Column <small>(optional)</small>:</label>
+                        <input type="text" id="ecosite-column" class="form-control" placeholder="e.g. PRI_ECO">
+                        <small class="form-hint">If your rules use Ecosite conditions and your CSV has a MNR FIM ecosite column (e.g. PRI_ECO), enter it here. The first 4 characters (e.g. B127) will be extracted automatically as Ecosite_GeoRangeAndNumber. Leave blank if your CSV already has an Ecosite_GeoRangeAndNumber column.</small>
                     </div>
 
                     <div class="form-group">
