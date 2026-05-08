@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ontario Forest Unit Analysis Tool</title>
-  <script type="module" crossorigin src="./assets/index-DqczXKxP.js"></script>
+    <title>Ontario Forest Unit Analysis Tool</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script type="module" crossorigin src="./assets/index-Dtuo1r0n.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/vendor-C5Clm1IL.js">
-  <link rel="stylesheet" crossorigin href="./assets/index-DXt1tPEG.css">
+  <link rel="stylesheet" crossorigin href="./assets/index-DSDGz1Si.css">
 </head>
 <body>
     <div id="app">
@@ -72,19 +75,20 @@
 
                     <div class="form-group">
                         <label for="spcomp-field">SPCOMP Field Name:</label>
-                        <input type="text" id="spcomp-field" class="form-control" value="SPCOMP">
+                        <select id="spcomp-field" class="form-control"></select>
+                        <small id="spcomp-field-hint" class="form-hint"></small>
                     </div>
 
                     <div class="form-group">
                         <label for="sfu-column">Prior SFU Column <small>(optional, for AU rule sets)</small>:</label>
-                        <input type="text" id="sfu-column" class="form-control" placeholder="e.g. SFU or PLANFU">
-                        <small class="form-hint">If running an AU rule set (e.g. NER_Boreal_AU_SUCC), enter the CSV column that holds the previously-assigned Forest Unit. Leave blank if the column is already named SFU.</small>
+                        <select id="sfu-column" class="form-control"></select>
+                        <small id="sfu-column-hint" class="form-hint"></small>
                     </div>
 
                     <div class="form-group">
                         <label for="ecosite-column">Ecosite Column <small>(optional)</small>:</label>
-                        <input type="text" id="ecosite-column" class="form-control" placeholder="e.g. PRI_ECO">
-                        <small class="form-hint">If your rules use Ecosite conditions and your CSV has a MNR FIM ecosite column (e.g. PRI_ECO), enter it here. The first 4 characters (e.g. B127) will be extracted automatically as Ecosite_GeoRangeAndNumber. Leave blank if your CSV already has an Ecosite_GeoRangeAndNumber column.</small>
+                        <select id="ecosite-column" class="form-control"></select>
+                        <small id="ecosite-column-hint" class="form-hint"></small>
                     </div>
 
                     <div class="form-group">
@@ -181,6 +185,7 @@
                 <div class="results-actions">
                     <button id="download-comparison-csv" class="btn btn-primary">📊 Download Comparison CSV</button>
                     <button id="download-merged-csv" class="btn btn-primary">📋 Download Full Results CSV</button>
+                    <button id="download-comparison-report" class="btn btn-primary">📄 Download Comparison Report</button>
                     <button id="comparison-reset-btn" class="btn btn-secondary">🔄 Process Another File</button>
                 </div>
             </section>
