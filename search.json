@@ -28,11 +28,60 @@
     "text": "Conference Presentations\n\nZhang, Y. 2017. Plant biodiversity and ecosystem functioning relationships in boreal and subtropical forests. Young Ecologists’ Forum of Terrestrial Ecosystems.\nZhang, Y. 2016. Plant biodiversity and ecosystem functioning relationships in boreal forests. Ecological Society of China Conference.\nZhang, Y. 2013. Environmental drivers of species diversity differ with vegetation strata in natural forests. Ecological Society of America Annual Meeting.\nZhang, Y. 2012. Quantifying the relative importance of climate and local conditions on tree species richness and evenness. Forest Ecosystem Science Co-operative Inc., Thunder Bay, ON.\nZhang, Y. 2010. The complexity of diversity–productivity relationship in natural forests. CONFOR Graduate Student Conference, Thunder Bay, ON.\nZhang, Y. 2009. The extent of life-history traits drives diversity–productivity relationship in forest ecosystems. Sustainable Forestry Management Network Conference, Poster Session, Gatineau, QC."
   },
   {
-    "objectID": "contact.html",
-    "href": "contact.html",
-    "title": "Contact",
+    "objectID": "forest-unit-js/HOW_TO_USE.html",
+    "href": "forest-unit-js/HOW_TO_USE.html",
+    "title": "📦 Distribution Package - For End Users",
     "section": "",
-    "text": "The best way to reach me is through the channels below.\nFor questions or issues with a specific tool, please open a GitHub Issue in the relevant repository — that keeps the conversation visible and searchable for other users.\n\n\nEmail: lifestyle_Zion@protonmail.com\nGitHub: github.com/rinecology\nLinkedIn: linkedin.com/in/zhangyuplantecologist"
+    "text": "This is the ready-to-use Forest Unit Analysis Tool web app. No installation required!\n\n\n\n\n\nRequirements: - Python installed (most Windows 10/11 have it) - Or Node.js installed\n\n\n\nOpen PowerShell in this folder\nRun:\npython -m http.server 8000\nOpen browser to: http://localhost:8000\n\n\n\n\n\nOpen PowerShell in this folder\nRun:\nnpx serve\nOpen browser to the URL shown (usually http://localhost:3000)\n\n\n\n\n\n\nOpen this folder in VS Code\nRight-click index.html\nSelect “Open with Live Server”\n\n\n\n\n\nDouble-click index.html\n⚠️ Note: Some features may not work due to browser security restrictions\n\n\n\n\n\n\ndist/\n├── index.html          # Main application file\n├── START_APP.bat       # Windows launcher (double-click to run)\n├── START_APP.ps1       # PowerShell launcher\n├── README.md           # End user guide\n├── HOW_TO_USE.md       # This file\n└── assets/\n    ├── vendor-*.js     # Libraries (PapaParse, Lodash, Chart.js)\n    ├── index-*.js      # Application code\n    └── index-*.css     # Styles\nEverything is self-contained! No internet connection needed after opening.\n\n\n\n\n\n\n# Copy to shared drive\nCopy-Item -Recurse * Z:\\shared\\forest-tool\\\n\n# Users access via:\n# Start Python HTTP server in that folder, or\n# Use IIS/Apache to serve the folder\n\n\n\n\nCopy dist/ contents to IIS web folder\nCreate new website in IIS Manager\nPoint to the folder\nUsers access via: http://your-server/forest-tool\n\n\n\n\nSame as IIS - just copy files to web root.\n\n\n\n\n\nAll processing happens in the user’s browser. - ✅ No data is uploaded to any server - ✅ CSV files are processed locally - ✅ Results are generated in browser memory - ✅ No external network requests (except initial page load)\n\n\n\n\nProblem: “Access-Control-Allow-Origin” error Solution: Don’t open index.html directly. Use HTTP server (Method 1)\nProblem: Page loads but app doesn’t work Solution: Clear browser cache (Ctrl+Shift+Delete)\nProblem: Can’t upload files Solution: Make sure you’re using a modern browser (Chrome 90+, Edge 90+, Firefox 88+)\nProblem: File size limit Solution: Maximum file size is ~100 MB (browser memory limit). Split large files into smaller batches.\n\n\n\n\nFor technical support, contact: [your-contact-info]\nDocumentation: See README files in the repository\n\nBuilt for Ontario Ministry of Natural Resources and Forestry 🌲🍁"
+  },
+  {
+    "objectID": "forest-unit-js/HOW_TO_USE.html#what-this-is",
+    "href": "forest-unit-js/HOW_TO_USE.html#what-this-is",
+    "title": "📦 Distribution Package - For End Users",
+    "section": "",
+    "text": "This is the ready-to-use Forest Unit Analysis Tool web app. No installation required!"
+  },
+  {
+    "objectID": "forest-unit-js/HOW_TO_USE.html#how-to-use",
+    "href": "forest-unit-js/HOW_TO_USE.html#how-to-use",
+    "title": "📦 Distribution Package - For End Users",
+    "section": "",
+    "text": "Requirements: - Python installed (most Windows 10/11 have it) - Or Node.js installed\n\n\n\nOpen PowerShell in this folder\nRun:\npython -m http.server 8000\nOpen browser to: http://localhost:8000\n\n\n\n\n\nOpen PowerShell in this folder\nRun:\nnpx serve\nOpen browser to the URL shown (usually http://localhost:3000)\n\n\n\n\n\n\nOpen this folder in VS Code\nRight-click index.html\nSelect “Open with Live Server”\n\n\n\n\n\nDouble-click index.html\n⚠️ Note: Some features may not work due to browser security restrictions"
+  },
+  {
+    "objectID": "forest-unit-js/HOW_TO_USE.html#whats-included",
+    "href": "forest-unit-js/HOW_TO_USE.html#whats-included",
+    "title": "📦 Distribution Package - For End Users",
+    "section": "",
+    "text": "dist/\n├── index.html          # Main application file\n├── START_APP.bat       # Windows launcher (double-click to run)\n├── START_APP.ps1       # PowerShell launcher\n├── README.md           # End user guide\n├── HOW_TO_USE.md       # This file\n└── assets/\n    ├── vendor-*.js     # Libraries (PapaParse, Lodash, Chart.js)\n    ├── index-*.js      # Application code\n    └── index-*.css     # Styles\nEverything is self-contained! No internet connection needed after opening."
+  },
+  {
+    "objectID": "forest-unit-js/HOW_TO_USE.html#for-it-departments",
+    "href": "forest-unit-js/HOW_TO_USE.html#for-it-departments",
+    "title": "📦 Distribution Package - For End Users",
+    "section": "",
+    "text": "# Copy to shared drive\nCopy-Item -Recurse * Z:\\shared\\forest-tool\\\n\n# Users access via:\n# Start Python HTTP server in that folder, or\n# Use IIS/Apache to serve the folder\n\n\n\n\nCopy dist/ contents to IIS web folder\nCreate new website in IIS Manager\nPoint to the folder\nUsers access via: http://your-server/forest-tool\n\n\n\n\nSame as IIS - just copy files to web root."
+  },
+  {
+    "objectID": "forest-unit-js/HOW_TO_USE.html#privacy-notice",
+    "href": "forest-unit-js/HOW_TO_USE.html#privacy-notice",
+    "title": "📦 Distribution Package - For End Users",
+    "section": "",
+    "text": "All processing happens in the user’s browser. - ✅ No data is uploaded to any server - ✅ CSV files are processed locally - ✅ Results are generated in browser memory - ✅ No external network requests (except initial page load)"
+  },
+  {
+    "objectID": "forest-unit-js/HOW_TO_USE.html#troubleshooting",
+    "href": "forest-unit-js/HOW_TO_USE.html#troubleshooting",
+    "title": "📦 Distribution Package - For End Users",
+    "section": "",
+    "text": "Problem: “Access-Control-Allow-Origin” error Solution: Don’t open index.html directly. Use HTTP server (Method 1)\nProblem: Page loads but app doesn’t work Solution: Clear browser cache (Ctrl+Shift+Delete)\nProblem: Can’t upload files Solution: Make sure you’re using a modern browser (Chrome 90+, Edge 90+, Firefox 88+)\nProblem: File size limit Solution: Maximum file size is ~100 MB (browser memory limit). Split large files into smaller batches."
+  },
+  {
+    "objectID": "forest-unit-js/HOW_TO_USE.html#support",
+    "href": "forest-unit-js/HOW_TO_USE.html#support",
+    "title": "📦 Distribution Package - For End Users",
+    "section": "",
+    "text": "For technical support, contact: [your-contact-info]\nDocumentation: See README files in the repository\n\nBuilt for Ontario Ministry of Natural Resources and Forestry 🌲🍁"
   },
   {
     "objectID": "about.html",
@@ -82,6 +131,13 @@
     "title": "About",
     "section": "Tools & Technologies",
     "text": "Tools & Technologies\n\n\n\nCategory\nTechnologies\n\n\n\n\nLanguages\nR, JavaScript (ES2020+), PowerShell, Python\n\n\nFrameworks\nShiny, Quarto, Leaflet, terra, lidR\n\n\nForest Modeling\nSFMM/FSOS, Patchworks, Woodstock, SLYM, MIST\n\n\nSpatial\nArcGIS Pro, QGIS, Ontario GeoHub APIs, WebGL\n\n\nVisualization\nPower BI (DAX, Power Query), ggplot2, Leaflet\n\n\nWorkflow\nGit, GitHub, CSV/Shapefile/LiDAR pipelines"
+  },
+  {
+    "objectID": "contact.html",
+    "href": "contact.html",
+    "title": "Contact",
+    "section": "",
+    "text": "The best way to reach me is through the channels below.\nFor questions or issues with a specific tool, please open a GitHub Issue in the relevant repository — that keeps the conversation visible and searchable for other users.\n\n\nEmail: lifestyle_Zion@protonmail.com\nGitHub: github.com/rinecology\nLinkedIn: linkedin.com/in/zhangyuplantecologist"
   },
   {
     "objectID": "index.html",
