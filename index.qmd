@@ -107,6 +107,7 @@ handled upstream by FRI DataKit.
 **Tech:** R, Shiny, PowerShell  
 **Live Demo — SLYM Visualization and Reporting:** [rinecology.github.io/slym-companion/slym_cutter_fastball.html](https://rinecology.github.io/slym-companion/slym_cutter_fastball.html)  
 **Live Demo — SLYM-READY Data Processor:** [rinecology.github.io/slym-companion/slym_processor_fastball.html](https://rinecology.github.io/slym-companion/slym_processor_fastball.html)  
+**Live Demo — SLYM Visulization with BIOMASS module (working in progress) :** [https://rinecology.github.io/slym-companion/slym_cutter_fireball_WIP.html](https://rinecology.github.io/slym-companion/slym_cutter_fireball_WIP.html)
 **Source:** [github.com/rinecology/slym-companion-dist](https://github.com/rinecology/slym-companion-dist)  
 **Download:** Available as a zip via GitHub Releases in the above repo
 
