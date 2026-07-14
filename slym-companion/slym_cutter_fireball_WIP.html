@@ -284,7 +284,7 @@
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="typeStand">
                     <label class="form-check-label" for="typeStand">
-                        STAND (background)
+                        STAND / POLYGON (background)
                     </label>
                 </div>
             </div>
@@ -312,6 +312,49 @@
                 <div class="btn-group-custom">
                     <button class="btn btn-sm btn-outline-primary" id="selectAllStrataYield">Select All</button>
                     <button class="btn btn-sm btn-outline-secondary" id="selectNoneStrataYield">Deselect All</button>
+                </div>
+            </div>
+
+            <!-- GLSL finer STRATA filters (shown only when SILSYS/CUT/AGSFRC present) -->
+            <div id="glslVolumeSection" style="display: none;">
+                <div class="alert alert-info py-2 px-2 small mb-2" id="glslVolumeBadge">
+                    <strong>GLSL input detected</strong> — selection (SE) strata use CUT · AGSFRC · SI
+                </div>
+                <div class="filter-section" id="silsysSection">
+                    <label>🪵 Silvicultural System (SILSYS)</label>
+                    <div class="checkbox-group" id="silsysCheckboxes">
+                        <p class="text-muted small">Upload a GLSL file to see options</p>
+                    </div>
+                    <div class="btn-group-custom">
+                        <button class="btn btn-sm btn-outline-primary" id="selectAllSilSys">Select All</button>
+                        <button class="btn btn-sm btn-outline-secondary" id="selectNoneSilSys">Deselect All</button>
+                    </div>
+                </div>
+                <div class="filter-section" id="cutSection">
+                    <label>✂️ CUT (selection SE) — 0 = not previously harvested, 1 = previously harvested</label>
+                    <div class="checkbox-group" id="cutCheckboxes"></div>
+                    <div class="btn-group-custom">
+                        <button class="btn btn-sm btn-outline-primary" id="selectAllCut">Select All</button>
+                        <button class="btn btn-sm btn-outline-secondary" id="selectNoneCut">Deselect All</button>
+                    </div>
+                </div>
+                <div class="filter-section" id="agsfrcSection">
+                    <label>📐 AGS Fraction (AGSFRC, SE)</label>
+                    <div class="checkbox-group" id="agsfrcCheckboxes" style="max-height: 140px;"></div>
+                    <div class="btn-group-custom">
+                        <button class="btn btn-sm btn-outline-primary" id="selectAllAgsfrc">Select All</button>
+                        <button class="btn btn-sm btn-outline-secondary" id="selectNoneAgsfrc">Deselect All</button>
+                    </div>
+                    <small class="text-muted">Defaults to a single AGS level — expand to compare more SE strata curves.</small>
+                </div>
+                <div class="filter-section" id="strataSiSection">
+                    <label>📏 Site Index SI (SE strata)</label>
+                    <div class="checkbox-group" id="strataSiCheckboxes" style="max-height: 140px;"></div>
+                    <div class="btn-group-custom">
+                        <button class="btn btn-sm btn-outline-primary" id="selectAllStrataSi">Select All</button>
+                        <button class="btn btn-sm btn-outline-secondary" id="selectNoneStrataSi">Deselect All</button>
+                    </div>
+                    <small class="text-muted">Defaults to median SI — each SI is a separate SE curve.</small>
                 </div>
             </div>
             
@@ -489,7 +532,7 @@
                 </div>
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="bioTypeStand" checked>
-                    <label class="form-check-label" for="bioTypeStand">STAND (individual)</label>
+                    <label class="form-check-label" for="bioTypeStand">STAND / POLYGON (individual)</label>
                 </div>
             </div>
             
@@ -526,6 +569,45 @@
                 <div class="btn-group-custom">
                     <button class="btn btn-sm btn-outline-primary" id="selectAllBioLeadspc">All</button>
                     <button class="btn btn-sm btn-outline-secondary" id="selectNoneBioLeadspc">None</button>
+                </div>
+            </div>
+
+            <!-- Biomass GLSL finer STRATA filters -->
+            <div id="glslBiomassSection" style="display:none;">
+                <div class="alert alert-info py-2 px-2 small mb-2">
+                    <strong>GLSL biomass</strong> — SE strata use CUT · AGSFRC · SI
+                </div>
+                <div class="filter-section">
+                    <label>🪵 SILSYS</label>
+                    <div class="checkbox-group" id="bioSilSysCheckboxes"></div>
+                    <div class="btn-group-custom">
+                        <button class="btn btn-sm btn-outline-primary" id="selectAllBioSilSys">All</button>
+                        <button class="btn btn-sm btn-outline-secondary" id="selectNoneBioSilSys">None</button>
+                    </div>
+                </div>
+                <div class="filter-section">
+                    <label>✂️ CUT (SE)</label>
+                    <div class="checkbox-group" id="bioCutCheckboxes"></div>
+                    <div class="btn-group-custom">
+                        <button class="btn btn-sm btn-outline-primary" id="selectAllBioCut">All</button>
+                        <button class="btn btn-sm btn-outline-secondary" id="selectNoneBioCut">None</button>
+                    </div>
+                </div>
+                <div class="filter-section">
+                    <label>📐 AGSFRC (SE)</label>
+                    <div class="checkbox-group" id="bioAgsfrcCheckboxes" style="max-height:140px;"></div>
+                    <div class="btn-group-custom">
+                        <button class="btn btn-sm btn-outline-primary" id="selectAllBioAgsfrc">All</button>
+                        <button class="btn btn-sm btn-outline-secondary" id="selectNoneBioAgsfrc">None</button>
+                    </div>
+                </div>
+                <div class="filter-section">
+                    <label>📏 SI (SE strata)</label>
+                    <div class="checkbox-group" id="bioStrataSiCheckboxes" style="max-height:140px;"></div>
+                    <div class="btn-group-custom">
+                        <button class="btn btn-sm btn-outline-primary" id="selectAllBioStrataSi">All</button>
+                        <button class="btn btn-sm btn-outline-secondary" id="selectNoneBioStrataSi">None</button>
+                    </div>
                 </div>
             </div>
             
@@ -636,7 +718,7 @@
                 </svg>
                 <h4>Drop CSV file(s) here or click "Add CSV File(s)" button</h4>
                 <p class="text-muted mb-2">✨ <strong>Multi-file support!</strong> Upload multiple files to combine datasets</p>
-                <p class="text-muted mb-1 small">💡 <strong>Recommended:</strong> Single CSV with both STRATA and STAND level yield curves</p>
+                <p class="text-muted mb-1 small">💡 <strong>Recommended:</strong> Single CSV with both STRATA and STAND/POLYGON level yield curves</p>
                 <p class="mb-1" style="color: #dc3545; font-weight: bold; font-size: 0.95rem;">⚠️ Browser note: MS Edge may crash with large datasets - Chrome recommended</p>
                 <p class="text-muted mb-0 small">Example: Upload strata + polygon files together for overlay analysis</p>
             </div>
@@ -724,8 +806,9 @@
                 alternatives: ['yYC', 'PLANFU', 'SFU', 'ForestUnit', 'forest_unit', 'yfu', 'yYc', 'planfu', 'sfu']
             },
             polygonID: {
+                // ID ≡ StandID (volume / biomass / GLSL polygon curves)
                 preferred: 'ID',
-                alternatives: ['unique_id', 'POLYID', 'PolyID', 'poly_id', 'id', 'polyid']
+                alternatives: ['StandID', 'standid', 'STANDID', 'unique_id', 'POLYID', 'PolyID', 'poly_id', 'id', 'polyid']
             },
             curveType: {
                 preferred: 'TYPE',
@@ -742,6 +825,19 @@
             siteIndex: {
                 preferred: 'SI',
                 alternatives: ['si', 'SiteIndex', 'site_index', 'Site_Index']
+            },
+            // GLSL selection-system finer stratification (STRATA, SILSYS=SE)
+            silsys: {
+                preferred: 'SILSYS',
+                alternatives: ['SilSys', 'SILVSYS', 'SilvSys', 'silsys', 'silvsys']
+            },
+            cut: {
+                preferred: 'CUT',
+                alternatives: ['Cut', 'cut', 'PREV_CUT', 'PrevCut']
+            },
+            agsfrc: {
+                preferred: 'AGSFRC',
+                alternatives: ['AgsFrc', 'AGS_FRC', 'agsfrc', 'ags_frc']
             },
             leadingSpecies: {
                 preferred: 'LEADSPC',
@@ -770,24 +866,493 @@
             bioFoliage:      { preferred: 'Foliage',  alternatives: ['foliage', 'FOLIAGE'] }
         };
 
+        // ============================================
+        // CURVE TYPE HELPERS + ID VALIDATION
+        // TYPE values: STRATA | STAND | POLYGON
+        // POLYGON is an accepted alias for STAND (individual polygon/stand curves).
+        // ============================================
+        function normalizeCurveType(value) {
+            return String(value ?? '').trim().toUpperCase();
+        }
+
+        function isStrataType(value) {
+            return normalizeCurveType(value) === 'STRATA';
+        }
+
+        function isStandType(value) {
+            const t = normalizeCurveType(value);
+            // POLYGON ≡ STAND (preferred label in some SLYM outputs)
+            return t === 'STAND' || t === 'POLYGON';
+        }
+
+        // ── GLSL / selection-system helpers ───────────────────────────
+        function cellStr(row, col) {
+            if (!row || !col) return '';
+            const v = row[col];
+            if (v == null) return '';
+            return String(v).trim();
+        }
+
+        function normalizeAgsfrc(value) {
+            if (value == null || value === '') return '';
+            const n = Number(value);
+            if (!Number.isNaN(n)) {
+                // 0.1, 0.10, 0.100 → "0.1"
+                const rounded = Math.round(n * 10) / 10;
+                return String(rounded);
+            }
+            return String(value).trim();
+        }
+
+        function normalizeSi(value) {
+            if (value == null || value === '') return '';
+            const n = Number(value);
+            if (!Number.isNaN(n)) return String(n);
+            return String(value).trim();
+        }
+
+        function isSelectionSilSys(value) {
+            return String(value ?? '').trim().toUpperCase() === 'SE';
+        }
+
+        /** GLSL yield inputs carry SILSYS + CUT + AGSFRC (Boreal typically does not). */
+        function isGlslColumnMap(cmap) {
+            return !!(cmap && cmap.silsys && cmap.cut && cmap.agsfrc);
+        }
+
+        /**
+         * STRATA curve identity:
+         *  - Boreal / non-SE GLSL: yFU + YIELD (+ SILSYS if present)
+         *  - GLSL selection (SILSYS=SE): yFU + YIELD + CUT + AGSFRC + SI
+         * One curve must still have exactly one ID.
+         */
+        function getStrataCurveKey(row, cmap) {
+            cmap = cmap || columnMap;
+            const fuCol = cmap.forestUnit || cmap.polygonID;
+            const fu = cellStr(row, fuCol);
+            const yld = cellStr(row, cmap.yieldScenario) || 'PRSNT';
+            const sil = cmap.silsys ? cellStr(row, cmap.silsys).toUpperCase() : '';
+            if (isSelectionSilSys(sil)) {
+                const cut = cellStr(row, cmap.cut);
+                const ags = normalizeAgsfrc(row[cmap.agsfrc]);
+                const si = normalizeSi(row[cmap.siteIndex]);
+                return `${fu}|${yld}|SE|${cut}|${ags}|${si}`;
+            }
+            if (sil) return `${fu}|${yld}|${sil}`;
+            return `${fu}|${yld}`;
+        }
+
+        function getStrataCurveLabel(row, cmap) {
+            cmap = cmap || columnMap;
+            const fuCol = cmap.forestUnit || cmap.polygonID;
+            const fu = cellStr(row, fuCol);
+            const yld = cellStr(row, cmap.yieldScenario) || 'PRSNT';
+            const sil = cmap.silsys ? cellStr(row, cmap.silsys).toUpperCase() : '';
+            if (isSelectionSilSys(sil)) {
+                const cut = cellStr(row, cmap.cut);
+                const ags = normalizeAgsfrc(row[cmap.agsfrc]);
+                const si = normalizeSi(row[cmap.siteIndex]);
+                return `${fu} ${yld} · SE · CUT=${cut} · AGS=${ags} · SI=${si}`;
+            }
+            if (sil) return `${fu} - ${yld} (${sil})`;
+            return `${fu} - ${yld}`;
+        }
+
+        /** Distinct colours for SI levels (GLSL SE strata). */
+        const SE_SI_COLOR_PALETTE = [
+            '#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00',
+            '#a65628', '#f781bf', '#00CED1', '#FF1493', '#32CD32',
+            '#FF4500', '#9370DB', '#00FA9A', '#DC143C', '#4169E1',
+            '#FF6347', '#3CB371', '#BA55D3', '#1f77b4', '#8B4513',
+            '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2'
+        ];
+
+        /**
+         * Build SI→colour and CUT→dash maps from a set of STRATA rows.
+         * SE encoding: colour = SI, dash = CUT (0 solid, 1 dash); AGSFRC only in legend label.
+         */
+        function buildSeStyleMaps(rows, cmap) {
+            cmap = cmap || columnMap;
+            const siSet = new Set();
+            const cutSet = new Set();
+            const agsSet = new Set();
+            (rows || []).forEach(row => {
+                if (!cmap.silsys || !isSelectionSilSys(row[cmap.silsys])) return;
+                const si = normalizeSi(row[cmap.siteIndex]);
+                if (si) siSet.add(si);
+                const cut = cellStr(row, cmap.cut);
+                if (cut !== '') cutSet.add(cut);
+                const ags = normalizeAgsfrc(row[cmap.agsfrc]);
+                if (ags) agsSet.add(ags);
+            });
+            const siVals = [...siSet].sort((a, b) => Number(a) - Number(b));
+            const siColorMap = {};
+            siVals.forEach((si, i) => {
+                siColorMap[si] = SE_SI_COLOR_PALETTE[i % SE_SI_COLOR_PALETTE.length];
+            });
+            // CUT: 0 = solid, 1 = dash; extra values cycle patterns
+            const cutDashMap = { '0': 'solid', '1': 'dash' };
+            const extraDash = ['dot', 'dashdot', 'longdash', 'longdashdot'];
+            let ei = 0;
+            [...cutSet].sort().forEach(c => {
+                if (!(c in cutDashMap)) {
+                    cutDashMap[c] = extraDash[ei % extraDash.length];
+                    ei++;
+                }
+            });
+            // Optional AGS dash when only one CUT is present (helps multi-AGS bundles)
+            const agsDashMap = {};
+            const agsPatterns = ['solid', 'dash', 'dot', 'dashdot', 'longdash', 'longdashdot'];
+            [...agsSet].sort((a, b) => Number(a) - Number(b)).forEach((ags, i) => {
+                agsDashMap[ags] = agsPatterns[i % agsPatterns.length];
+            });
+            return { siColorMap, cutDashMap, agsDashMap, siVals, cutSet, agsSet };
+        }
+
+        /**
+         * Line style for one STRATA row. SE → SI colour + CUT dash.
+         * Non-SE → null (caller uses YIELD/FU style).
+         */
+        function getSeStrataLineStyle(row, cmap, styleMaps) {
+            cmap = cmap || columnMap;
+            if (!cmap.silsys || !isSelectionSilSys(row[cmap.silsys])) return null;
+            const maps = styleMaps || buildSeStyleMaps([row], cmap);
+            const si = normalizeSi(row[cmap.siteIndex]);
+            const cut = cellStr(row, cmap.cut);
+            const ags = normalizeAgsfrc(row[cmap.agsfrc]);
+            const color = maps.siColorMap[si] || '#666666';
+            // Prefer CUT for dash; if only one CUT in the map set, vary dash by AGSFRC
+            let dash = maps.cutDashMap[cut] || 'solid';
+            if (maps.cutSet && maps.cutSet.size <= 1 && maps.agsDashMap && maps.agsDashMap[ags]) {
+                dash = maps.agsDashMap[ags];
+            }
+            return { color, dash, si, cut, ags };
+        }
+
+        /**
+         * Pick one representative SE curve (row group) for species/component breakdown.
+         * Prefer provided GLSL selections (volume or biomass); else CUT=0 + default AGS + median SI.
+         * @param {object} [glslSelections] optional {silsys,cut,agsfrc,si}
+         */
+        function pickRepresentativeSeCurveRows(rows, cmap, glslSelections) {
+            cmap = cmap || columnMap;
+            if (!rows || rows.length === 0) return { rows: [], label: '', key: '' };
+
+            const byKey = {};
+            rows.forEach(r => {
+                const k = getStrataCurveKey(r, cmap);
+                if (!byKey[k]) byKey[k] = [];
+                byKey[k].push(r);
+            });
+            const keys = Object.keys(byKey).sort();
+            if (keys.length === 1) {
+                return { rows: byKey[keys[0]], label: getStrataCurveLabel(byKey[keys[0]][0], cmap), key: keys[0] };
+            }
+
+            // Prefer rows matching GLSL checkboxes (volume and/or biomass)
+            let preferred = null;
+            try {
+                const selCandidates = [];
+                if (glslSelections) selCandidates.push(glslSelections);
+                if (typeof getVolumeGlslSelections === 'function' && typeof isGlslVolume !== 'undefined' && isGlslVolume) {
+                    selCandidates.push(getVolumeGlslSelections());
+                }
+                if (typeof getBiomassGlslSelections === 'function' && typeof isGlslBiomass !== 'undefined' && isGlslBiomass) {
+                    selCandidates.push(getBiomassGlslSelections());
+                }
+                for (const sel of selCandidates) {
+                    if (!sel || !isGlslColumnMap(cmap)) continue;
+                    const matchedKeys = keys.filter(k => matchesGlslStrataFilters(byKey[k][0], cmap, sel));
+                    if (matchedKeys.length === 1) {
+                        preferred = matchedKeys[0];
+                        break;
+                    }
+                    if (matchedKeys.length > 1) {
+                        preferred = pickBestSeKey(matchedKeys, byKey, cmap);
+                        break;
+                    }
+                }
+            } catch (e) { /* ignore */ }
+
+            if (!preferred) preferred = pickBestSeKey(keys, byKey, cmap);
+            return {
+                rows: byKey[preferred],
+                label: getStrataCurveLabel(byKey[preferred][0], cmap),
+                key: preferred
+            };
+        }
+
+        /** Cap biomass Mg/ha to drop SLYM numerical blow-ups. */
+        const BIOMASS_METRIC_CAP = 5000;
+
+        function pickBestSeKey(keys, byKey, cmap) {
+            // Score: CUT=0 best, AGS closest to 0.5, SI closest to median of candidates
+            const sis = keys.map(k => Number(normalizeSi(byKey[k][0][cmap.siteIndex]))).filter(n => !Number.isNaN(n)).sort((a, b) => a - b);
+            const medSi = sis.length ? sis[Math.floor(sis.length / 2)] : null;
+            let best = keys[0];
+            let bestScore = -Infinity;
+            keys.forEach(k => {
+                const r = byKey[k][0];
+                const cut = cellStr(r, cmap.cut);
+                const ags = Number(normalizeAgsfrc(r[cmap.agsfrc]));
+                const si = Number(normalizeSi(r[cmap.siteIndex]));
+                let score = 0;
+                if (cut === '0') score += 100;
+                if (!Number.isNaN(ags)) score += 50 - Math.min(50, Math.abs(ags - 0.5) * 100);
+                if (medSi != null && !Number.isNaN(si)) score += 30 - Math.min(30, Math.abs(si - medSi));
+                if (score > bestScore) { bestScore = score; best = k; }
+            });
+            return best;
+        }
+
+        /**
+         * Iterate STRATA curves by full identity key; provide SE-aware line style.
+         * callback(curveRows, yieldVal, style: {color, dash, label, isSE})
+         */
+        function forEachStrataCurveGroup(strataByYield, yieldColors, yieldDashStyles, callback) {
+            const allRows = Object.values(strataByYield || {}).flat();
+            const seMaps = buildSeStyleMaps(allRows, columnMap);
+            for (const yieldVal in strataByYield) {
+                const byKey = {};
+                (strataByYield[yieldVal] || []).forEach(row => {
+                    const k = getStrataCurveKey(row, columnMap) ||
+                        String(row.ID || row.id || row.StandID || '');
+                    if (!byKey[k]) byKey[k] = [];
+                    byKey[k].push(row);
+                });
+                Object.keys(byKey).forEach(k => {
+                    const curveRows = byKey[k];
+                    const seStyle = getSeStrataLineStyle(curveRows[0], columnMap, seMaps);
+                    const label = getStrataCurveLabel(curveRows[0], columnMap);
+                    callback(curveRows, yieldVal, {
+                        color: seStyle ? seStyle.color : (yieldColors[yieldVal] || '#666'),
+                        dash: seStyle ? seStyle.dash : (yieldDashStyles[yieldVal] || 'solid'),
+                        width: seStyle ? 2.5 : 4,
+                        label,
+                        isSE: !!seStyle
+                    });
+                });
+            }
+        }
+
+        /** Pair age + metric, drop non-finite / above maxAbs, sort by age. */
+        function sanitizeAgeMetricSeries(ages, values, maxAbs) {
+            const cap = maxAbs == null ? 1e6 : maxAbs;
+            const pairs = [];
+            const n = Math.min((ages || []).length, (values || []).length);
+            for (let i = 0; i < n; i++) {
+                const a = toFiniteNumber(ages[i]);
+                const v = toFiniteNumber(values[i]);
+                if (a == null || a < 0 || a > 500 || v == null || v < 0 || v > cap) continue;
+                pairs.push({ a, v });
+            }
+            pairs.sort((p, q) => p.a - q.a);
+            return { ages: pairs.map(p => p.a), values: pairs.map(p => p.v) };
+        }
+
+        function valuesMatchSelected(value, selected, normalizer) {
+            if (!selected || selected.length === 0) return true;
+            const norm = normalizer || (v => String(v ?? '').trim());
+            const v = norm(value);
+            return selected.some(s => norm(s) === v);
+        }
+
+        /**
+         * GLSL STRATA row filter. Non-SE rows only need SILSYS match.
+         * SE rows also require CUT + AGSFRC + SI.
+         */
+        function matchesGlslStrataFilters(row, cmap, selections) {
+            if (!isGlslColumnMap(cmap)) return true;
+            const sil = cellStr(row, cmap.silsys).toUpperCase();
+            const selSil = (selections.silsys || []).map(s => String(s).trim().toUpperCase());
+            if (selSil.length > 0 && !selSil.includes(sil)) return false;
+            if (!isSelectionSilSys(sil)) return true;
+            return valuesMatchSelected(row[cmap.cut], selections.cut, v => String(v ?? '').trim()) &&
+                   valuesMatchSelected(row[cmap.agsfrc], selections.agsfrc, normalizeAgsfrc) &&
+                   valuesMatchSelected(row[cmap.siteIndex], selections.si, normalizeSi);
+        }
+
+        function getCheckedValues(selector) {
+            return Array.from(document.querySelectorAll(selector + ':checked')).map(cb => cb.value);
+        }
+
+        // ── Plausible yield metrics (guards against SLYM numerical blow-ups) ──
+        // A few POLYGON series (observed on HDSL1) explode to ~1e199 and crush the y-axis.
+        const YIELD_METRIC_CAPS = {
+            netMerchVolume: 5000,   // m³/ha — Ontario NMV rarely > ~300–500
+            grossMerchVolume: 5000,
+            grossTotalVolume: 8000,
+            basalArea: 250          // m²/ha
+        };
+
+        function toFiniteNumber(value) {
+            if (value == null || value === '') return null;
+            const n = typeof value === 'number' ? value : Number(String(value).trim());
+            return Number.isFinite(n) ? n : null;
+        }
+
+        function isPlausibleYieldMetric(value, metricKey) {
+            const n = toFiniteNumber(value);
+            if (n == null || n < 0) return false;
+            const cap = YIELD_METRIC_CAPS[metricKey] || 1e6;
+            return n <= cap;
+        }
+
+        /**
+         * Pair age/volume points, drop non-finite / out-of-range values, sort by age.
+         * Returns { ages, volumes, dropped }.
+         */
+        function sanitizeAgeVolumeSeries(ages, volumes, metricKey) {
+            const pairs = [];
+            let dropped = 0;
+            const n = Math.min((ages || []).length, (volumes || []).length);
+            for (let i = 0; i < n; i++) {
+                const a = toFiniteNumber(ages[i]);
+                const v = toFiniteNumber(volumes[i]);
+                if (a == null || a < 0 || a > 500 || v == null || !isPlausibleYieldMetric(v, metricKey)) {
+                    dropped++;
+                    continue;
+                }
+                pairs.push({ a, v });
+            }
+            pairs.sort((p, q) => p.a - q.a);
+            return {
+                ages: pairs.map(p => p.a),
+                volumes: pairs.map(p => p.v),
+                dropped
+            };
+        }
+
+        function pickDefaultCut(values) {
+            const strs = (values || []).map(v => String(v));
+            if (strs.includes('0')) return ['0'];
+            return strs.slice(0, 1);
+        }
+
+        function pickDefaultAgsfrc(values) {
+            const raw = values || [];
+            const normalized = raw.map(normalizeAgsfrc).filter(Boolean);
+            if (normalized.includes('0.5')) return ['0.5'];
+            if (normalized.includes('0.1')) return ['0.1'];
+            const nums = normalized.map(Number).filter(n => !Number.isNaN(n)).sort((a, b) => a - b);
+            if (nums.length) return [normalizeAgsfrc(nums[Math.floor(nums.length / 2)])];
+            return normalized.slice(0, 1);
+        }
+
+        function pickDefaultSI(values) {
+            const nums = (values || []).map(Number).filter(n => !Number.isNaN(n)).sort((a, b) => a - b);
+            if (!nums.length) return (values || []).slice(0, 1).map(String);
+            return [String(nums[Math.floor(nums.length / 2)])];
+        }
+
+        /** Full-report SE representative grid (avoid exploding 420 curves × FU). */
+        function pickFullReportAgsfrc(values) {
+            const normalized = [...new Set((values || []).map(normalizeAgsfrc).filter(Boolean))];
+            const preferred = ['0.3', '0.6', '0.9'].filter(v => normalized.includes(v));
+            if (preferred.length) return preferred;
+            return pickDefaultAgsfrc(values);
+        }
+
+        function pickFullReportSI(values) {
+            const nums = (values || []).map(Number).filter(n => !Number.isNaN(n)).sort((a, b) => a - b);
+            if (!nums.length) return (values || []).slice(0, 1).map(String);
+            if (nums.length === 1) return [String(nums[0])];
+            if (nums.length === 2) return nums.map(String);
+            const lo = nums[0];
+            const mid = nums[Math.floor(nums.length / 2)];
+            const hi = nums[nums.length - 1];
+            return [...new Set([lo, mid, hi].map(String))];
+        }
+
+        /**
+         * Each logical curve (rows sharing the same non-age identity) must have
+         * exactly one ID value. Catches SLYM anomalies where multiple IDs
+         * contaminate one age-series (typically STRATA: FU + YIELD).
+         *
+         * STAND/POLYGON curves are keyed by ID already, so multi-ID cannot occur
+         * by construction; still safe to run if curveKeyFn does not include ID.
+         */
+        function validateSingleIdPerCurve(rows, opts) {
+            const { idCol, curveKeyFn, label } = opts || {};
+            if (!rows || rows.length === 0 || !idCol || typeof curveKeyFn !== 'function') {
+                return { ok: true, issues: [] };
+            }
+
+            const groups = {};
+            rows.forEach(row => {
+                const key = String(curveKeyFn(row) ?? '');
+                if (!groups[key]) {
+                    groups[key] = { ids: new Set(), rowCount: 0 };
+                }
+                groups[key].rowCount += 1;
+                const idVal = row[idCol];
+                if (idVal != null && String(idVal).trim() !== '') {
+                    groups[key].ids.add(String(idVal).trim());
+                }
+            });
+
+            const issues = [];
+            Object.keys(groups).forEach(curveKey => {
+                const g = groups[curveKey];
+                if (g.ids.size > 1) {
+                    issues.push({
+                        label: label || 'CURVE',
+                        curveKey,
+                        ids: Array.from(g.ids),
+                        rowCount: g.rowCount
+                    });
+                }
+            });
+
+            return { ok: issues.length === 0, issues };
+        }
+
+        function reportCurveIdAnomalies(issueLists, options) {
+            const opts = options || {};
+            const alertUser = opts.alertUser !== false;
+            const maxShow = opts.maxShow || 8;
+            const allIssues = (issueLists || []).flatMap(r => (r && r.issues) ? r.issues : []);
+            if (allIssues.length === 0) return;
+
+            console.warn(
+                '⚠️ Yield curve ID anomaly: each curve should have only one ID value.',
+                allIssues
+            );
+
+            if (!alertUser) return;
+
+            const lines = allIssues.slice(0, maxShow).map(iss => {
+                const idPreview = iss.ids.slice(0, 5).join(', ') + (iss.ids.length > 5 ? ', …' : '');
+                return `• [${iss.label}] ${iss.curveKey}: ${iss.ids.length} IDs (${idPreview}) — ${iss.rowCount} rows`;
+            });
+            const more = allIssues.length > maxShow
+                ? `\n… and ${allIssues.length - maxShow} more`
+                : '';
+
+            alert(
+                '⚠️ Yield curve validation warning\n\n' +
+                'Each curve should have only one ID value after filters are applied.\n' +
+                'Found curve(s) with multiple IDs (possible SLYM output anomaly):\n\n' +
+                lines.join('\n') + more +
+                '\n\nPlotting continues — please inspect the source yield curve data.'
+            );
+        }
+
         function detectColumn(headers, conceptKey) {
             const mapping = COLUMN_MAPPINGS[conceptKey];
             if (!mapping) return null;
+            // Headers should already be trimmed at parse time; still compare trimmed.
+            const clean = (headers || []).map(h => String(h).trim());
+            const lowerMap = {};
+            clean.forEach((h, i) => { lowerMap[h.toLowerCase()] = clean[i]; });
 
-            if (headers.includes(mapping.preferred)) {
-                return mapping.preferred;
+            if (lowerMap[mapping.preferred.toLowerCase()]) {
+                return lowerMap[mapping.preferred.toLowerCase()];
             }
 
             for (const alt of mapping.alternatives) {
-                if (headers.includes(alt)) {
-                    return alt;
-                }
-            }
-
-            const preferredLower = mapping.preferred.toLowerCase();
-            for (const header of headers) {
-                if (header.toLowerCase() === preferredLower) {
-                    return header;
+                if (lowerMap[String(alt).toLowerCase()]) {
+                    return lowerMap[String(alt).toLowerCase()];
                 }
             }
 
@@ -817,6 +1382,12 @@
         let loadedFiles = []; // Track loaded file names
         let strataCurves = [];  // For scatter plot overlays
         let standCurves = [];   // For scatter plot overlays
+        // Volume GLSL state (selection system finer strata)
+        let isGlslVolume = false;
+        let uniqueSilSys = [];
+        let uniqueCut = [];
+        let uniqueAgsfrc = [];
+        let uniqueStrataSI = [];
 
         // ── Biomass module state ────────────────────────────────────
         let bioData        = null;
@@ -826,6 +1397,11 @@
         let uniqueBioYYCs   = [];
         let bioYieldTypes   = [];
         let bioLeadspcTypes = [];
+        let isGlslBiomass   = false;
+        let uniqueBioSilSys = [];
+        let uniqueBioCut = [];
+        let uniqueBioAgsfrc = [];
+        let uniqueBioStrataSI = [];
 
         // ============================================
         // UI EVENT HANDLERS
@@ -929,6 +1505,58 @@
             document.querySelectorAll('.stand-leadspc-checkbox').forEach(cb => {
                 cb.checked = false;
             });
+        });
+
+        // GLSL volume filter buttons
+        document.getElementById('selectAllSilSys').addEventListener('click', () => {
+            document.querySelectorAll('.silsys-checkbox').forEach(cb => { cb.checked = true; });
+        });
+        document.getElementById('selectNoneSilSys').addEventListener('click', () => {
+            document.querySelectorAll('.silsys-checkbox').forEach(cb => { cb.checked = false; });
+        });
+        document.getElementById('selectAllCut').addEventListener('click', () => {
+            document.querySelectorAll('.cut-checkbox').forEach(cb => { cb.checked = true; });
+        });
+        document.getElementById('selectNoneCut').addEventListener('click', () => {
+            document.querySelectorAll('.cut-checkbox').forEach(cb => { cb.checked = false; });
+        });
+        document.getElementById('selectAllAgsfrc').addEventListener('click', () => {
+            document.querySelectorAll('.agsfrc-checkbox').forEach(cb => { cb.checked = true; });
+        });
+        document.getElementById('selectNoneAgsfrc').addEventListener('click', () => {
+            document.querySelectorAll('.agsfrc-checkbox').forEach(cb => { cb.checked = false; });
+        });
+        document.getElementById('selectAllStrataSi').addEventListener('click', () => {
+            document.querySelectorAll('.strata-si-checkbox').forEach(cb => { cb.checked = true; });
+        });
+        document.getElementById('selectNoneStrataSi').addEventListener('click', () => {
+            document.querySelectorAll('.strata-si-checkbox').forEach(cb => { cb.checked = false; });
+        });
+
+        // GLSL biomass filter buttons
+        document.getElementById('selectAllBioSilSys').addEventListener('click', () => {
+            document.querySelectorAll('.bio-silsys-checkbox').forEach(cb => { cb.checked = true; });
+        });
+        document.getElementById('selectNoneBioSilSys').addEventListener('click', () => {
+            document.querySelectorAll('.bio-silsys-checkbox').forEach(cb => { cb.checked = false; });
+        });
+        document.getElementById('selectAllBioCut').addEventListener('click', () => {
+            document.querySelectorAll('.bio-cut-checkbox').forEach(cb => { cb.checked = true; });
+        });
+        document.getElementById('selectNoneBioCut').addEventListener('click', () => {
+            document.querySelectorAll('.bio-cut-checkbox').forEach(cb => { cb.checked = false; });
+        });
+        document.getElementById('selectAllBioAgsfrc').addEventListener('click', () => {
+            document.querySelectorAll('.bio-agsfrc-checkbox').forEach(cb => { cb.checked = true; });
+        });
+        document.getElementById('selectNoneBioAgsfrc').addEventListener('click', () => {
+            document.querySelectorAll('.bio-agsfrc-checkbox').forEach(cb => { cb.checked = false; });
+        });
+        document.getElementById('selectAllBioStrataSi').addEventListener('click', () => {
+            document.querySelectorAll('.bio-strata-si-checkbox').forEach(cb => { cb.checked = true; });
+        });
+        document.getElementById('selectNoneBioStrataSi').addEventListener('click', () => {
+            document.querySelectorAll('.bio-strata-si-checkbox').forEach(cb => { cb.checked = false; });
         });
 
         document.getElementById('applyFilters').addEventListener('click', applyFiltersAndPlot);
@@ -1132,6 +1760,10 @@
             document.getElementById('strataYieldCheckboxes').innerHTML = '<p class="text-muted small">Upload a file to see options</p>';
             document.getElementById('standYieldCheckboxes').innerHTML = '<p class="text-muted small">Upload a file to see options</p>';
             document.getElementById('standLeadspcCheckboxes').innerHTML = '<p class="text-muted small">Upload a file to see options</p>';
+            isGlslVolume = false;
+            uniqueSilSys = []; uniqueCut = []; uniqueAgsfrc = []; uniqueStrataSI = [];
+            const glslSec = document.getElementById('glslVolumeSection');
+            if (glslSec) glslSec.style.display = 'none';
         }
 
         // ============================================
@@ -1184,7 +1816,7 @@
                         <h4>📋 Ready to Plot!</h4>
                         <p style="margin: 20px 0;">Please select your filters:</p>
                         <ol style="text-align: left; display: inline-block; margin: 0 auto;">
-                            <li>Select <strong>Curve Type</strong> (STRATA/STAND)</li>
+                            <li>Select <strong>Curve Type</strong> (STRATA / STAND or POLYGON)</li>
                             <li>Select <strong>Forest Units</strong> (use "Select All" button)</li>
                             <li>Select <strong>Yield Scenarios</strong> (use "Select All" button)</li>
                             <li>Click <strong>"✓ Apply Filters"</strong> to generate plot</li>
@@ -1215,30 +1847,72 @@
             const leadspcCol = columnMap.leadingSpecies;
 
             // Get unique yFUs
-            uniqueYFUs = [...new Set(csvData.map(row => row[yFUCol]))].filter(Boolean).sort();
+            uniqueYFUs = [...new Set(csvData.map(row => row[yFUCol]))].filter(v => v != null && String(v).trim() !== '').map(v => String(v).trim()).sort();
 
-            // Get unique YIELD types by TYPE
+            // Get unique YIELD types by TYPE (POLYGON ≡ STAND)
             if (typeCol && yieldCol) {
                 strataYieldTypes = [...new Set(
-                    csvData.filter(row => row[typeCol] === 'STRATA').map(row => row[yieldCol])
-                )].filter(Boolean).sort();
+                    csvData.filter(row => isStrataType(row[typeCol])).map(row => row[yieldCol])
+                )].filter(v => v != null && String(v).trim() !== '').map(v => String(v).trim()).sort();
 
                 standYieldTypes = [...new Set(
-                    csvData.filter(row => row[typeCol] === 'STAND').map(row => row[yieldCol])
-                )].filter(Boolean).sort();
+                    csvData.filter(row => isStandType(row[typeCol])).map(row => row[yieldCol])
+                )].filter(v => v != null && String(v).trim() !== '').map(v => String(v).trim()).sort();
             } else if (yieldCol) {
                 // No TYPE column, assume all are strata yields
-                strataYieldTypes = [...new Set(csvData.map(row => row[yieldCol]))].filter(Boolean).sort();
+                strataYieldTypes = [...new Set(csvData.map(row => row[yieldCol]))].filter(v => v != null && String(v).trim() !== '').map(v => String(v).trim()).sort();
             }
 
-            // Get unique LEADSPC for STAND curves
+            // Get unique LEADSPC for STAND / POLYGON curves
             if (typeCol && leadspcCol) {
                 standLeadingSpecies = [...new Set(
-                    csvData.filter(row => row[typeCol] === 'STAND').map(row => row[leadspcCol])
-                )].filter(Boolean).sort();
+                    csvData.filter(row => isStandType(row[typeCol])).map(row => row[leadspcCol])
+                )].filter(v => v != null && String(v).trim() !== '').map(v => String(v).trim()).sort();
             } else if (leadspcCol) {
                 // No TYPE column, but LEADSPC exists - get all unique values
-                standLeadingSpecies = [...new Set(csvData.map(row => row[leadspcCol]))].filter(Boolean).sort();
+                standLeadingSpecies = [...new Set(csvData.map(row => row[leadspcCol]))].filter(v => v != null && String(v).trim() !== '').map(v => String(v).trim()).sort();
+            }
+
+            // GLSL detection + unique SE finer-strata dimensions
+            isGlslVolume = isGlslColumnMap(columnMap);
+            uniqueSilSys = [];
+            uniqueCut = [];
+            uniqueAgsfrc = [];
+            uniqueStrataSI = [];
+            if (isGlslVolume) {
+                const strataRows = typeCol
+                    ? csvData.filter(row => isStrataType(row[typeCol]))
+                    : csvData;
+                uniqueSilSys = [...new Set(csvData.map(r => cellStr(r, columnMap.silsys).toUpperCase()).filter(Boolean))].sort();
+                const seRows = strataRows.filter(r => isSelectionSilSys(r[columnMap.silsys]));
+                uniqueCut = [...new Set(seRows.map(r => cellStr(r, columnMap.cut)).filter(v => v !== ''))].sort((a, b) => Number(a) - Number(b));
+                uniqueAgsfrc = [...new Set(seRows.map(r => normalizeAgsfrc(r[columnMap.agsfrc])).filter(Boolean))]
+                    .sort((a, b) => Number(a) - Number(b));
+                uniqueStrataSI = [...new Set(seRows.map(r => normalizeSi(r[columnMap.siteIndex])).filter(Boolean))]
+                    .sort((a, b) => Number(a) - Number(b));
+                console.log(`🪵 GLSL volume detected — SILSYS:${uniqueSilSys.join(',')}, SE CUT:${uniqueCut.length}, AGSFRC:${uniqueAgsfrc.length}, SI:${uniqueStrataSI.length}`);
+            }
+        }
+
+        function populateCheckboxGroup(containerId, values, cssClass, idPrefix, defaultSelected) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+            const defaults = new Set((defaultSelected || values).map(String));
+            (values || []).forEach(val => {
+                const safeVal = String(val);
+                const safeId = `${idPrefix}_${safeVal}`.replace(/[^a-zA-Z0-9_\-.]/g, '_');
+                const div = document.createElement('div');
+                div.className = 'form-check';
+                const checked = defaults.has(safeVal) ? 'checked' : '';
+                div.innerHTML = `
+                    <input class="form-check-input ${cssClass}" type="checkbox" value="${safeVal.replace(/"/g, '&quot;')}" id="${safeId}" ${checked}>
+                    <label class="form-check-label" for="${safeId}">${safeVal}</label>
+                `;
+                container.appendChild(div);
+            });
+            if (!values || values.length === 0) {
+                container.innerHTML = '<p class="text-muted small">None found</p>';
             }
         }
 
@@ -1306,23 +1980,78 @@
             } else {
                 standLeadspcContainer.innerHTML = '<p class="text-muted small">No LEADSPC found</p>';
             }
+
+            // GLSL finer STRATA filters (restrictive SE defaults)
+            const glslSec = document.getElementById('glslVolumeSection');
+            if (glslSec) {
+                if (isGlslVolume) {
+                    glslSec.style.display = 'block';
+                    populateCheckboxGroup('silsysCheckboxes', uniqueSilSys, 'silsys-checkbox', 'silsys', uniqueSilSys);
+                    populateCheckboxGroup('cutCheckboxes', uniqueCut, 'cut-checkbox', 'cut', pickDefaultCut(uniqueCut));
+                    populateCheckboxGroup('agsfrcCheckboxes', uniqueAgsfrc, 'agsfrc-checkbox', 'agsfrc', pickDefaultAgsfrc(uniqueAgsfrc));
+                    populateCheckboxGroup('strataSiCheckboxes', uniqueStrataSI, 'strata-si-checkbox', 'strata_si', pickDefaultSI(uniqueStrataSI));
+                } else {
+                    glslSec.style.display = 'none';
+                }
+            }
         }
 
         function displayColumnMapping() {
             const mappingParts = [];
             
             const keyMappings = {
+                'Mode': isGlslVolume ? 'GLSL' : 'BOREAL',
                 'Forest Unit': columnMap.forestUnit || columnMap.polygonID || 'Not found',
+                'ID': columnMap.polygonID || 'Not found',
                 'Type': columnMap.curveType || 'Assumed STRATA',
                 'Yield': columnMap.yieldScenario || 'Assumed PRSNT',
                 'Age': columnMap.age || 'ERROR'
             };
+            if (isGlslVolume) {
+                keyMappings['SILSYS'] = columnMap.silsys;
+                keyMappings['CUT'] = columnMap.cut;
+                keyMappings['AGSFRC'] = columnMap.agsfrc;
+                keyMappings['SI'] = columnMap.siteIndex || 'N/A';
+            }
 
             for (const [concept, column] of Object.entries(keyMappings)) {
                 mappingParts.push(`<strong>${concept}:</strong> ${column}`);
             }
 
             document.getElementById('columnMappingText').innerHTML = mappingParts.join(' | ');
+        }
+
+        function getVolumeGlslSelections() {
+            return {
+                silsys: getCheckedValues('.silsys-checkbox'),
+                cut: getCheckedValues('.cut-checkbox'),
+                agsfrc: getCheckedValues('.agsfrc-checkbox'),
+                si: getCheckedValues('.strata-si-checkbox')
+            };
+        }
+
+        /** Interactive defaults (restrictive SE slice). */
+        function applyVolumeGlslInteractiveDefaults() {
+            if (!isGlslVolume) return;
+            document.querySelectorAll('.silsys-checkbox').forEach(cb => { cb.checked = true; });
+            const defCut = new Set(pickDefaultCut(uniqueCut));
+            document.querySelectorAll('.cut-checkbox').forEach(cb => { cb.checked = defCut.has(cb.value); });
+            const defAgs = new Set(pickDefaultAgsfrc(uniqueAgsfrc));
+            document.querySelectorAll('.agsfrc-checkbox').forEach(cb => { cb.checked = defAgs.has(cb.value); });
+            const defSi = new Set(pickDefaultSI(uniqueStrataSI));
+            document.querySelectorAll('.strata-si-checkbox').forEach(cb => { cb.checked = defSi.has(cb.value); });
+        }
+
+        /** Full report: all SILSYS; SE uses a small representative grid. */
+        function applyVolumeGlslFullReportDefaults() {
+            if (!isGlslVolume) return;
+            document.querySelectorAll('.silsys-checkbox').forEach(cb => { cb.checked = true; });
+            document.querySelectorAll('.cut-checkbox').forEach(cb => { cb.checked = true; });
+            const defAgs = new Set(pickFullReportAgsfrc(uniqueAgsfrc));
+            document.querySelectorAll('.agsfrc-checkbox').forEach(cb => { cb.checked = defAgs.has(cb.value); });
+            const defSi = new Set(pickFullReportSI(uniqueStrataSI));
+            document.querySelectorAll('.strata-si-checkbox').forEach(cb => { cb.checked = defSi.has(cb.value); });
+            console.log('🪵 Full report GLSL SE defaults — AGSFRC:', [...defAgs], 'SI:', [...defSi]);
         }
 
 
@@ -1348,7 +2077,7 @@
             console.log('Filter settings:', { showStrata, showStand });
             
             if (!showStrata && !showStand) {
-                if (!skipValidation) alert('⚠️ Please select at least one Curve Type:\n\n☑️ STRATA (aggregated)\n☑️ STAND (background)');
+                if (!skipValidation) alert('⚠️ Please select at least one Curve Type:\n\n☑️ STRATA (aggregated)\n☑️ STAND / POLYGON (background)');
                 return false;
             }
             
@@ -1403,6 +2132,24 @@
             const typeCol = columnMap.curveType;
             const yieldCol = columnMap.yieldScenario;
             const leadspcCol = columnMap.leadingSpecies;
+            const glslSel = isGlslVolume ? getVolumeGlslSelections() : { silsys: [], cut: [], agsfrc: [], si: [] };
+
+            // GLSL SE: require at least one value for each SE dimension when SE is selected
+            if (isGlslVolume && showStrata && !skipValidation) {
+                const seSelected = glslSel.silsys.some(s => isSelectionSilSys(s));
+                if (seSelected) {
+                    const missing = [];
+                    if (uniqueCut.length > 0 && glslSel.cut.length === 0) missing.push('CUT');
+                    if (uniqueAgsfrc.length > 0 && glslSel.agsfrc.length === 0) missing.push('AGSFRC');
+                    if (uniqueStrataSI.length > 0 && glslSel.si.length === 0) missing.push('SI');
+                    if (missing.length) {
+                        alert('⚠️ GLSL selection (SE) strata need finer filters:\n\n• ' +
+                              missing.join('\n• ') +
+                              '\n\nTip: defaults pick a small slice — use Select All to expand the cloud.');
+                        return false;
+                    }
+                }
+            }
 
             // Filter data - using global variables for scatter plot overlay access
             strataCurves = [];
@@ -1410,30 +2157,55 @@
 
             if (showStrata) {
                 strataCurves = csvData.filter(row => {
-                    const matchesYFU = selectedYFUs.includes(row[yFUCol]);
+                    const matchesYFU = selectedYFUs.includes(String(row[yFUCol]).trim()) || selectedYFUs.includes(row[yFUCol]);
                     // If TYPE column exists, must be STRATA; if not, assume all are STRATA
-                    const matchesType = !typeCol || row[typeCol] === 'STRATA';
+                    const matchesType = !typeCol || isStrataType(row[typeCol]);
                     // If YIELD column exists, must match selection; if not, include all
-                    const matchesYield = !yieldCol || selectedStrataYields.length === 0 || selectedStrataYields.includes(row[yieldCol]);
-                    
-                    return matchesYFU && matchesType && matchesYield;
+                    const yldVal = yieldCol ? String(row[yieldCol] ?? '').trim() : '';
+                    const matchesYield = !yieldCol || selectedStrataYields.length === 0 || selectedStrataYields.includes(yldVal) || selectedStrataYields.includes(row[yieldCol]);
+                    const matchesGlsl = matchesGlslStrataFilters(row, columnMap, glslSel);
+                    return matchesYFU && matchesType && matchesYield && matchesGlsl;
                 });
             }
 
             if (showStand) {
                 standCurves = csvData.filter(row => {
-                    const matchesYFU = selectedYFUs.includes(row[yFUCol]);
-                    // TYPE column must exist and be STAND
-                    const matchesType = typeCol && row[typeCol] === 'STAND';
+                    const matchesYFU = selectedYFUs.includes(String(row[yFUCol]).trim()) || selectedYFUs.includes(row[yFUCol]);
+                    // TYPE must be STAND or POLYGON (POLYGON ≡ STAND)
+                    const matchesType = typeCol && isStandType(row[typeCol]);
                     // If YIELD column exists, must match selection; if not, include all
-                    const matchesYield = !yieldCol || selectedStandYields.length === 0 || selectedStandYields.includes(row[yieldCol]);
+                    const yldVal = yieldCol ? String(row[yieldCol] ?? '').trim() : '';
+                    const matchesYield = !yieldCol || selectedStandYields.length === 0 || selectedStandYields.includes(yldVal) || selectedStandYields.includes(row[yieldCol]);
                     // If LEADSPC column exists and user selected species, must match; otherwise include all
-                    const matchesLeadspc = !leadspcCol || selectedStandLeadspc.length === 0 || selectedStandLeadspc.includes(row[leadspcCol]);
+                    const leadVal = leadspcCol ? String(row[leadspcCol] ?? '').trim() : '';
+                    const matchesLeadspc = !leadspcCol || selectedStandLeadspc.length === 0 || selectedStandLeadspc.includes(leadVal) || selectedStandLeadspc.includes(row[leadspcCol]);
                     return matchesYFU && matchesType && matchesYield && matchesLeadspc;
                 });
             }
 
-            console.log(`✅ Data filtered: ${strataCurves.length} STRATA, ${standCurves.length} STAND curves (NO PLOTTING)`);
+            // Subtle curve integrity check: each logical STRATA curve → one ID
+            // SE uses full key (FU|YIELD|SE|CUT|AGSFRC|SI); Boreal uses FU|YIELD
+            const idCol = columnMap.polygonID;
+            if (idCol) {
+                const idChecks = [];
+                if (showStrata && strataCurves.length > 0) {
+                    idChecks.push(validateSingleIdPerCurve(strataCurves, {
+                        idCol,
+                        label: 'STRATA',
+                        curveKeyFn: row => getStrataCurveKey(row, columnMap)
+                    }));
+                }
+                if (showStand && standCurves.length > 0) {
+                    idChecks.push(validateSingleIdPerCurve(standCurves, {
+                        idCol,
+                        label: 'STAND/POLYGON',
+                        curveKeyFn: row => String(row[idCol] ?? '').trim()
+                    }));
+                }
+                reportCurveIdAnomalies(idChecks, { alertUser: !skipValidation });
+            }
+
+            console.log(`✅ Data filtered: ${strataCurves.length} STRATA rows, ${standCurves.length} STAND/POLYGON rows (NO PLOTTING)`);
             return true;
         }
 
@@ -1456,12 +2228,13 @@
         }
 
         function updateStats(strataCurves, standCurves, identifierCol) {
-            const strataUnique = new Set(strataCurves.map(row => `${row[identifierCol]}_${row[columnMap.yieldScenario] || 'PRSNT'}`)).size;
+            const strataUnique = new Set(strataCurves.map(row => getStrataCurveKey(row, columnMap))).size;
             const standUnique = new Set(standCurves.map(row => row[columnMap.polygonID || identifierCol])).size;
             
             document.getElementById('strataCount').innerHTML = `STRATA: ${strataUnique > 0 ? strataUnique + ' curves' : '<span class="text-muted">none</span>'}`;
-            document.getElementById('standCount').innerHTML = `STAND: ${standUnique > 0 ? standUnique + ' curves' : '<span class="text-muted">none</span>'}`;
-            document.getElementById('totalRows').textContent = `Total rows: ${strataCurves.length + standCurves.length}`;
+            document.getElementById('standCount').innerHTML = `STAND/POLYGON: ${standUnique > 0 ? standUnique + ' curves' : '<span class="text-muted">none</span>'}`;
+            document.getElementById('totalRows').textContent = `Total rows: ${strataCurves.length + standCurves.length}` +
+                (isGlslVolume ? ' · mode: GLSL' : ' · mode: BOREAL');
         }
 
         function createPlot(strataCurves, standCurves, volumeMetricKey, identifierCol) {
@@ -1575,16 +2348,20 @@
                 return `rgba(${r},${g},${b},${alpha})`;
             }
 
-            // Plot STAND curves (background, thin, semi-transparent, differentiated by FU + YIELD)
+            // Plot STAND/POLYGON curves (background). Sanitize volumes so rare
+            // SLYM numerical blow-ups (e.g. HDSL1 NMV ~1e199) do not destroy the y-axis.
+            let sanitizerDroppedPoints = 0;
+            let sanitizerDroppedCurves = 0;
+            const sanitizerBadIds = [];
+
             if (standCurves.length > 0) {
                 // Track unique FU+YIELD combinations for legend
                 const standLegendAdded = {};
                 
                 const standGroups = {};
                 
-                standCurves.forEach((row, idx) => {
+                standCurves.forEach((row) => {
                     const curveID = row[columnMap.polygonID || identifierCol];
-                    const volValue = row[volumeColumn];
                     
                     if (!standGroups[curveID]) {
                         const yieldVal = (row.YIELD || row[columnMap.yieldScenario] || 'PRSNT').toString().trim();
@@ -1604,6 +2381,17 @@
 
                 Object.keys(standGroups).forEach((curveID, idx) => {
                     const curve = standGroups[curveID];
+                    const cleaned = sanitizeAgeVolumeSeries(curve.ages, curve.volumes, volumeMetricKey);
+                    sanitizerDroppedPoints += cleaned.dropped;
+                    if (cleaned.ages.length === 0) {
+                        sanitizerDroppedCurves++;
+                        if (sanitizerBadIds.length < 12) sanitizerBadIds.push(String(curveID));
+                        return; // nothing plausible left — skip curve
+                    }
+                    if (cleaned.dropped > 0 && sanitizerBadIds.length < 12) {
+                        sanitizerBadIds.push(String(curveID));
+                    }
+
                     const yieldVal = curve.yield;
                     const fuVal = curve.fu || 'Unknown';
                     const baseColor = isSingleFUView
@@ -1612,16 +2400,8 @@
                     const lineDash = yieldDashMap[yieldVal] || 'solid';
                     const rgbaColor = hexToRgba(baseColor, 0.10);
                     
-                    // DEBUG: Check if trace will be valid
-                    const agesValid = Array.isArray(curve.ages) && curve.ages.length > 0;
-                    const volumesValid = Array.isArray(curve.volumes) && curve.volumes.length > 0;
-                    const dataMatch = curve.ages.length === curve.volumes.length;
-                    const volumesSample = curve.volumes.slice(0, 3);
-                    const agesSample = curve.ages.slice(0, 3);
-                    
-                    // DEBUG: Log yield values for main plot STAND curves
                     if (idx < 5) {
-                        console.log(`  🎯 Main Plot STAND ${curveID}: FU="${fuVal}" YIELD="${yieldVal}" -> color:${baseColor} dash:${lineDash}, ages:${agesValid}(${curve.ages.length}), vols:${volumesValid}(${curve.volumes.length}), match:${dataMatch}, 1stAges:${agesSample}, 1stVols:${volumesSample}`);
+                        console.log(`  🎯 Main Plot STAND/POLYGON ${curveID}: FU="${fuVal}" YIELD="${yieldVal}" points:${cleaned.ages.length} (dropped ${cleaned.dropped})`);
                     }
                     
                     // Add legend entry for each FU+YIELD once
@@ -1632,10 +2412,10 @@
                     }
                     
                     traces.push({
-                        x: curve.ages,
-                        y: curve.volumes,
+                        x: cleaned.ages,
+                        y: cleaned.volumes,
                         mode: 'lines',
-                        name: showLegend ? `STAND ${fuVal} - ${yieldVal}` : undefined,
+                        name: showLegend ? `STAND/POLYGON ${fuVal} - ${yieldVal}` : undefined,
                         legendgroup: `stand_${fuVal}_${yieldVal}`,
                         line: { width: 0.6, color: rgbaColor, dash: lineDash },
                         showlegend: showLegend,
@@ -1645,49 +2425,110 @@
             }
 
             // Plot STRATA curves (foreground, thick, opaque)
+            // Group by full strata identity (Boreal: FU+YIELD; GLSL SE: +CUT+AGSFRC+SI)
             if (strataCurves.length > 0) {
                 const strataGroups = {};
-                strataCurves.forEach((row, idx) => {
-                    const yfu = row[identifierCol];
-                    const yieldType = row[columnMap.yieldScenario] || 'PRSNT';
-                    const key = `${yfu}_${yieldType}`;
+                strataCurves.forEach((row) => {
+                    const key = getStrataCurveKey(row, columnMap);
+                    const yfu = String(row[identifierCol] ?? '').trim();
+                    const yieldType = (row[columnMap.yieldScenario] || 'PRSNT').toString().trim();
                     if (!strataGroups[key]) {
-                        strataGroups[key] = { 
-                            yfu, 
-                            yieldType, 
-                            ages: [], 
+                        const sil = columnMap.silsys ? cellStr(row, columnMap.silsys).toUpperCase() : '';
+                        strataGroups[key] = {
+                            yfu,
+                            yieldType,
+                            sil,
+                            cut: columnMap.cut ? cellStr(row, columnMap.cut) : '',
+                            ags: columnMap.agsfrc ? normalizeAgsfrc(row[columnMap.agsfrc]) : '',
+                            ages: [],
                             volumes: [],
-                            si: row[columnMap.siteIndex] || 'N/A'
+                            si: row[columnMap.siteIndex] ?? 'N/A',
+                            label: getStrataCurveLabel(row, columnMap)
                         };
                     }
-                    
                     strataGroups[key].ages.push(row[columnMap.age]);
                     strataGroups[key].volumes.push(row[volumeColumn]);
                 });
 
-                // Use consistent style mapping: FU controls color, YIELD controls dash
-                const allCombinations = Object.keys(strataGroups).sort();
-                
-                console.log(`🎨 Found ${allCombinations.length} unique FU-YIELD combinations`);
-
-                allCombinations.forEach((key, idx) => {
+                // Sanitize + sort by age (also drops numerical blow-ups)
+                Object.keys(strataGroups).forEach(key => {
                     const curve = strataGroups[key];
-                    const color = isSingleFUView
-                        ? (yieldColorMap[curve.yieldType] || '#666666')
-                        : (fuColorMap[curve.yfu] || '#666666');
-                    const dash = yieldDashMap[curve.yieldType] || 'solid';
-                    
+                    const cleaned = sanitizeAgeVolumeSeries(curve.ages, curve.volumes, volumeMetricKey);
+                    sanitizerDroppedPoints += cleaned.dropped;
+                    curve.ages = cleaned.ages;
+                    curve.volumes = cleaned.volumes;
+                    if (cleaned.ages.length === 0) {
+                        sanitizerDroppedCurves++;
+                        delete strataGroups[key];
+                    }
+                });
+
+                const allCombinations = Object.keys(strataGroups).sort();
+                console.log(`🎨 Found ${allCombinations.length} unique STRATA curves (full identity key)`);
+
+                // Cap SE cloud for interactive plot responsiveness
+                const MAX_STRATA_TRACES = 80;
+                const limitedKeys = allCombinations.length > MAX_STRATA_TRACES
+                    ? allCombinations.slice(0, MAX_STRATA_TRACES)
+                    : allCombinations;
+                if (allCombinations.length > MAX_STRATA_TRACES) {
+                    console.warn(`⚠️ Capped STRATA traces at ${MAX_STRATA_TRACES} of ${allCombinations.length}`);
+                }
+
+                // Style: SE → colour=SI, dash=CUT (or AGS if single CUT)
+                // Non-SE → colour by YIELD (or FU if multi-FU), dash by YIELD
+                const seStyleMaps = buildSeStyleMaps(strataCurves, columnMap);
+
+                limitedKeys.forEach((key) => {
+                    const curve = strataGroups[key];
+                    if (!curve || !curve.ages.length) return;
+                    const isSE = isSelectionSilSys(curve.sil);
+                    let color, dash;
+                    if (isSE) {
+                        const si = normalizeSi(curve.si);
+                        const cut = curve.cut;
+                        const ags = curve.ags;
+                        color = seStyleMaps.siColorMap[si] || '#666666';
+                        dash = seStyleMaps.cutDashMap[cut] || 'solid';
+                        if (seStyleMaps.cutSet.size <= 1 && seStyleMaps.agsDashMap[ags]) {
+                            dash = seStyleMaps.agsDashMap[ags];
+                        }
+                    } else {
+                        color = isSingleFUView
+                            ? (yieldColorMap[curve.yieldType] || '#666666')
+                            : (fuColorMap[curve.yfu] || '#666666');
+                        dash = yieldDashMap[curve.yieldType] || 'solid';
+                    }
+
                     traces.push({
                         x: curve.ages,
                         y: curve.volumes,
                         mode: 'lines+markers',
-                        name: `${curve.yfu} - ${curve.yieldType}`,
-                        line: { width: 4, color: color, dash: dash },
-                        marker: { size: 6, color: color },
+                        name: curve.label,
+                        line: { width: isSE ? 2.5 : 4, color: color, dash: dash },
+                        marker: { size: isSE ? 4 : 6, color: color },
                         showlegend: true,
-                        hovertemplate: `<b>${curve.yfu} - ${curve.yieldType}</b><br>SI: ${curve.si}<br>Age: %{x}<br>Volume: %{y:.2f}<extra></extra>`
+                        hovertemplate: `<b>${curve.label}</b><br>SI: ${curve.si}<br>Age: %{x}<br>Volume: %{y:.2f}<extra></extra>`
                     });
                 });
+            }
+
+            if (sanitizerDroppedPoints > 0 || sanitizerDroppedCurves > 0) {
+                console.warn(
+                    `⚠️ Sanitized implausible yield values (likely SLYM blow-up): ` +
+                    `${sanitizerDroppedPoints} points, ${sanitizerDroppedCurves} empty curves skipped.` +
+                    (sanitizerBadIds.length ? ` Example IDs: ${sanitizerBadIds.join(', ')}` : ''),
+                    `Caps:`, YIELD_METRIC_CAPS
+                );
+                // Soft note in stats box (non-blocking)
+                try {
+                    const totalEl = document.getElementById('totalRows');
+                    if (totalEl) {
+                        totalEl.textContent += ` · ⚠️ dropped ${sanitizerDroppedPoints} bad point(s)` +
+                            (sanitizerDroppedCurves ? ` / ${sanitizerDroppedCurves} empty curve(s)` : '') +
+                            ' (implausible volume/BA)';
+                    }
+                } catch (e) { /* ignore */ }
             }
 
             // Layout
@@ -1793,6 +2634,7 @@
                 Papa.parse(file, {
                     header: true,
                     skipEmptyLines: true,
+                    transformHeader: function(header) { return header.trim(); },
                     complete: function(results) {
                         rawData = results.data;
                         console.log(`✅ Loaded ${rawData.length} raw data rows`);
@@ -2214,26 +3056,25 @@
                     overlayDashMap[yieldVal] = overlayDashPatterns[idx % overlayDashPatterns.length];
                 });
 
-                // Group curves by yFU
+                // Group STRATA overlays by full curve identity (SE-safe)
                 if (showStrataOverlay && filteredStrataCurves.length > 0) {
                     const sampleRow = filteredStrataCurves[0];
                     console.log('📊 Adding STRATA overlays, sample row:', sampleRow);
                     console.log('📊 Available columns:', Object.keys(sampleRow));
-                    // Group by both yFU and YIELD to show separate curves for each yield scenario
-                    const curvesByFUAndYield = {};
+                    const curvesByKey = {};
                     filteredStrataCurves.forEach(row => {
-                        const fu = row.yFU?.trim() || 'Unknown';
-                        const yieldScenario = row.YIELD?.trim() || 'Unknown';
-                        const key = `${fu}_${yieldScenario}`;
-                        if (!curvesByFUAndYield[key]) curvesByFUAndYield[key] = [];
-                        curvesByFUAndYield[key].push(row);
+                        const key = getStrataCurveKey(row, columnMap);
+                        if (!curvesByKey[key]) curvesByKey[key] = [];
+                        curvesByKey[key].push(row);
                     });
                     
-                    Object.keys(curvesByFUAndYield).forEach(key => {
-                        const curves = curvesByFUAndYield[key].sort((a, b) => (a.AGE || a.Age) - (b.AGE || b.Age));
-                        const fu = curves[0].yFU?.trim() || 'Unknown';
-                        const yieldScenario = curves[0].YIELD?.trim() || 'Unknown';
-                        const xValues = curves.map(r => r.AGE || r.Age);  // Use AGE for yield curves
+                    Object.keys(curvesByKey).sort().forEach(key => {
+                        const curves = curvesByKey[key].sort((a, b) =>
+                            (Number(a.AGE || a.Age) || 0) - (Number(b.AGE || b.Age) || 0));
+                        const label = getStrataCurveLabel(curves[0], columnMap);
+                        const fu = cellStr(curves[0], columnMap.forestUnit) || curves[0].yFU?.trim() || 'Unknown';
+                        const yieldScenario = cellStr(curves[0], columnMap.yieldScenario) || curves[0].YIELD?.trim() || 'Unknown';
+                        const xValues = curves.map(r => r.AGE || r.Age);
                         const yValues = curves.map(r => r[yMetric]);
                         
                         const curveColor = isSingleFUOverlayView
@@ -2241,19 +3082,14 @@
                             : (overlayFuColorMap[fu] || '#666666');
                         const curveDash = overlayDashMap[yieldScenario] || 'dash';
                         
-                        console.log(`📈 Adding STRATA curve for ${fu} - ${yieldScenario}, points: ${curves.length}, yMetric: ${yMetric}, color: ${curveColor}, dash: ${curveDash}`);
-                        console.log(`   X values (first 5):`, xValues.slice(0, 5));
-                        console.log(`   Y values (first 5):`, yValues.slice(0, 5));
-                        console.log(`   Y has nulls?`, yValues.some(v => v === null || v === undefined || isNaN(v)));
-                        
                         traces.push({
                             x: xValues,
                             y: yValues,
                             mode: 'lines',
                             type: 'scatter',
-                            name: `STRATA ${fu} - ${yieldScenario}`,
-                            line: { width: 4, dash: curveDash, color: curveColor },
-                            hovertemplate: `STRATA ${fu} - ${yieldScenario}<br>Age: %{x}<br>${yMetric}: %{y:.2f}<extra></extra>`
+                            name: `STRATA ${label}`,
+                            line: { width: 3, dash: curveDash, color: curveColor },
+                            hovertemplate: `STRATA ${label}<br>Age: %{x}<br>${yMetric}: %{y:.2f}<extra></extra>`
                         });
                     });
                 }
@@ -3200,9 +4036,10 @@
                 });
                 
                 for (const id in standCurvesByID) {
-                    const curve = standCurvesByID[id].sort((a, b) => parseFloat(a.AGE) - parseFloat(b.AGE));
-                    const ages = curve.map(r => parseFloat(r.AGE)).filter(v => !isNaN(v));
-                    const nmvs = curve.map(r => parseFloat(r.NMV || r.nmv)).filter(v => !isNaN(v));
+                    const curve = standCurvesByID[id];
+                    const agesRaw = curve.map(r => r.AGE);
+                    const nmvsRaw = curve.map(r => r.NMV || r.nmv);
+                    const cleaned = sanitizeAgeVolumeSeries(agesRaw, nmvsRaw, 'netMerchVolume');
                     
                     // Extract YIELD value from curve (use first row)
                     const yieldVal = (curve[0].YIELD || 'UNKNOWN').toString().trim();
@@ -3213,10 +4050,10 @@
                         ? `rgba(${parseInt(baseColor.slice(1,3), 16)}, ${parseInt(baseColor.slice(3,5), 16)}, ${parseInt(baseColor.slice(5,7), 16)}, 0.15)`
                         : baseColor;
                     
-                    if (ages.length > 0 && nmvs.length > 0) {
+                    if (cleaned.ages.length > 0 && cleaned.volumes.length > 0) {
                         traces.push({
-                            x: ages,
-                            y: nmvs,
+                            x: cleaned.ages,
+                            y: cleaned.volumes,
                             mode: 'lines',
                             type: 'scatter',
                             name: `STAND - ${yieldVal}`,
@@ -3229,7 +4066,7 @@
                         });
                     }
                 }
-                console.log(`    ✅ STAND curves: ${traces.length} traces added (colored by YIELD)`);
+                console.log(`    ✅ STAND curves: ${traces.filter(t => String(t.name||'').startsWith('STAND')).length} traces added (colored by YIELD, sanitized)`);
             }
             
             // Add scatter plot from pre-filtered raw data
@@ -3255,37 +4092,46 @@
                 }
             }
             
-            // Add STRATA yield curves (using pre-filtered data) - BOLD with different line styles
+            // Add STRATA yield curves — one series per full curve key; SE coloured by SI
+            const allStrataRowsForStyle = Object.values(strataByYield).flat();
+            const seStyleMapsNmv = buildSeStyleMaps(allStrataRowsForStyle, columnMap);
             for (const yieldVal in strataByYield) {
                 const yieldData = strataByYield[yieldVal];
-                const curvesByID = {};
+                const curvesByKey = {};
                 
                 yieldData.forEach(row => {
-                    const id = row.ID || row.id;
-                    if (!curvesByID[id]) curvesByID[id] = [];
-                    curvesByID[id].push(row);
+                    const key = getStrataCurveKey(row, columnMap) ||
+                        String(row.ID || row.id || row.StandID || row[columnMap.polygonID] || '');
+                    if (!curvesByKey[key]) curvesByKey[key] = [];
+                    curvesByKey[key].push(row);
                 });
                 
-                for (const id in curvesByID) {
-                    const curve = curvesByID[id].sort((a, b) => parseFloat(a.AGE) - parseFloat(b.AGE));
-                    const ages = curve.map(r => parseFloat(r.AGE)).filter(v => !isNaN(v));
-                    const nmvs = curve.map(r => parseFloat(r.NMV || r.nmv)).filter(v => !isNaN(v));
+                for (const key in curvesByKey) {
+                    const curve = curvesByKey[key];
+                    const cleaned = sanitizeAgeVolumeSeries(
+                        curve.map(r => r.AGE),
+                        curve.map(r => r.NMV || r.nmv),
+                        'netMerchVolume'
+                    );
+                    const label = getStrataCurveLabel(curve[0], columnMap);
+                    const seStyle = getSeStrataLineStyle(curve[0], columnMap, seStyleMapsNmv);
+                    const lineColor = seStyle ? seStyle.color : (yieldColors[yieldVal] || '#666');
+                    const lineDash = seStyle ? seStyle.dash : (yieldDashStyles[yieldVal] || 'solid');
                     
-                    if (ages.length > 0 && nmvs.length > 0) {
+                    if (cleaned.ages.length > 0 && cleaned.volumes.length > 0) {
                         traces.push({
-                            x: ages,
-                            y: nmvs,
+                            x: cleaned.ages,
+                            y: cleaned.volumes,
                             mode: 'lines',
                             type: 'scatter',
-                            name: `STRATA - ${yieldVal}`,
+                            name: `STRATA - ${label}`,
                             line: {
-                                color: yieldColors[yieldVal] || '#666',
-                                width: 4,
-                                dash: yieldDashStyles[yieldVal] || 'solid'
+                                color: lineColor,
+                                width: seStyle ? 2.5 : 3,
+                                dash: lineDash
                             },
-                            showlegend: traces.filter(t => t.name === `STRATA - ${yieldVal}`).length === 0
+                            showlegend: traces.filter(t => t.name === `STRATA - ${label}`).length === 0
                         });
-                        console.log(`    ✅ STRATA ${yieldVal}: ${ages.length} data points added (curve ID: ${id})`);
                     }
                 }
             }
@@ -3334,16 +4180,34 @@
         }
         
         // Panel 2: NMV by Species vs Age (PRSNT YIELD only)
+        // For GLSL SE: use ONE representative strata curve (not average of all SI/AGS/CUT).
         async function generatePanel_NMV_BySpecies(forestUnit, strataByYield) {
             console.log(`  📈 Panel 2: NMV by Species vs Age for ${forestUnit} (PRSNT only)`);
             
             const traces = [];
             
             // Only process PRSNT yield
-            const prsnTData = strataByYield['PRSNT'] || [];
+            let prsnTData = strataByYield['PRSNT'] || [];
             if (prsnTData.length === 0) {
                 console.log(`  ⚠️ No PRSNT data for ${forestUnit}, skipping species panel`);
                 return null;
+            }
+
+            // SE: do not average hundreds of curves — pick one representative series
+            let seSliceNote = '';
+            const hasSe = isGlslColumnMap(columnMap) && prsnTData.some(r => isSelectionSilSys(r[columnMap.silsys]));
+            if (hasSe) {
+                const seOnly = prsnTData.filter(r => isSelectionSilSys(r[columnMap.silsys]));
+                const nonSe = prsnTData.filter(r => !isSelectionSilSys(r[columnMap.silsys]));
+                const picked = pickRepresentativeSeCurveRows(seOnly, columnMap);
+                prsnTData = picked.rows.length ? picked.rows : seOnly;
+                // If CC/SH also present under PRSNT, keep them out of SE average path — SE-only for this panel when SE exists
+                seSliceNote = picked.label
+                    ? ` · SE slice: ${picked.label.replace(forestUnit + ' ', '')}`
+                    : ' · SE (representative curve)';
+                console.log(`  🪵 SE species panel uses single curve: ${picked.label || picked.key} (${prsnTData.length} rows)`);
+                // nonSe intentionally unused (species panel for SE FUs focuses on one SE series)
+                void nonSe;
             }
             
             // Get all column names from first row to detect species columns
@@ -3359,10 +4223,13 @@
             }
             
             // Species columns are all columns AFTER NMV
+            const speciesExclude = new Set([
+                'AGE', 'YIELD', 'ID', 'YFU', 'FU', 'SI', 'LEADSPC', 'TYPE', 'POLYID',
+                'STANDID', 'SILSYS', 'SILVSYS', 'CUT', 'AGSFRC', 'SPCOMP', 'YYC'
+            ]);
             const speciesColumns = allColumns.slice(nmvIndex + 1).filter(col => {
-                // Exclude non-species columns (AGE, YIELD, ID, yFU, SI, etc.)
-                const upper = col.toUpperCase();
-                return !['AGE', 'YIELD', 'ID', 'YFU', 'FU', 'SI', 'LEADSPC', 'TYPE', 'POLYID'].includes(upper);
+                const upper = col.toUpperCase().trim();
+                return !speciesExclude.has(upper) && !/^NMV_/i.test(upper);
             });
             
             console.log(`  🌲 Detected ${speciesColumns.length} species columns:`, speciesColumns);
@@ -3383,40 +4250,40 @@
             // Define line styles for variety
             const lineStyles = ['solid', 'dash', 'dot', 'dashdot', 'longdash', 'longdashdot'];
             
-            // Group PRSNT data by ID
-            const curvesByID = {};
+            // Group by full curve key (SE-safe) — for representative SE pick there is one key
+            const curvesByKey = {};
             prsnTData.forEach(row => {
-                const id = row.ID || row.id;
-                if (!curvesByID[id]) curvesByID[id] = [];
-                curvesByID[id].push(row);
+                const key = getStrataCurveKey(row, columnMap) ||
+                    String(row.ID || row.id || row.StandID || '');
+                if (!curvesByKey[key]) curvesByKey[key] = [];
+                curvesByKey[key].push(row);
             });
-            
-            // Calculate Total NMV curve first (sum of all species)
+
+            // For non-SE multi-ID (rare), still average by age; for single key, pure series
             const totalNMVByAge = {};
-            for (const id in curvesByID) {
-                const curve = curvesByID[id].sort((a, b) => parseFloat(a.AGE) - parseFloat(b.AGE));
+            for (const key in curvesByKey) {
+                const curve = curvesByKey[key].sort((a, b) => parseFloat(a.AGE) - parseFloat(b.AGE));
                 curve.forEach(row => {
                     const age = parseFloat(row.AGE);
                     if (!isNaN(age)) {
                         if (!totalNMVByAge[age]) totalNMVByAge[age] = [];
-                        
-                        // Sum all species NMV values for this age
-                        let totalForAge = 0;
-                        speciesColumns.forEach(speciesCol => {
-                            const val = parseFloat(row[speciesCol]);
-                            if (!isNaN(val) && val > 0) {
-                                totalForAge += val;
-                            }
-                        });
-                        
-                        if (totalForAge > 0) {
+                        // Prefer total NMV column when present
+                        let totalForAge = parseFloat(row.NMV || row.nmv);
+                        if (isNaN(totalForAge) || totalForAge < 0) {
+                            totalForAge = 0;
+                            speciesColumns.forEach(speciesCol => {
+                                const val = parseFloat(row[speciesCol]);
+                                if (!isNaN(val) && val > 0) totalForAge += val;
+                            });
+                        }
+                        if (totalForAge > 0 && isPlausibleYieldMetric(totalForAge, 'netMerchVolume')) {
                             totalNMVByAge[age].push(totalForAge);
                         }
                     }
                 });
             }
             
-            // Add Total NMV trace (averaged across IDs for each age)
+            // Add Total NMV trace (mean across remaining curve keys — usually 1 for SE)
             const totalAges = Object.keys(totalNMVByAge).map(a => parseFloat(a)).sort((a, b) => a - b);
             const totalNMVs = totalAges.map(age => {
                 const values = totalNMVByAge[age];
@@ -3440,25 +4307,23 @@
                 console.log(`  ✅ Total NMV curve: ${totalAges.length} data points`);
             }
             
-            // Process each species column
+            // Process each species column (one value per age; mean if multiple keys)
             speciesColumns.forEach((speciesCol, idx) => {
-                // Collect all values for this species across all IDs
                 const speciesDataByAge = {};
                 
-                for (const id in curvesByID) {
-                    const curve = curvesByID[id].sort((a, b) => parseFloat(a.AGE) - parseFloat(b.AGE));
+                for (const key in curvesByKey) {
+                    const curve = curvesByKey[key].sort((a, b) => parseFloat(a.AGE) - parseFloat(b.AGE));
                     curve.forEach(row => {
                         const age = parseFloat(row.AGE);
                         const value = parseFloat(row[speciesCol]);
                         
-                        if (!isNaN(age) && !isNaN(value) && value > 0) {
+                        if (!isNaN(age) && !isNaN(value) && value > 0 && value <= 5000) {
                             if (!speciesDataByAge[age]) speciesDataByAge[age] = [];
                             speciesDataByAge[age].push(value);
                         }
                     });
                 }
                 
-                // If species has data, add trace
                 if (Object.keys(speciesDataByAge).length > 0) {
                     const ages = Object.keys(speciesDataByAge).map(a => parseFloat(a)).sort((a, b) => a - b);
                     const values = ages.map(age => {
@@ -3493,8 +4358,8 @@
             
             const layout = {
                 title: {
-                    text: `Net Merchantable Volume by Species vs Age - ${forestUnit} (PRSNT YIELD)`,
-                    font: { size: 18, family: 'Arial, sans-serif', weight: 'bold' }
+                    text: `Net Merchantable Volume by Species vs Age - ${forestUnit} (PRSNT YIELD)${seSliceNote}`,
+                    font: { size: 15, family: 'Arial, sans-serif', weight: 'bold' }
                 },
                 xaxis: { title: 'Age (years)', gridcolor: '#e9ecef', dtick: 10 },
                 yaxis: { title: 'NMV (m³/ha)', gridcolor: '#e9ecef' },
@@ -3657,35 +4522,43 @@
                 });
             }
             
-            // Add STRATA yield curves (pre-grouped) with varied line styles
+            // Add STRATA yield curves (SE-safe key; colour by SI for SE)
+            const seStyleMapsBa = buildSeStyleMaps(Object.values(strataByYield).flat(), columnMap);
             for (const yieldVal in strataByYield) {
                 const yieldData = strataByYield[yieldVal];
                 const curvesByID = {};
                 
                 yieldData.forEach(row => {
-                    const id = row.ID || row.id;
+                    const id = getStrataCurveKey(row, columnMap) || (row.ID || row.id);
                     if (!curvesByID[id]) curvesByID[id] = [];
                     curvesByID[id].push(row);
                 });
                 
                 for (const id in curvesByID) {
-                    const curve = curvesByID[id].sort((a, b) => parseFloat(a.AGE) - parseFloat(b.AGE));
-                    const ages = curve.map(r => parseFloat(r.AGE)).filter(v => !isNaN(v));
-                    const bas = curve.map(r => parseFloat(r.BA || r.ba)).filter(v => !isNaN(v));
+                    const curve = curvesByID[id];
+                    const cleaned = sanitizeAgeVolumeSeries(
+                        curve.map(r => r.AGE),
+                        curve.map(r => r.BA || r.ba),
+                        'basalArea'
+                    );
+                    const label = getStrataCurveLabel(curve[0], columnMap);
+                    const seStyle = getSeStrataLineStyle(curve[0], columnMap, seStyleMapsBa);
+                    const lineColor = seStyle ? seStyle.color : (yieldColors[yieldVal] || '#666');
+                    const lineDash = seStyle ? seStyle.dash : (yieldDashStyles[yieldVal] || 'solid');
                     
-                    if (ages.length > 0 && bas.length > 0) {
+                    if (cleaned.ages.length > 0 && cleaned.volumes.length > 0) {
                         traces.push({
-                            x: ages,
-                            y: bas,
+                            x: cleaned.ages,
+                            y: cleaned.volumes,
                             mode: 'lines',
                             type: 'scatter',
-                            name: `STRATA - ${yieldVal}`,
+                            name: `STRATA - ${label}`,
                             line: {
-                                color: yieldColors[yieldVal] || '#666',
-                                width: 4,
-                                dash: yieldDashStyles[yieldVal] || 'solid'
+                                color: lineColor,
+                                width: seStyle ? 2.5 : 4,
+                                dash: lineDash
                             },
-                            showlegend: traces.filter(t => t.name === `STRATA - ${yieldVal}`).length === 0
+                            showlegend: traces.filter(t => t.name === `STRATA - ${label}`).length === 0
                         });
                     }
                 }
@@ -3839,35 +4712,43 @@
                 });
             }
             
-            // Add STRATA yield curves (pre-grouped) with varied line styles
+            // Add STRATA yield curves (SE-safe key; colour by SI for SE)
+            const seStyleMapsGtv = buildSeStyleMaps(Object.values(strataByYield).flat(), columnMap);
             for (const yieldVal in strataByYield) {
                 const yieldData = strataByYield[yieldVal];
                 const curvesByID = {};
                 
                 yieldData.forEach(row => {
-                    const id = row.ID || row.id;
+                    const id = getStrataCurveKey(row, columnMap) || (row.ID || row.id);
                     if (!curvesByID[id]) curvesByID[id] = [];
                     curvesByID[id].push(row);
                 });
                 
                 for (const id in curvesByID) {
-                    const curve = curvesByID[id].sort((a, b) => parseFloat(a.AGE) - parseFloat(b.AGE));
-                    const ages = curve.map(r => parseFloat(r.AGE)).filter(v => !isNaN(v));
-                    const gtvs = curve.map(r => parseFloat(r.GTV || r.gtv)).filter(v => !isNaN(v));
+                    const curve = curvesByID[id];
+                    const cleaned = sanitizeAgeVolumeSeries(
+                        curve.map(r => r.AGE),
+                        curve.map(r => r.GTV || r.gtv),
+                        'grossTotalVolume'
+                    );
+                    const label = getStrataCurveLabel(curve[0], columnMap);
+                    const seStyle = getSeStrataLineStyle(curve[0], columnMap, seStyleMapsGtv);
+                    const lineColor = seStyle ? seStyle.color : (yieldColors[yieldVal] || '#666');
+                    const lineDash = seStyle ? seStyle.dash : (yieldDashStyles[yieldVal] || 'solid');
                     
-                    if (ages.length > 0 && gtvs.length > 0) {
+                    if (cleaned.ages.length > 0 && cleaned.volumes.length > 0) {
                         traces.push({
-                            x: ages,
-                            y: gtvs,
+                            x: cleaned.ages,
+                            y: cleaned.volumes,
                             mode: 'lines',
                             type: 'scatter',
-                            name: `STRATA - ${yieldVal}`,
+                            name: `STRATA - ${label}`,
                             line: {
-                                color: yieldColors[yieldVal] || '#666',
-                                width: 4,
-                                dash: yieldDashStyles[yieldVal] || 'solid'
+                                color: lineColor,
+                                width: seStyle ? 2.5 : 4,
+                                dash: lineDash
                             },
-                            showlegend: traces.filter(t => t.name === `STRATA - ${yieldVal}`).length === 0
+                            showlegend: traces.filter(t => t.name === `STRATA - ${label}`).length === 0
                         });
                     }
                 }
@@ -3957,39 +4838,25 @@
                 });
             }
             
-            // Add STRATA yield curves (HT column) - pre-grouped
-            for (const yieldVal in strataByYield) {
-                const yieldData = strataByYield[yieldVal];
-                const curvesByID = {};
-                
-                yieldData.forEach(row => {
-                    const id = row.ID || row.id;
-                    if (!curvesByID[id]) curvesByID[id] = [];
-                    curvesByID[id].push(row);
+            // Add STRATA HT curves (SE-safe grouping + SI colour)
+            forEachStrataCurveGroup(strataByYield, yieldColors, yieldDashStyles, (curveRows, yieldVal, style) => {
+                const cleaned = sanitizeAgeMetricSeries(
+                    curveRows.map(r => r.AGE),
+                    curveRows.map(r => r.HT || r.ht),
+                    80
+                );
+                if (!cleaned.ages.length) return;
+                const name = `STRATA - ${style.label}`;
+                traces.push({
+                    x: cleaned.ages,
+                    y: cleaned.values,
+                    mode: 'lines',
+                    type: 'scatter',
+                    name,
+                    line: { color: style.color, width: style.width, dash: style.dash },
+                    showlegend: traces.filter(t => t.name === name).length === 0
                 });
-                
-                for (const id in curvesByID) {
-                    const curve = curvesByID[id].sort((a, b) => parseFloat(a.AGE) - parseFloat(b.AGE));
-                    const ages = curve.map(r => parseFloat(r.AGE)).filter(v => !isNaN(v));
-                    const heights = curve.map(r => parseFloat(r.HT || r.ht)).filter(v => !isNaN(v));
-                    
-                    if (heights.length > 0) {
-                        traces.push({
-                            x: ages,
-                            y: heights,
-                            mode: 'lines',
-                            type: 'scatter',
-                            name: `STRATA - ${yieldVal}`,
-                            line: {
-                                color: yieldColors[yieldVal] || '#666',
-                                width: 4,
-                                dash: yieldDashStyles[yieldVal] || 'solid'
-                            },
-                            showlegend: traces.filter(t => t.name === `STRATA - ${yieldVal}`).length === 0
-                        });
-                    }
-                }
-            }
+            });
             
             const layout = {
                 title: { text: `Height vs Age - ${forestUnit}`, font: { size: 16 } },
@@ -4015,39 +4882,25 @@
             
             const traces = [];
             
-            // Add STRATA yield curves (DBHQ column) - pre-grouped
-            for (const yieldVal in strataByYield) {
-                const yieldData = strataByYield[yieldVal];
-                const curvesByID = {};
-                
-                yieldData.forEach(row => {
-                    const id = row.ID || row.id;
-                    if (!curvesByID[id]) curvesByID[id] = [];
-                    curvesByID[id].push(row);
+            // Add STRATA DBHQ curves (SE-safe + SI colour; drop blow-ups)
+            forEachStrataCurveGroup(strataByYield, yieldColors, yieldDashStyles, (curveRows, yieldVal, style) => {
+                const cleaned = sanitizeAgeMetricSeries(
+                    curveRows.map(r => r.AGE),
+                    curveRows.map(r => r.DBHQ || r.dbhq),
+                    200
+                );
+                if (!cleaned.ages.length) return;
+                const name = `STRATA - ${style.label}`;
+                traces.push({
+                    x: cleaned.ages,
+                    y: cleaned.values,
+                    mode: 'lines',
+                    type: 'scatter',
+                    name,
+                    line: { color: style.color, width: style.width, dash: style.dash },
+                    showlegend: traces.filter(t => t.name === name).length === 0
                 });
-                
-                for (const id in curvesByID) {
-                    const curve = curvesByID[id].sort((a, b) => parseFloat(a.AGE) - parseFloat(b.AGE));
-                    const ages = curve.map(r => parseFloat(r.AGE)).filter(v => !isNaN(v));
-                    const dbhqs = curve.map(r => parseFloat(r.DBHQ || r.dbhq)).filter(v => !isNaN(v));
-                    
-                    if (dbhqs.length > 0) {
-                        traces.push({
-                            x: ages,
-                            y: dbhqs,
-                            mode: 'lines',
-                            type: 'scatter',
-                            name: `STRATA - ${yieldVal}`,
-                            line: {
-                                color: yieldColors[yieldVal] || '#666',
-                                width: 4,
-                                dash: yieldDashStyles[yieldVal] || 'solid'
-                            },
-                            showlegend: traces.filter(t => t.name === `STRATA - ${yieldVal}`).length === 0
-                        });
-                    }
-                }
-            }
+            });
             
             const layout = {
                 title: { text: `DBH Quadratic Mean vs Age - ${forestUnit}`, font: { size: 16 } },
@@ -4073,39 +4926,25 @@
             
             const traces = [];
             
-            // Add STRATA yield curves (STEMS column) - pre-grouped
-            for (const yieldVal in strataByYield) {
-                const yieldData = strataByYield[yieldVal];
-                const curvesByID = {};
-                
-                yieldData.forEach(row => {
-                    const id = row.ID || row.id;
-                    if (!curvesByID[id]) curvesByID[id] = [];
-                    curvesByID[id].push(row);
+            // Add STRATA STEMS curves (SE-safe + SI colour)
+            forEachStrataCurveGroup(strataByYield, yieldColors, yieldDashStyles, (curveRows, yieldVal, style) => {
+                const cleaned = sanitizeAgeMetricSeries(
+                    curveRows.map(r => r.AGE),
+                    curveRows.map(r => r.STEMS || r.stems),
+                    20000
+                );
+                if (!cleaned.ages.length) return;
+                const name = `STRATA - ${style.label}`;
+                traces.push({
+                    x: cleaned.ages,
+                    y: cleaned.values,
+                    mode: 'lines',
+                    type: 'scatter',
+                    name,
+                    line: { color: style.color, width: style.width, dash: style.dash },
+                    showlegend: traces.filter(t => t.name === name).length === 0
                 });
-                
-                for (const id in curvesByID) {
-                    const curve = curvesByID[id].sort((a, b) => parseFloat(a.AGE) - parseFloat(b.AGE));
-                    const ages = curve.map(r => parseFloat(r.AGE)).filter(v => !isNaN(v));
-                    const stems = curve.map(r => parseFloat(r.STEMS || r.stems)).filter(v => !isNaN(v));
-                    
-                    if (stems.length > 0) {
-                        traces.push({
-                            x: ages,
-                            y: stems,
-                            mode: 'lines',
-                            type: 'scatter',
-                            name: `STRATA - ${yieldVal}`,
-                            line: {
-                                color: yieldColors[yieldVal] || '#666',
-                                width: 4,
-                                dash: yieldDashStyles[yieldVal] || 'solid'
-                            },
-                            showlegend: traces.filter(t => t.name === `STRATA - ${yieldVal}`).length === 0
-                        });
-                    }
-                }
-            }
+            });
             
             const layout = {
                 title: { text: `Stems per Hectare vs Age - ${forestUnit}`, font: { size: 16 } },
@@ -4131,49 +4970,38 @@
             
             const traces = [];
             
-            // Add STRATA yield curves (GTV, GMV, NMV columns) - pre-grouped
+            // Add STRATA GTV/GMV/NMV — SE-safe groups; colour by SI (SE) or YIELD
             const volumeTypes = [
-                { key: 'GTV', label: 'GTV', dashStyle: 'solid' },
-                { key: 'GMV', label: 'GMV', dashStyle: 'dash' },
-                { key: 'NMV', label: 'NMV', dashStyle: 'dot' }
+                { key: 'GTV', label: 'GTV', metricKey: 'grossTotalVolume', dashStyle: 'solid' },
+                { key: 'GMV', label: 'GMV', metricKey: 'grossMerchVolume', dashStyle: 'dash' },
+                { key: 'NMV', label: 'NMV', metricKey: 'netMerchVolume', dashStyle: 'dot' }
             ];
             
-            for (const yieldVal in strataByYield) {
-                const yieldData = strataByYield[yieldVal];
-                const curvesByID = {};
-                
-                yieldData.forEach(row => {
-                    const id = row.ID || row.id;
-                    if (!curvesByID[id]) curvesByID[id] = [];
-                    curvesByID[id].push(row);
-                });
-                
-                // For each curve ID and volume type, create a trace
-                for (const id in curvesByID) {
-                    const curve = curvesByID[id].sort((a, b) => parseFloat(a.AGE) - parseFloat(b.AGE));
-                    const ages = curve.map(r => parseFloat(r.AGE)).filter(v => !isNaN(v));
-                    
-                    volumeTypes.forEach(volType => {
-                        const volumes = curve.map(r => parseFloat(r[volType.key] || r[volType.key.toLowerCase()])).filter(v => !isNaN(v));
-                        
-                        if (volumes.length > 0) {
-                            traces.push({
-                                x: ages,
-                                y: volumes,
-                                mode: 'lines',
-                                type: 'scatter',
-                                name: `${yieldVal} - ${volType.label}`,
-                                line: {
-                                    color: yieldColors[yieldVal] || '#666',
-                                    width: 4,
-                                    dash: volType.dashStyle
-                                },
-                                showlegend: traces.filter(t => t.name === `${yieldVal} - ${volType.label}`).length === 0
-                            });
-                        }
+            forEachStrataCurveGroup(strataByYield, yieldColors, yieldDashStyles, (curveRows, yieldVal, style) => {
+                volumeTypes.forEach(volType => {
+                    const cleaned = sanitizeAgeVolumeSeries(
+                        curveRows.map(r => r.AGE),
+                        curveRows.map(r => r[volType.key] || r[volType.key.toLowerCase()]),
+                        volType.metricKey
+                    );
+                    if (!cleaned.ages.length) return;
+                    // Dash encodes volume type; colour encodes SI (SE) or YIELD
+                    const name = `${style.label} · ${volType.label}`;
+                    traces.push({
+                        x: cleaned.ages,
+                        y: cleaned.volumes,
+                        mode: 'lines',
+                        type: 'scatter',
+                        name,
+                        line: {
+                            color: style.color,
+                            width: style.width,
+                            dash: volType.dashStyle
+                        },
+                        showlegend: traces.filter(t => t.name === name).length === 0
                     });
-                }
-            }
+                });
+            });
             
             const layout = {
                 title: { text: `Combined Volumes (GTV/GMV/NMV) - ${forestUnit}`, font: { size: 16 } },
@@ -4656,6 +5484,7 @@
         ${panels.nmvBySpecies ? `
         <div class="chart-container" style="margin-bottom: 30px;">
             <h4 style="margin-top: 0; color: #6f42c1;">📊 Species Breakdown - NMV vs Age (PRSNT YIELD)</h4>
+            <p style="color:#666; font-size:12px; margin:0 0 8px 0;">For GLSL selection (SE) strata, this panel uses one representative curve (CUT / AGSFRC / SI) — not an average of all SE series.</p>
             <img src="${panels.nmvBySpecies}" alt="${fu} - NMV by Species" style="width: 100%; max-width: 1400px;">
         </div>
         ` : ''}
@@ -4920,6 +5749,8 @@
             let savedYFUCheckboxes, savedStrataYields, savedStandYields, savedStandSpecies, savedScatterPlanfu, savedScatterYield, savedScatterLeadspc;
             let savedTypeStrata, savedTypeStand;
             let savedBioYYC, savedBioYield, savedBioLeadspc, savedBioTypeStrata, savedBioTypeStand;
+            let savedSilSys, savedCut, savedAgsfrc, savedStrataSi;
+            let savedBioSilSys, savedBioCut, savedBioAgsfrc, savedBioStrataSi;
             
             try {
                 // Save current filter state (volume + biomass)
@@ -4930,6 +5761,10 @@
                 savedScatterPlanfu = Array.from(document.querySelectorAll('.scatter-planfu-checkbox')).map(cb => ({ el: cb, checked: cb.checked }));
                 savedScatterYield = Array.from(document.querySelectorAll('.scatter-yield-checkbox')).map(cb => ({ el: cb, checked: cb.checked }));
                 savedScatterLeadspc = Array.from(document.querySelectorAll('.scatter-leadspc-checkbox')).map(cb => ({ el: cb, checked: cb.checked }));
+                savedSilSys = Array.from(document.querySelectorAll('.silsys-checkbox')).map(cb => ({ el: cb, checked: cb.checked }));
+                savedCut = Array.from(document.querySelectorAll('.cut-checkbox')).map(cb => ({ el: cb, checked: cb.checked }));
+                savedAgsfrc = Array.from(document.querySelectorAll('.agsfrc-checkbox')).map(cb => ({ el: cb, checked: cb.checked }));
+                savedStrataSi = Array.from(document.querySelectorAll('.strata-si-checkbox')).map(cb => ({ el: cb, checked: cb.checked }));
                 
                 const typeStrataEl = document.getElementById('typeStrata');
                 const typeStandEl = document.getElementById('typeStand');
@@ -4939,6 +5774,10 @@
                 savedBioYYC = Array.from(document.querySelectorAll('.bio-yyc-checkbox')).map(cb => ({ el: cb, checked: cb.checked }));
                 savedBioYield = Array.from(document.querySelectorAll('.bio-yield-checkbox')).map(cb => ({ el: cb, checked: cb.checked }));
                 savedBioLeadspc = Array.from(document.querySelectorAll('.bio-leadspc-checkbox')).map(cb => ({ el: cb, checked: cb.checked }));
+                savedBioSilSys = Array.from(document.querySelectorAll('.bio-silsys-checkbox')).map(cb => ({ el: cb, checked: cb.checked }));
+                savedBioCut = Array.from(document.querySelectorAll('.bio-cut-checkbox')).map(cb => ({ el: cb, checked: cb.checked }));
+                savedBioAgsfrc = Array.from(document.querySelectorAll('.bio-agsfrc-checkbox')).map(cb => ({ el: cb, checked: cb.checked }));
+                savedBioStrataSi = Array.from(document.querySelectorAll('.bio-strata-si-checkbox')).map(cb => ({ el: cb, checked: cb.checked }));
                 const bioTypeStrataEl = document.getElementById('bioTypeStrata');
                 const bioTypeStandEl = document.getElementById('bioTypeStand');
                 savedBioTypeStrata = bioTypeStrataEl ? bioTypeStrataEl.checked : false;
@@ -4965,7 +5804,11 @@
                     document.querySelectorAll('.strata-yield-checkbox').forEach(cb => cb.checked = true);
                     document.querySelectorAll('.stand-yield-checkbox').forEach(cb => cb.checked = true);
                     document.querySelectorAll('.stand-leadspc-checkbox').forEach(cb => cb.checked = true);
-                    console.log('✅ Selected all Yield Curve filters');
+                    // GLSL SE: do NOT select all AGSFRC×SI (hundreds of curves) — use representative grid
+                    if (isGlslVolume) {
+                        applyVolumeGlslFullReportDefaults();
+                    }
+                    console.log('✅ Selected Yield Curve filters (GLSL SE uses representative grid if applicable)');
                     
                     updateProgress('🔍 Auto-selecting all Raw Data filters...', 25);
                     await new Promise(resolve => setTimeout(resolve, 50));
@@ -5018,7 +5861,10 @@
                     document.querySelectorAll('.bio-yyc-checkbox').forEach(cb => cb.checked = true);
                     document.querySelectorAll('.bio-yield-checkbox').forEach(cb => cb.checked = true);
                     document.querySelectorAll('.bio-leadspc-checkbox').forEach(cb => cb.checked = true);
-                    console.log('✅ Selected all Biomass filters for full report');
+                    if (isGlslBiomass) {
+                        applyBiomassGlslFullReportDefaults();
+                    }
+                    console.log('✅ Selected Biomass filters for full report (GLSL SE grid if applicable)');
 
                     updateProgress('🌿 Generating Biomass dashboards...', 85);
                     await new Promise(resolve => setTimeout(resolve, 50));
@@ -5089,11 +5935,19 @@
                     if (savedScatterPlanfu) savedScatterPlanfu.forEach(item => item.el.checked = item.checked);
                     if (savedScatterYield) savedScatterYield.forEach(item => item.el.checked = item.checked);
                     if (savedScatterLeadspc) savedScatterLeadspc.forEach(item => item.el.checked = item.checked);
+                    if (savedSilSys) savedSilSys.forEach(item => item.el.checked = item.checked);
+                    if (savedCut) savedCut.forEach(item => item.el.checked = item.checked);
+                    if (savedAgsfrc) savedAgsfrc.forEach(item => item.el.checked = item.checked);
+                    if (savedStrataSi) savedStrataSi.forEach(item => item.el.checked = item.checked);
 
                     // Restore biomass filters
                     if (savedBioYYC) savedBioYYC.forEach(item => item.el.checked = item.checked);
                     if (savedBioYield) savedBioYield.forEach(item => item.el.checked = item.checked);
                     if (savedBioLeadspc) savedBioLeadspc.forEach(item => item.el.checked = item.checked);
+                    if (savedBioSilSys) savedBioSilSys.forEach(item => item.el.checked = item.checked);
+                    if (savedBioCut) savedBioCut.forEach(item => item.el.checked = item.checked);
+                    if (savedBioAgsfrc) savedBioAgsfrc.forEach(item => item.el.checked = item.checked);
+                    if (savedBioStrataSi) savedBioStrataSi.forEach(item => item.el.checked = item.checked);
                     const bioTypeStrataEl = document.getElementById('bioTypeStrata');
                     const bioTypeStandEl = document.getElementById('bioTypeStand');
                     if (bioTypeStrataEl && typeof savedBioTypeStrata === 'boolean') bioTypeStrataEl.checked = savedBioTypeStrata;
@@ -5441,6 +6295,16 @@
             if (data.length === 0) { alert('Biomass file appears to be empty.'); return; }
 
             bioData = data;
+            // Headers already trimmed via transformHeader; re-trim keys if a path skipped it
+            const rawHeaders = Object.keys(data[0]);
+            if (rawHeaders.some(h => h !== String(h).trim())) {
+                const trimmed = data.map(row => {
+                    const o = {};
+                    Object.keys(row).forEach(k => { o[String(k).trim()] = row[k]; });
+                    return o;
+                });
+                bioData = data = trimmed;
+            }
             const headers = Object.keys(data[0]);
 
             const yycCol = findBioHeader(headers, ['yYC', 'yFU', 'PLANFU', 'SFU']) || headers[1];
@@ -5452,13 +6316,21 @@
                 yieldScenario:   findBioHeader(headers, ['YIELD', 'Yield']) || 'YIELD',
                 leadingSpecies:  leadspcCol,
                 age:             findBioHeader(headers, ['AGE', 'Age']) || 'AGE',
-                standId:         findBioHeader(headers, ['StandID', 'ID', 'POLYID']) || headers[0],
+                // ID ≡ StandID
+                standId:         findBioHeader(headers, ['ID', 'StandID', 'POLYID', 'unique_id']) || headers[0],
+                siteIndex:       findBioHeader(headers, ['SI', 'SiteIndex', 'site_index']),
+                silsys:          findBioHeader(headers, ['SILSYS', 'SILVSYS', 'SilSys']),
+                cut:             findBioHeader(headers, ['CUT', 'Cut', 'PREV_CUT']),
+                agsfrc:          findBioHeader(headers, ['AGSFRC', 'AgsFrc', 'AGS_FRC']),
                 bioTotalBiomass: findBioHeader(headers, ['Biomass', 'TotalBiomass', 'TOTAL_BIOMASS']),
                 bioWood:         findBioHeader(headers, ['Wood', 'WOOD']),
                 bioBark:         findBioHeader(headers, ['Bark', 'BARK']),
                 bioBranches:     findBioHeader(headers, ['Branches', 'BRANCHES']),
-                bioFoliage:      findBioHeader(headers, ['Foliage', 'FOLIAGE'])
+                bioFoliage:      findBioHeader(headers, ['Foliage', 'FOLIAGE']),
+                // alias polygonID so shared getStrataCurveKey works
+                polygonID:       null
             };
+            bioColumnMap.polygonID = bioColumnMap.standId;
 
             if (!bioColumnMap.bioTotalBiomass && !bioColumnMap.bioWood) {
                 alert('Could not find biomass columns (Biomass / Wood / Bark / Branches / Foliage) in the uploaded file.');
@@ -5466,17 +6338,50 @@
             }
 
             const typeCol = bioColumnMap.curveType;
-            bioStrataCurves = data.filter(r => String(r[typeCol] || '').trim().toUpperCase() === 'STRATA');
-            bioStandCurves  = data.filter(r => String(r[typeCol] || '').trim().toUpperCase() === 'STAND');
+            // POLYGON ≡ STAND (individual polygon/stand curves)
+            bioStrataCurves = data.filter(r => isStrataType(r[typeCol]));
+            bioStandCurves  = data.filter(r => isStandType(r[typeCol]));
 
             const fuCol = bioColumnMap.forestUnit;
             uniqueBioYYCs    = [...new Set(data.map(r => String(r[fuCol] ?? '').trim()).filter(Boolean))].sort();
             bioYieldTypes    = [...new Set(data.map(r => String(r[bioColumnMap.yieldScenario] ?? '').trim()).filter(Boolean))].sort();
             bioLeadspcTypes  = [...new Set(data.map(r => String(r[bioColumnMap.leadingSpecies] ?? '').trim()).filter(Boolean))].sort();
 
+            // GLSL detection for biomass
+            isGlslBiomass = isGlslColumnMap(bioColumnMap);
+            uniqueBioSilSys = [];
+            uniqueBioCut = [];
+            uniqueBioAgsfrc = [];
+            uniqueBioStrataSI = [];
+            if (isGlslBiomass) {
+                uniqueBioSilSys = [...new Set(data.map(r => cellStr(r, bioColumnMap.silsys).toUpperCase()).filter(Boolean))].sort();
+                const seRows = bioStrataCurves.filter(r => isSelectionSilSys(r[bioColumnMap.silsys]));
+                uniqueBioCut = [...new Set(seRows.map(r => cellStr(r, bioColumnMap.cut)).filter(v => v !== ''))]
+                    .sort((a, b) => Number(a) - Number(b));
+                uniqueBioAgsfrc = [...new Set(seRows.map(r => normalizeAgsfrc(r[bioColumnMap.agsfrc])).filter(Boolean))]
+                    .sort((a, b) => Number(a) - Number(b));
+                uniqueBioStrataSI = [...new Set(seRows.map(r => normalizeSi(r[bioColumnMap.siteIndex])).filter(Boolean))]
+                    .sort((a, b) => Number(a) - Number(b));
+                console.log(`🪵 GLSL biomass — SILSYS:${uniqueBioSilSys.join(',')}, SE dims CUT/AGS/SI:`,
+                    uniqueBioCut.length, uniqueBioAgsfrc.length, uniqueBioStrataSI.length);
+            }
+
             populateBiomassCheckboxes('bioYYCCheckboxes',     uniqueBioYYCs,   'bio-yyc-checkbox');
             populateBiomassCheckboxes('bioYieldCheckboxes',   bioYieldTypes,   'bio-yield-checkbox');
             populateBiomassCheckboxes('bioLeadspcCheckboxes', bioLeadspcTypes, 'bio-leadspc-checkbox');
+
+            const glslBioSec = document.getElementById('glslBiomassSection');
+            if (glslBioSec) {
+                if (isGlslBiomass) {
+                    glslBioSec.style.display = 'block';
+                    populateCheckboxGroup('bioSilSysCheckboxes', uniqueBioSilSys, 'bio-silsys-checkbox', 'bio_silsys', uniqueBioSilSys);
+                    populateCheckboxGroup('bioCutCheckboxes', uniqueBioCut, 'bio-cut-checkbox', 'bio_cut', pickDefaultCut(uniqueBioCut));
+                    populateCheckboxGroup('bioAgsfrcCheckboxes', uniqueBioAgsfrc, 'bio-agsfrc-checkbox', 'bio_agsfrc', pickDefaultAgsfrc(uniqueBioAgsfrc));
+                    populateCheckboxGroup('bioStrataSiCheckboxes', uniqueBioStrataSI, 'bio-strata-si-checkbox', 'bio_si', pickDefaultSI(uniqueBioStrataSI));
+                } else {
+                    glslBioSec.style.display = 'none';
+                }
+            }
 
             // Large multi-FU files: default to first FU only so the first plot stays responsive
             let defaultNote = '';
@@ -5487,13 +6392,16 @@
                 defaultNote = ` Showing ${uniqueBioYYCs[0]} by default — select more FUs and click Apply.`;
             }
 
-            // Very large STAND sets: leave STAND off initially (STRATA is the main dashboard view)
+            // Very large STAND/POLYGON sets: leave STAND off initially (STRATA is the main dashboard view)
             const standUniqueApprox = new Set(
                 bioStandCurves.map(r => String(r[bioColumnMap.standId] ?? '').trim())
             ).size;
             if (standUniqueApprox > 400) {
                 document.getElementById('bioTypeStand').checked = false;
-                defaultNote += ' STAND curves hidden by default (large file) — enable STAND to overlay individual stands.';
+                defaultNote += ' STAND/POLYGON curves hidden by default (large file) — enable STAND/POLYGON to overlay individuals.';
+            }
+            if (isGlslBiomass) {
+                defaultNote += ' GLSL SE strata default to a small CUT/AGSFRC/SI slice.';
             }
 
             document.getElementById('bioYYCSection').style.display     = uniqueBioYYCs.length   ? 'block' : 'none';
@@ -5505,7 +6413,7 @@
             document.getElementById('bioFileStatus').textContent           = fileName;
             document.getElementById('bioColumnMappingAlert').style.display = 'block';
             document.getElementById('bioColumnMappingText').textContent    =
-                `Loaded ${data.length.toLocaleString()} rows · FU: "${fuCol}" · STRATA: ${bioStrataCurves.length.toLocaleString()} · STAND: ${bioStandCurves.length.toLocaleString()}.${defaultNote}`;
+                `Loaded ${data.length.toLocaleString()} rows · ${isGlslBiomass ? 'GLSL' : 'BOREAL'} · FU: "${fuCol}" · ID: "${bioColumnMap.standId}" · STRATA: ${bioStrataCurves.length.toLocaleString()} · STAND/POLYGON: ${bioStandCurves.length.toLocaleString()}.${defaultNote}`;
 
             // Switch to Biomass tab and auto-plot so the dashboard is immediately usable
             try {
@@ -5517,6 +6425,25 @@
 
             console.log('✅ Biomass data loaded:', data.length, 'rows, FU col:', fuCol, bioColumnMap);
             updateBiomassPlot();
+        }
+
+        function getBiomassGlslSelections() {
+            return {
+                silsys: getCheckedValues('.bio-silsys-checkbox'),
+                cut: getCheckedValues('.bio-cut-checkbox'),
+                agsfrc: getCheckedValues('.bio-agsfrc-checkbox'),
+                si: getCheckedValues('.bio-strata-si-checkbox')
+            };
+        }
+
+        function applyBiomassGlslFullReportDefaults() {
+            if (!isGlslBiomass) return;
+            document.querySelectorAll('.bio-silsys-checkbox').forEach(cb => { cb.checked = true; });
+            document.querySelectorAll('.bio-cut-checkbox').forEach(cb => { cb.checked = true; });
+            const defAgs = new Set(pickFullReportAgsfrc(uniqueBioAgsfrc));
+            document.querySelectorAll('.bio-agsfrc-checkbox').forEach(cb => { cb.checked = defAgs.has(cb.value); });
+            const defSi = new Set(pickFullReportSI(uniqueBioStrataSI));
+            document.querySelectorAll('.bio-strata-si-checkbox').forEach(cb => { cb.checked = defSi.has(cb.value); });
         }
 
         function populateBiomassCheckboxes(containerId, values, cssClass) {
@@ -5582,7 +6509,7 @@
                 return;
             }
             if (!showStrata && !showStand) {
-                alert('Select at least one curve type (STRATA and/or STAND).');
+                alert('Select at least one curve type (STRATA and/or STAND/POLYGON).');
                 return;
             }
 
@@ -5604,17 +6531,45 @@
             const yieldDashMap = {};
             allYields.forEach((y, i) => { yieldDashMap[y] = dashPatterns[i % dashPatterns.length]; });
 
+            const glslBioSel = isGlslBiomass ? getBiomassGlslSelections() : { silsys: [], cut: [], agsfrc: [], si: [] };
+
             function matchesFilters(r) {
                 const fu  = String(r[fuCol] ?? '').trim();
                 const yld = String(r[yldCol] ?? '').trim();
                 const sp  = String(r[leadCol] ?? '').trim();
-                return selYYCs.includes(fu) &&
+                const base = selYYCs.includes(fu) &&
                        (selYields.length  === 0 || selYields.includes(yld)) &&
                        (selLeadspc.length === 0 || selLeadspc.includes(sp));
+                return base;
             }
 
-            const filteredStrata = showStrata ? bioStrataCurves.filter(matchesFilters) : [];
+            function matchesStrataFilters(r) {
+                return matchesFilters(r) && matchesGlslStrataFilters(r, bioColumnMap, glslBioSel);
+            }
+
+            // STAND/POLYGON: FU + YIELD + LEADSPC only (no SILSYS SE finer key)
+            const filteredStrata = showStrata ? bioStrataCurves.filter(matchesStrataFilters) : [];
             const filteredStand  = showStand  ? bioStandCurves.filter(matchesFilters)  : [];
+
+            // Subtle curve integrity check: full SE key for GLSL STRATA
+            if (idCol) {
+                const bioIdChecks = [];
+                if (filteredStrata.length > 0) {
+                    bioIdChecks.push(validateSingleIdPerCurve(filteredStrata, {
+                        idCol,
+                        label: 'BIO STRATA',
+                        curveKeyFn: row => getStrataCurveKey(row, bioColumnMap)
+                    }));
+                }
+                if (filteredStand.length > 0) {
+                    bioIdChecks.push(validateSingleIdPerCurve(filteredStand, {
+                        idCol,
+                        label: 'BIO STAND/POLYGON',
+                        curveKeyFn: row => String(row[idCol] ?? '').trim()
+                    }));
+                }
+                reportCurveIdAnomalies(bioIdChecks, { alertUser: true });
+            }
 
             // ── STAND: thin semi-transparent line per stand, coloured by FU ──
             if (filteredStand.length > 0) {
@@ -5642,15 +6597,20 @@
 
                 limitedKeys.forEach(key => {
                     const g = byID[key];
-                    g.rows.sort((a, b) => (Number(a[ageCol]) || 0) - (Number(b[ageCol]) || 0));
+                    const cleaned = sanitizeAgeMetricSeries(
+                        g.rows.map(r => r[ageCol]),
+                        g.rows.map(r => r[standMetricCol]),
+                        BIOMASS_METRIC_CAP
+                    );
+                    if (!cleaned.ages.length) return;
                     const base = fuColorMap[g.fu] || '#2e7d32';
-                    const legendKey = `STAND ${g.fu} — ${g.yld}`;
+                    const legendKey = `STAND/POLYGON ${g.fu} — ${g.yld}`;
                     const showLegend = !standLegendAdded[legendKey];
                     if (showLegend) standLegendAdded[legendKey] = true;
 
                     traces.push({
-                        x: g.rows.map(r => Number(r[ageCol])),
-                        y: g.rows.map(r => Number(r[standMetricCol])),
+                        x: cleaned.ages,
+                        y: cleaned.values,
                         mode: 'lines',
                         name: showLegend ? legendKey : undefined,
                         legendgroup: `stand_${g.fu}_${g.yld}`,
@@ -5671,55 +6631,91 @@
                 }
             }
 
-            // ── STRATA: group by Forest Unit + YIELD ─────────────────────────
+            // ── STRATA: full curve identity; SE → colour=SI, dash=CUT/AGS ───
             if (filteredStrata.length > 0) {
                 const strataGroups = {};
                 filteredStrata.forEach(r => {
+                    const key = getStrataCurveKey(r, bioColumnMap);
                     const fu  = String(r[fuCol] ?? '').trim();
                     const yld = String(r[yldCol] ?? 'PRSNT').trim();
-                    const key = `${fu}||${yld}`;
-                    if (!strataGroups[key]) strataGroups[key] = { fu, yld, rows: [] };
+                    if (!strataGroups[key]) {
+                        strataGroups[key] = {
+                            fu, yld, rows: [],
+                            sample: r,
+                            label: getStrataCurveLabel(r, bioColumnMap)
+                        };
+                    }
                     strataGroups[key].rows.push(r);
                 });
 
-                Object.values(strataGroups).forEach((g, gi) => {
-                    g.rows.sort((a, b) => (Number(a[ageCol]) || 0) - (Number(b[ageCol]) || 0));
-                    const ages = g.rows.map(r => Number(r[ageCol]));
-                    const labelBase = `${g.fu} — ${g.yld}`;
-                    const fuColor = fuColorMap[g.fu] || palette[gi % palette.length];
-                    const yldDash = yieldDashMap[g.yld] || 'solid';
+                const seStyleMapsBio = buildSeStyleMaps(filteredStrata, bioColumnMap);
+                const strataKeys = Object.keys(strataGroups).sort();
+                const MAX_BIO_STRATA = 60;
+                const limitedStrataKeys = strataKeys.length > MAX_BIO_STRATA
+                    ? strataKeys.slice(0, MAX_BIO_STRATA) : strataKeys;
+                if (strataKeys.length > MAX_BIO_STRATA) {
+                    console.warn(`🌿 Capped bio STRATA traces at ${MAX_BIO_STRATA} of ${strataKeys.length}`);
+                }
+
+                limitedStrataKeys.forEach((key, gi) => {
+                    const g = strataGroups[key];
+                    const seStyle = getSeStrataLineStyle(g.sample, bioColumnMap, seStyleMapsBio);
+                    // SE: SI colour + CUT/AGS dash; non-SE: FU colour + YIELD dash
+                    const seriesColor = seStyle
+                        ? seStyle.color
+                        : (fuColorMap[g.fu] || palette[gi % palette.length]);
+                    const seriesDash = seStyle
+                        ? seStyle.dash
+                        : (yieldDashMap[g.yld] || 'solid');
+                    const labelBase = g.label || `${g.fu} — ${g.yld}`;
 
                     if (metricKey === 'Biomass') {
-                        // Full component breakdown + total biomass
+                        // Components keep fixed hues; Total uses SE SI colour when SE
                         componentDefs.forEach(comp => {
                             const col = bioColumnMap[comp.key];
                             if (!col) return;
                             const isTotal = comp.key === 'bioTotalBiomass';
+                            const cleaned = sanitizeAgeMetricSeries(
+                                g.rows.map(r => r[ageCol]),
+                                g.rows.map(r => r[col]),
+                                BIOMASS_METRIC_CAP
+                            );
+                            if (!cleaned.ages.length) return;
+                            const lineColor = isTotal ? seriesColor : comp.color;
+                            const lineDash = isTotal
+                                ? (seStyle ? 'dash' : 'dash')
+                                : seriesDash;
                             traces.push({
-                                x: ages,
-                                y: g.rows.map(r => Number(r[col])),
+                                x: cleaned.ages,
+                                y: cleaned.values,
                                 mode: 'lines+markers',
                                 name: `${labelBase} · ${comp.label}`,
-                                legendgroup: `strata_${g.fu}_${g.yld}_${comp.key}`,
+                                legendgroup: `strata_${key}_${comp.key}`,
                                 line: {
-                                    color: isTotal ? fuColor : comp.color,
+                                    color: lineColor,
                                     width: isTotal ? 3.5 : 2.5,
-                                    dash: isTotal ? 'dash' : yldDash
+                                    dash: lineDash
                                 },
-                                marker: { size: 5, color: isTotal ? fuColor : comp.color },
+                                marker: { size: 5, color: lineColor },
                                 hovertemplate:
                                     `<b>${labelBase}</b><br>${comp.label}<br>Age: %{x}<br>%{y:.2f} Mg/ha<extra></extra>`
                             });
                         });
                     } else {
+                        const cleaned = sanitizeAgeMetricSeries(
+                            g.rows.map(r => r[ageCol]),
+                            g.rows.map(r => r[metricCol]),
+                            BIOMASS_METRIC_CAP
+                        );
+                        if (!cleaned.ages.length) return;
                         traces.push({
-                            x: ages,
-                            y: g.rows.map(r => Number(r[metricCol])),
+                            x: cleaned.ages,
+                            y: cleaned.values,
                             mode: 'lines+markers',
                             name: labelBase,
-                            legendgroup: `strata_${g.fu}_${g.yld}`,
-                            line: { color: fuColor, width: 3.5, dash: yldDash },
-                            marker: { size: 6, color: fuColor },
+                            legendgroup: `strata_${key}`,
+                            line: { color: seriesColor, width: 3.5, dash: seriesDash },
+                            marker: { size: 6, color: seriesColor },
                             hovertemplate:
                                 `<b>${labelBase}</b><br>Age: %{x}<br>${metricKey}: %{y:.2f} Mg/ha<extra></extra>`
                         });
@@ -5735,7 +6731,7 @@
                     '<div style="display:flex;align-items:center;justify-content:center;height:300px;color:#6c757d;">' +
                     '<div style="text-align:center;">' +
                     '<h4>No curves match the selected filters</h4>' +
-                    '<p class="mb-0">Try adjusting Forest Unit, YIELD, Leading Species, or curve type.</p>' +
+                    '<p class="mb-0">Try adjusting Forest Unit, YIELD, Leading Species, GLSL SE filters (CUT/AGSFRC/SI), or curve type.</p>' +
                     '</div></div>';
                 document.getElementById('bioStatsBox').style.display = 'block';
                 document.getElementById('bioStrataCount').innerHTML = 'STRATA: <span class="text-muted">none</span>';
@@ -5797,10 +6793,9 @@
                 try { Plotly.Plots.resize('biomassPlot'); } catch (e) { /* ignore */ }
             }, 200);
 
-            // Unique curve counts for stats
+            // Unique curve counts for stats (SE-safe identity)
             const strataCurveCount = new Set(
-                filteredStrata.map(r =>
-                    `${String(r[fuCol]).trim()}|${String(r[yldCol] || '').trim()}`)
+                filteredStrata.map(r => getStrataCurveKey(r, bioColumnMap))
             ).size;
             const standCurveCount = new Set(
                 filteredStand.map(r => String(r[idCol] ?? '').trim())
@@ -5838,21 +6833,38 @@
 
             let html = `<h2 style="color:#198754; border-bottom:3px solid #198754; padding-bottom:8px; margin-top:50px;">🌿 Biomass Analysis</h2>`;
 
+            const glslBioSelTables = isGlslBiomass ? getBiomassGlslSelections() : null;
+
             fuList.forEach(fu => {
-                const fuStrata = bioData.filter(r => String(r[fuCol]) === fu &&
-                    String(r[typeCol] || '').trim().toUpperCase() === 'STRATA');
-                const fuStand  = bioData.filter(r => String(r[fuCol]) === fu &&
-                    String(r[typeCol] || '').trim().toUpperCase() === 'STAND');
+                let fuStrata = bioData.filter(r => String(r[fuCol]) === fu && isStrataType(r[typeCol]));
+                if (isGlslBiomass && glslBioSelTables) {
+                    fuStrata = fuStrata.filter(r => matchesGlslStrataFilters(r, bioColumnMap, glslBioSelTables));
+                }
+                const fuStand  = bioData.filter(r => String(r[fuCol]) === fu && isStandType(r[typeCol]));
+
+                // SE tables: one representative curve (avoid multi-row zigzag mess)
+                let seTableNote = '';
+                const hasSeTable = isGlslColumnMap(bioColumnMap) &&
+                    fuStrata.some(r => isSelectionSilSys(r[bioColumnMap.silsys]));
+                if (hasSeTable) {
+                    const seOnly = fuStrata.filter(r => isSelectionSilSys(r[bioColumnMap.silsys]));
+                    const nonSe = fuStrata.filter(r => !isSelectionSilSys(r[bioColumnMap.silsys]));
+                    const picked = pickRepresentativeSeCurveRows(seOnly, bioColumnMap, glslBioSelTables);
+                    fuStrata = [...nonSe, ...(picked.rows || [])];
+                    seTableNote = picked.label
+                        ? ` · SE table slice: ${picked.label}`
+                        : ' · SE representative curve';
+                }
 
                 html += `<h3 style="color:#0d6efd; margin-top:30px; page-break-before:avoid;">Forest Unit: ${fu}</h3>`;
-                html += `<p style="color:#666; font-size:13px;">STRATA rows: ${fuStrata.length} | STAND rows: ${fuStand.length}</p>`;
+                html += `<p style="color:#666; font-size:13px;">STRATA rows: ${fuStrata.length} | STAND/POLYGON rows: ${fuStand.length}${seTableNote}</p>`;
 
                 // ── 1. STAND: Total Biomass vs Age (table, all unique ages) ──
                 if (fuStand.length > 0) {
                     const bmCol = bioColumnMap.bioTotalBiomass;
                     if (bmCol) {
                         html += `<h4 style="margin-top:20px;">STAND — Total Biomass vs Age</h4>`;
-                        const idCol = Object.keys(bioData[0])[0];
+                        const idCol = bioColumnMap.standId || Object.keys(bioData[0])[0];
                         const standIDs = [...new Set(fuStand.map(r => r[idCol]))].slice(0, 10); // cap at 10 for readability
                         const ages = [...new Set(fuStand.map(r => r[ageCol]))].sort((a,b)=>a-b);
                         html += `<table style="width:100%;border-collapse:collapse;font-size:12px;page-break-inside:avoid;">
@@ -5880,7 +6892,7 @@
                 // ── 2. STRATA: Biomass Components table (Wood/Bark/Branches/Foliage) ──
                 if (fuStrata.length > 0 && COMPONENTS.length > 0) {
                     const strataRows = fuStrata.sort((a,b) => (a[ageCol]||0) - (b[ageCol]||0));
-                    html += `<h4 style="margin-top:20px;">STRATA — Biomass Components vs Age</h4>`;
+                    html += `<h4 style="margin-top:20px;">STRATA — Biomass Components vs Age${seTableNote ? ' (single SE series)' : ''}</h4>`;
                     html += `<table style="width:100%;border-collapse:collapse;font-size:12px;page-break-inside:avoid;">
                         <thead><tr style="background:#198754;color:white;">
                             <th style="padding:4px 8px;">Age</th>`;
@@ -5902,7 +6914,7 @@
                     const presentNmv = nmvCols.filter(col => fuStrata.some(r => r[col] && Number(r[col]) !== 0));
                     if (presentNmv.length > 0) {
                         const strataRows = fuStrata.sort((a,b) => (a[ageCol]||0) - (b[ageCol]||0));
-                        html += `<h4 style="margin-top:20px;">STRATA — Species NMV Breakdown (m³/ha)</h4>`;
+                        html += `<h4 style="margin-top:20px;">STRATA — Species NMV Breakdown (m³/ha)${seTableNote ? ' (single SE series)' : ''}</h4>`;
                         html += `<table style="width:100%;border-collapse:collapse;font-size:12px;page-break-inside:avoid;">
                             <thead><tr style="background:#0d6efd;color:white;">
                                 <th style="padding:4px 8px;">Age</th>`;
@@ -5952,21 +6964,26 @@
 
             const byID = {};
             fuStand.forEach(r => {
-                const id = String(r[idCol]);
+                const id = String(r[idCol] ?? r[bioColumnMap.standId] ?? '');
                 if (!byID[id]) byID[id] = [];
                 byID[id].push(r);
             });
             const traces = Object.values(byID).map(rows => {
-                rows.sort((a, b) => (Number(a[ageCol]) || 0) - (Number(b[ageCol]) || 0));
+                const cleaned = sanitizeAgeMetricSeries(
+                    rows.map(r => r[ageCol]),
+                    rows.map(r => r[bmCol]),
+                    BIOMASS_METRIC_CAP
+                );
+                if (!cleaned.ages.length) return null;
                 return {
-                    x: rows.map(r => Number(r[ageCol])),
-                    y: rows.map(r => Number(r[bmCol])),
+                    x: cleaned.ages,
+                    y: cleaned.values,
                     mode: 'lines',
                     line: { color: 'rgba(46,125,50,0.2)', width: 1.5 },
                     showlegend: false,
                     hoverinfo: 'skip'
                 };
-            });
+            }).filter(Boolean);
             if (traces.length === 0) return null;
 
             const layout = {
@@ -5990,42 +7007,64 @@
             ].filter(c => c.col);
             if (COMPS.length === 0) return null;
 
-            // Group by YIELD so multi-scenario strata don't get mixed
-            const yldCol = bioColumnMap.yieldScenario;
-            const byYield = {};
+            // Group by full STRATA identity (SE-safe)
+            const byCurve = {};
             fuStrata.forEach(r => {
-                const y = String(r[yldCol] || 'PRSNT').trim();
-                if (!byYield[y]) byYield[y] = [];
-                byYield[y].push(r);
+                const key = getStrataCurveKey(r, bioColumnMap);
+                if (!byCurve[key]) byCurve[key] = [];
+                byCurve[key].push(r);
             });
 
+            const seStyleMaps = buildSeStyleMaps(fuStrata, bioColumnMap);
             const traces = [];
-            const yields = Object.keys(byYield).sort();
-            const dashPatterns = ['solid', 'dash', 'dot', 'dashdot'];
-            yields.forEach((yld, yi) => {
-                const sorted = [...byYield[yld]].sort((a, b) => (Number(a[ageCol]) || 0) - (Number(b[ageCol]) || 0));
+            const curveKeys = Object.keys(byCurve).sort();
+            // Cap report panel series for readability
+            const limitedKeys = curveKeys.length > 24 ? curveKeys.slice(0, 24) : curveKeys;
+            limitedKeys.forEach((key) => {
+                const sample = byCurve[key][0];
+                const seStyle = getSeStrataLineStyle(sample, bioColumnMap, seStyleMaps);
+                const curveLabel = getStrataCurveLabel(sample, bioColumnMap);
                 COMPS.forEach(c => {
                     const isTotal = c.label === 'Total Biomass';
+                    const cleaned = sanitizeAgeMetricSeries(
+                        byCurve[key].map(r => r[ageCol]),
+                        byCurve[key].map(r => r[c.col]),
+                        BIOMASS_METRIC_CAP
+                    );
+                    if (!cleaned.ages.length) return;
+                    // Total: SI colour when SE; components keep fixed component colours, dash from SE style
+                    const lineColor = isTotal
+                        ? (seStyle ? seStyle.color : c.color)
+                        : c.color;
+                    const lineDash = isTotal
+                        ? 'dash'
+                        : (seStyle ? seStyle.dash : 'solid');
                     traces.push({
-                        x: sorted.map(r => Number(r[ageCol])),
-                        y: sorted.map(r => Number(r[c.col])),
+                        x: cleaned.ages,
+                        y: cleaned.values,
                         mode: 'lines+markers',
-                        name: yields.length > 1 ? `${c.label} (${yld})` : c.label,
+                        name: curveKeys.length > 1 ? `${c.label} · ${curveLabel}` : c.label,
                         line: {
-                            color: c.color,
+                            color: lineColor,
                             width: isTotal ? 3 : 2.5,
-                            dash: isTotal ? 'dash' : dashPatterns[yi % dashPatterns.length]
+                            dash: lineDash
                         },
-                        marker: { size: 4 }
+                        marker: { size: 4, color: lineColor }
                     });
                 });
             });
 
+            if (traces.length === 0) return null;
+
             const layout = {
-                title: { text: `${yYC} — STRATA: Biomass Components vs Age`, font: { size: 13 } },
+                title: {
+                    text: `${yYC} — STRATA: Biomass Components vs Age` +
+                        (curveKeys.length > 1 ? ` (${Math.min(curveKeys.length, 24)} curves)` : ''),
+                    font: { size: 13 }
+                },
                 xaxis: { title: 'Age (years)', gridcolor: '#e9ecef' },
                 yaxis: { title: 'Biomass (Mg/ha)', gridcolor: '#e9ecef' },
-                legend: { x: 0.02, y: 0.98 },
+                legend: { x: 0.02, y: 0.98, font: { size: 9 } },
                 paper_bgcolor: '#ffffff', plot_bgcolor: '#f8f9fa',
                 margin: { t: 50, r: 20, b: 60, l: 70 }
             };
@@ -6034,23 +7073,93 @@
 
         async function generateBioPanel_SpeciesNMV(yYC, fuStrata) {
             const ageCol  = bioColumnMap.age;
-            const headers = Object.keys(fuStrata[0] || {});
+            if (!fuStrata || fuStrata.length === 0) return null;
+
+            // SE: one representative curve (same scheme as volume species panel)
+            let dataRows = fuStrata;
+            let seNote = '';
+            const hasSe = isGlslColumnMap(bioColumnMap) &&
+                fuStrata.some(r => isSelectionSilSys(r[bioColumnMap.silsys]));
+            if (hasSe) {
+                const seOnly = fuStrata.filter(r => isSelectionSilSys(r[bioColumnMap.silsys]));
+                const bioSel = typeof getBiomassGlslSelections === 'function'
+                    ? getBiomassGlslSelections() : null;
+                const picked = pickRepresentativeSeCurveRows(seOnly, bioColumnMap, bioSel);
+                dataRows = picked.rows.length ? picked.rows : seOnly;
+                seNote = picked.label
+                    ? ` · ${picked.label.replace(String(yYC) + ' ', '')}`
+                    : ' · SE representative';
+                console.log(`  🌿 Bio species NMV uses SE slice: ${picked.label || picked.key}`);
+            }
+
+            const headers = Object.keys(dataRows[0] || {});
             const nmvCols = headers.filter(h => /^NMV_[A-Z]+$/i.test(String(h).trim()));
-            const active  = nmvCols.filter(col => fuStrata.some(r => r[col] != null && Number(r[col]) !== 0));
+            const active  = nmvCols.filter(col => dataRows.some(r => r[col] != null && Number(r[col]) !== 0));
             if (active.length === 0) return null;
 
-            const sorted  = [...fuStrata].sort((a, b) => (Number(a[ageCol]) || 0) - (Number(b[ageCol]) || 0));
+            // Group by full key then take mean per age (usually one SE series)
+            const byKey = {};
+            dataRows.forEach(r => {
+                const k = getStrataCurveKey(r, bioColumnMap);
+                if (!byKey[k]) byKey[k] = [];
+                byKey[k].push(r);
+            });
+
             const palette = ['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf'];
-            const traces  = active.map((col, i) => ({
-                x: sorted.map(r => Number(r[ageCol])),
-                y: sorted.map(r => Number(r[col])),
-                mode: 'lines+markers',
-                name: String(col).replace(/^NMV_/i, ''),
-                line: { color: palette[i % palette.length], width: 2 },
-                marker: { size: 4 }
-            }));
+            const traces = [];
+
+            // Total NMV if present
+            const totalCol = headers.find(h => String(h).trim().toUpperCase() === 'NMV');
+            if (totalCol) {
+                const byAge = {};
+                Object.values(byKey).forEach(rows => {
+                    rows.forEach(r => {
+                        const a = toFiniteNumber(r[ageCol]);
+                        const v = toFiniteNumber(r[totalCol]);
+                        if (a == null || v == null || v < 0 || v > 5000) return;
+                        if (!byAge[a]) byAge[a] = [];
+                        byAge[a].push(v);
+                    });
+                });
+                const ages = Object.keys(byAge).map(Number).sort((a, b) => a - b);
+                if (ages.length) {
+                    traces.push({
+                        x: ages,
+                        y: ages.map(a => byAge[a].reduce((s, v) => s + v, 0) / byAge[a].length),
+                        mode: 'lines',
+                        name: 'Total NMV',
+                        line: { color: '#000000', width: 3 }
+                    });
+                }
+            }
+
+            active.forEach((col, i) => {
+                const byAge = {};
+                Object.values(byKey).forEach(rows => {
+                    rows.forEach(r => {
+                        const a = toFiniteNumber(r[ageCol]);
+                        const v = toFiniteNumber(r[col]);
+                        if (a == null || v == null || v <= 0 || v > 5000) return;
+                        if (!byAge[a]) byAge[a] = [];
+                        byAge[a].push(v);
+                    });
+                });
+                const ages = Object.keys(byAge).map(Number).sort((a, b) => a - b);
+                if (!ages.length) return;
+                traces.push({
+                    x: ages,
+                    y: ages.map(a => byAge[a].reduce((s, v) => s + v, 0) / byAge[a].length),
+                    mode: 'lines+markers',
+                    name: String(col).replace(/^NMV_/i, ''),
+                    line: { color: palette[i % palette.length], width: 2 },
+                    marker: { size: 4 }
+                });
+            });
+
+            if (traces.length === 0) return null;
+
             const layout = {
-                title: { text: `${yYC} — STRATA: Species NMV vs Age`, font: { size: 13 } },
+                title: { text: `${yYC} — STRATA: Species NMV vs Age${seNote}`, font: { size: 12 } },
                 xaxis: { title: 'Age (years)', gridcolor: '#e9ecef' },
                 yaxis: { title: 'NMV (m³/ha)', gridcolor: '#e9ecef' },
                 legend: { x: 1.02, y: 1 },
@@ -6086,12 +7195,14 @@
                     }
                 } catch (e) { /* ignore */ }
 
+                const glslBioSel = isGlslBiomass ? getBiomassGlslSelections() : { silsys: [], cut: [], agsfrc: [], si: [] };
                 const fuStrata = bioData.filter(r =>
                     String(r[fuCol]).trim() === String(yYC).trim() &&
-                    String(r[typeCol] || '').trim().toUpperCase() === 'STRATA');
+                    isStrataType(r[typeCol]) &&
+                    matchesGlslStrataFilters(r, bioColumnMap, glslBioSel));
                 const fuStand  = bioData.filter(r =>
                     String(r[fuCol]).trim() === String(yYC).trim() &&
-                    String(r[typeCol] || '').trim().toUpperCase() === 'STAND');
+                    isStandType(r[typeCol]));
 
                 dashboards[yYC] = {};
                 try {
@@ -6121,6 +7232,7 @@
     </h2>
     <p style="color:#666; font-size:14px; margin-bottom:20px;">
         Biomass estimates generated by SLYM Biomass Module. Biomass values in Mg/ha; NMV species breakdown in m³/ha.
+        GLSL selection (SE) strata use the same scheme as volume: colour by SI, dash by CUT/AGSFRC; species NMV uses one representative SE curve.
     </p>`;
 
             for (const [yYC, panels] of Object.entries(bioDashboards)) {
