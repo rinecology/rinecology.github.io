@@ -795,10 +795,34 @@
                         <path d="M8 5a.5.5 0 0 1 .5.5v3.362l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 9.362V5.5A.5.5 0 0 1 8 5z"/>
                         <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
                     </svg>
-                    ⚡ Full Report (All Data)
+                    ⚡ Full Report (All FUs)
                 </button>
+
+                <div class="border rounded p-2 mb-2 bg-light" id="fullReportSeModeBox">
+                    <label class="form-label small fw-semibold mb-1">Full Report · GLSL SE density</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="fullReportSeMode" id="fullReportSeGrid" value="grid" checked>
+                        <label class="form-check-label small" for="fullReportSeGrid">
+                            Representative AGS/SI grid <span class="text-muted">(recommended)</span>
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="fullReportSeMode" id="fullReportSeAll" value="all">
+                        <label class="form-check-label small" for="fullReportSeAll">
+                            All AGSFRC × SI combinations
+                        </label>
+                    </div>
+                    <small class="text-muted d-block mt-1">
+                        Grid picks AGS 0.3/0.6/0.9 and low·mid·high SI (when present).
+                        “All” can be slow on dense units (e.g. HDSL1). Charts still sample up to
+                        <strong id="reportCapHint">~60</strong> STRATA curves per panel for browser stability.
+                    </small>
+                </div>
                 
-                <small class="text-muted">💡 Filtered: Respects your selections | Full: Complete dataset, ignores filters</small>
+                <small class="text-muted d-block">
+                    💡 <strong>Filtered:</strong> Uses your sidebar selections (after Apply) — can be denser than Full if you Select All on SE.<br>
+                    💡 <strong>Full:</strong> Auto-selects all FUs / yields / species; GLSL SE uses the density option above. Volume + biomass both included when both CSVs are loaded.
+                </small>
             </div>
             
             <!-- Scatter Plot Stats -->
@@ -2584,8 +2608,11 @@
                                 <br><small style="color: #6c757d;">(a.k.a. SLYM input - required for reports)</small>
                             </li>
                             <li>
-                                <strong style="color: #fd7e14;">New Feature!</strong> Orange <strong>"📊 Full Report (All Data)"</strong> button at the bottom of the sidebar
-                                <br><small style="color: #6c757d;">Click it directly - no filter selection needed! Generates comprehensive report for all forest units instantly.</small>
+                                <strong style="color: #fd7e14;">Full Report</strong> (orange button): auto-selects all FUs / yields.
+                                <br><small style="color: #6c757d;">GLSL SE uses a representative AGS/SI grid by default (or choose “All AGS×SI”). Charts sample ~${typeof REPORT_MAX_STRATA_TRACES !== 'undefined' ? REPORT_MAX_STRATA_TRACES : 60} STRATA curves/panel. Filtered Report uses your sidebar selections and can be denser if you Select All on SE.</small>
+                            </li>
+                            <li>
+                                <strong>Scatter:</strong> upload Raw Data under Scatter Plot — filters default to All and plot immediately.
                             </li>
                         </ol>
                     </div>
@@ -2803,16 +2830,34 @@
             document.querySelectorAll('.strata-si-checkbox').forEach(cb => { cb.checked = defSi.has(cb.value); });
         }
 
-        /** Full report: all SILSYS; SE uses a small representative grid. */
-        function applyVolumeGlslFullReportDefaults() {
+        /** Read Full Report GLSL SE density mode: 'grid' | 'all'. */
+        function getFullReportSeMode() {
+            const el = document.querySelector('input[name="fullReportSeMode"]:checked');
+            return (el && el.value === 'all') ? 'all' : 'grid';
+        }
+
+        /**
+         * Full report GLSL filters.
+         * @param {'grid'|'all'} seMode
+         *   grid — all SILSYS/CUT; representative AGS 0.3/0.6/0.9 + low/mid/high SI
+         *   all  — every AGSFRC × SI combination (dense; charts still sample to REPORT_MAX_STRATA_TRACES)
+         */
+        function applyVolumeGlslFullReportDefaults(seMode) {
             if (!isGlslVolume) return;
+            const mode = seMode === 'all' ? 'all' : 'grid';
             document.querySelectorAll('.silsys-checkbox').forEach(cb => { cb.checked = true; });
             document.querySelectorAll('.cut-checkbox').forEach(cb => { cb.checked = true; });
-            const defAgs = new Set(pickFullReportAgsfrc(uniqueAgsfrc));
-            document.querySelectorAll('.agsfrc-checkbox').forEach(cb => { cb.checked = defAgs.has(cb.value); });
-            const defSi = new Set(pickFullReportSI(uniqueStrataSI));
-            document.querySelectorAll('.strata-si-checkbox').forEach(cb => { cb.checked = defSi.has(cb.value); });
-            console.log('🪵 Full report GLSL SE defaults — AGSFRC:', [...defAgs], 'SI:', [...defSi]);
+            if (mode === 'all') {
+                document.querySelectorAll('.agsfrc-checkbox').forEach(cb => { cb.checked = true; });
+                document.querySelectorAll('.strata-si-checkbox').forEach(cb => { cb.checked = true; });
+                console.log('🪵 Full report GLSL SE mode=all — every AGSFRC × SI selected');
+            } else {
+                const defAgs = new Set(pickFullReportAgsfrc(uniqueAgsfrc));
+                document.querySelectorAll('.agsfrc-checkbox').forEach(cb => { cb.checked = defAgs.has(cb.value); });
+                const defSi = new Set(pickFullReportSI(uniqueStrataSI));
+                document.querySelectorAll('.strata-si-checkbox').forEach(cb => { cb.checked = defSi.has(cb.value); });
+                console.log('🪵 Full report GLSL SE mode=grid — AGSFRC:', [...defAgs], 'SI:', [...defSi]);
+            }
         }
 
 
@@ -3370,17 +3415,25 @@
         /**
          * Report generation caps — full FSF files (20+ FUs × 8 panels × Plotly PNG)
          * previously froze/crashed the tab (esp. with F12 open).
+         * Raised slightly so dense GLSL FUs (e.g. HDSL1) keep more SE diversity
+         * while remaining browser-safe. Even sampling still applies when over cap.
          */
-        const REPORT_MAX_FUS = 6;
+        const REPORT_MAX_FUS = 10;
         const REPORT_MAX_STAND_TRACES = 0;   // structure panels: STRATA only (huge win)
-        const REPORT_MAX_STRATA_TRACES = 36; // enough for SE (SI×CUT×AGS) sampling
-        const REPORT_MAX_LOG_SERIES = 8;    // Log_XX series; each SE key × log is capped overall
+        const REPORT_MAX_STRATA_TRACES = 60; // SE even-sample cap per panel (was 36)
+        const REPORT_MAX_LOG_SERIES = 10;   // Log_XX series; each SE key × log is capped overall
         const REPORT_PNG_W = 700;
         const REPORT_PNG_H = 400;
         const REPORT_PNG_WIDE_W = 900;
         const REPORT_PNG_WIDE_H = 420;
-        const REPORT_MAX_STAND_CLOUD_IDS = 120;
+        const REPORT_MAX_STAND_CLOUD_IDS = 150;
         const REPORT_QUIET = true; // suppress per-panel console noise during report
+
+        // Keep sidebar hint in sync with live constants
+        try {
+            const capHint = document.getElementById('reportCapHint');
+            if (capHint) capHint.textContent = '~' + REPORT_MAX_STRATA_TRACES;
+        } catch (e) { /* ignore */ }
 
         const DASHBOARD_METRIC_CAPS = {
             biomass: BIOMASS_METRIC_CAP,
@@ -4633,8 +4686,50 @@
             leadingSpecies: 'LEADSPC',
             basalArea: 'BA',
             grossTotalVolume: 'GTV',
-            netMerchVolume: 'NMV'
+            netMerchVolume: 'NMV',
+            age: 'AGE'
         };
+
+        /** Read age from a raw-data row using detected / common header names. */
+        function rawRowAge(row) {
+            if (!row) return NaN;
+            const col = detectedColumns.age;
+            const v = (col && row[col] != null && row[col] !== '')
+                ? row[col]
+                : (row.Age != null && row.Age !== '' ? row.Age
+                    : (row.AGE != null && row.AGE !== '' ? row.AGE : undefined));
+            return parseFloat(v);
+        }
+
+        /** Resolve scatter Y-axis radio (GTV|BA) to actual column name. */
+        function resolveScatterYColumn(yMetricKey) {
+            if (yMetricKey === 'BA') {
+                return detectedColumns.basalArea || 'BA';
+            }
+            // GTV default
+            return detectedColumns.grossTotalVolume || 'GTV';
+        }
+
+        /** Pretty label for scatter Y axis. */
+        function scatterYAxisTitle(yMetricKey) {
+            if (yMetricKey === 'BA') return 'Basal Area (m²/ha)';
+            return 'Gross Total Volume (m³/ha)';
+        }
+
+        /** Safe string from raw row cell (detected column or fallbacks). */
+        function rawCellStr(row, colName, fallbacks) {
+            if (!row) return '';
+            if (colName && row[colName] != null && String(row[colName]).trim() !== '') {
+                return String(row[colName]).trim();
+            }
+            if (fallbacks) {
+                for (let i = 0; i < fallbacks.length; i++) {
+                    const k = fallbacks[i];
+                    if (row[k] != null && String(row[k]).trim() !== '') return String(row[k]).trim();
+                }
+            }
+            return '';
+        }
         
         // Raw Data Upload Handler
         console.log('🔧 Attaching event listener to rawDataFile...');
@@ -4667,17 +4762,19 @@
                                 leadingSpecies: detectColumn(headers, 'leadingSpecies') || 'LEADSPC',
                                 basalArea: detectColumn(headers, 'basalArea') || 'BA',
                                 grossTotalVolume: detectColumn(headers, 'grossTotalVolume') || 'GTV',
-                                netMerchVolume: detectColumn(headers, 'netMerchVolume') || 'NMV'
+                                netMerchVolume: detectColumn(headers, 'netMerchVolume') || 'NMV',
+                                age: detectColumn(headers, 'age') || findHeaderByCandidates(headers, ['AGE', 'Age', 'age']) || 'AGE'
                             };
-                            console.log('🔍 Detected columns:', detectedColumns);
+                            console.log('🔍 Detected scatter/raw columns:', detectedColumns);
                         }
                         
-                        // Build scatter plot filters
+                        // Build scatter plot filters (defaults to Select All → plot immediately)
                         buildScatterFilters();
                         
                         // Update stats
                         document.getElementById('scatterStats').innerHTML = `
                             <strong>${rawData.length.toLocaleString()}</strong> inventory records loaded
+                            <div class="text-muted small mt-1">Scatter filters default to All — plot updates automatically</div>
                         `;
                         
                         document.getElementById('loadingSpinner').style.display = 'none';
@@ -4694,21 +4791,25 @@
             console.error('❌ ERROR: rawDataFile element not found!');
         }
         
-        // Build Scatter Plot Filters
+        // Build Scatter Plot Filters (default: all options checked so plot appears on load)
         function buildScatterFilters() {
             if (!rawData || rawData.length === 0) return;
             
+            const fuCol = detectedColumns.forestUnit;
+            const yldCol = detectedColumns.yieldClass;
+            const spcCol = detectedColumns.leadingSpecies;
+
             // Extract unique values using detected column names
-            const uniquePlanfu = [...new Set(rawData.map(row => row[detectedColumns.forestUnit]).filter(val => val))].sort();
-            const uniqueYield = [...new Set(rawData.map(row => row[detectedColumns.yieldClass]).filter(val => val))].sort();
-            const uniqueLeadspc = [...new Set(rawData.map(row => row[detectedColumns.leadingSpecies]).filter(val => val))].sort();
+            const uniquePlanfu = [...new Set(rawData.map(row => rawCellStr(row, fuCol, ['PLANFU', 'yFU', 'SFU'])).filter(Boolean))].sort();
+            const uniqueYield = [...new Set(rawData.map(row => rawCellStr(row, yldCol, ['YIELD', 'Yield'])).filter(Boolean))].sort();
+            const uniqueLeadspc = [...new Set(rawData.map(row => rawCellStr(row, spcCol, ['LEADSPC', 'LeadSpc'])).filter(Boolean))].sort();
             
-            // Auto-detect age range
-            const ages = rawData.map(row => parseFloat(row.Age || row.AGE)).filter(age => !isNaN(age));
-            const minAge = Math.floor(Math.min(...ages));
-            const maxAge = Math.ceil(Math.max(...ages));
+            // Auto-detect age range via detected age column
+            const ages = rawData.map(rawRowAge).filter(age => !isNaN(age));
+            const minAge = ages.length ? Math.floor(Math.min(...ages)) : 0;
+            const maxAge = ages.length ? Math.ceil(Math.max(...ages)) : 150;
             
-            console.log(`📊 Age range detected: ${minAge} - ${maxAge}`);
+            console.log(`📊 Age range detected: ${minAge} - ${maxAge} (col=${detectedColumns.age})`);
             
             // Update age controls
             document.getElementById('ageMin').value = minAge;
@@ -4720,43 +4821,46 @@
             document.getElementById('ageSlider').value = maxAge;
             updateAgeRangeDisplay();
             
-            // Build PLANFU checkboxes
+            // Build PLANFU checkboxes — checked by default
             const planfuContainer = document.getElementById('scatterPlanfuCheckboxes');
             planfuContainer.innerHTML = '';
-            uniquePlanfu.forEach(planfu => {
+            uniquePlanfu.forEach((planfu, idx) => {
+                const safeId = `scatter_planfu_${idx}_${String(planfu).replace(/[^a-zA-Z0-9_\-]/g, '_')}`;
                 const div = document.createElement('div');
                 div.className = 'form-check';
                 div.innerHTML = `
-                    <input class="form-check-input scatter-planfu-checkbox" type="checkbox" value="${planfu}" id="scatter_planfu_${planfu}" data-filter="planfu">
-                    <label class="form-check-label" for="scatter_planfu_${planfu}">${planfu}</label>
+                    <input class="form-check-input scatter-planfu-checkbox" type="checkbox" value="${String(planfu).replace(/"/g, '&quot;')}" id="${safeId}" data-filter="planfu" checked>
+                    <label class="form-check-label" for="${safeId}">${planfu}</label>
                 `;
                 planfuContainer.appendChild(div);
             });
             document.getElementById('scatterPlanfuSection').style.display = 'block';
             
-            // Build YIELD checkboxes
+            // Build YIELD checkboxes — checked by default
             const yieldContainer = document.getElementById('scatterYieldCheckboxes');
             yieldContainer.innerHTML = '';
-            uniqueYield.forEach(yield_val => {
+            uniqueYield.forEach((yield_val, idx) => {
+                const safeId = `scatter_yield_${idx}_${String(yield_val).replace(/[^a-zA-Z0-9_\-]/g, '_')}`;
                 const div = document.createElement('div');
                 div.className = 'form-check';
                 div.innerHTML = `
-                    <input class="form-check-input scatter-yield-checkbox" type="checkbox" value="${yield_val}" id="scatter_yield_${yield_val}" data-filter="yield">
-                    <label class="form-check-label" for="scatter_yield_${yield_val}">${yield_val}</label>
+                    <input class="form-check-input scatter-yield-checkbox" type="checkbox" value="${String(yield_val).replace(/"/g, '&quot;')}" id="${safeId}" data-filter="yield" checked>
+                    <label class="form-check-label" for="${safeId}">${yield_val}</label>
                 `;
                 yieldContainer.appendChild(div);
             });
             document.getElementById('scatterYieldSection').style.display = 'block';
             
-            // Build LEADSPC checkboxes
+            // Build LEADSPC checkboxes — checked by default
             const leadspcContainer = document.getElementById('scatterLeadspcCheckboxes');
             leadspcContainer.innerHTML = '';
-            uniqueLeadspc.forEach(leadspc => {
+            uniqueLeadspc.forEach((leadspc, idx) => {
+                const safeId = `scatter_leadspc_${idx}_${String(leadspc).replace(/[^a-zA-Z0-9_\-]/g, '_')}`;
                 const div = document.createElement('div');
                 div.className = 'form-check';
                 div.innerHTML = `
-                    <input class="form-check-input scatter-leadspc-checkbox" type="checkbox" value="${leadspc}" id="scatter_leadspc_${leadspc}" data-filter="leadspc">
-                    <label class="form-check-label" for="scatter_leadspc_${leadspc}">${leadspc}</label>
+                    <input class="form-check-input scatter-leadspc-checkbox" type="checkbox" value="${String(leadspc).replace(/"/g, '&quot;')}" id="${safeId}" data-filter="leadspc" checked>
+                    <label class="form-check-label" for="${safeId}">${leadspc}</label>
                 `;
                 leadspcContainer.appendChild(div);
             });
@@ -4770,7 +4874,7 @@
                 cb.addEventListener('change', updateScatterPlot);
             });
             
-            console.log(`✅ Built scatter filters: ${uniquePlanfu.length} PLANFUs, ${uniqueYield.length} YIELDs, ${uniqueLeadspc.length} LEADSPCs`);
+            console.log(`✅ Built scatter filters (all checked): ${uniquePlanfu.length} FUs, ${uniqueYield.length} YIELDs, ${uniqueLeadspc.length} LEADSPCs`);
         }
         
         // Age Range Controls
@@ -4867,7 +4971,7 @@
         document.getElementById('overlayStrata').addEventListener('change', updateScatterPlot);
         document.getElementById('overlayStand').addEventListener('change', updateScatterPlot);
         
-        // Update Scatter Plot
+        // Update Scatter Plot (uses detectedColumns — not hardcoded PLANFU/Age/GTV)
         function updateScatterPlot() {
             if (!rawData || rawData.length === 0) {
                 document.getElementById('scatterPlotContainer').style.display = 'none';
@@ -4879,56 +4983,81 @@
             // Get current filter values
             const ageMin = parseInt(document.getElementById('ageMin').value) || 0;
             const ageMax = parseInt(document.getElementById('ageMax').value) || 150;
-            const yMetric = document.querySelector('input[name="yAxisMetric"]:checked').value;
+            const yMetricKey = (document.querySelector('input[name="yAxisMetric"]:checked') || {}).value || 'GTV';
+            const yCol = resolveScatterYColumn(yMetricKey);
+            const fuCol = detectedColumns.forestUnit;
+            const yldCol = detectedColumns.yieldClass;
+            const spcCol = detectedColumns.leadingSpecies;
             
             // Get active filters from scatter plot checkboxes (not yield curve filters)
             const activePlanfu = Array.from(document.querySelectorAll('.scatter-planfu-checkbox:checked')).map(cb => cb.value);
             const activeYield = Array.from(document.querySelectorAll('.scatter-yield-checkbox:checked')).map(cb => cb.value);
             const activeLeadspc = Array.from(document.querySelectorAll('.scatter-leadspc-checkbox:checked')).map(cb => cb.value);
             
-            console.log('Filters:', { ageMin, ageMax, yMetric, activePlanfu, activeYield, activeLeadspc });
+            console.log('Filters:', {
+                ageMin, ageMax, yMetricKey, yCol, fuCol, yldCol, spcCol,
+                activePlanfu: activePlanfu.length, activeYield: activeYield.length, activeLeadspc: activeLeadspc.length
+            });
             
-            // Validate that all three filter types are selected
-            if (activePlanfu.length === 0 || activeYield.length === 0 || activeLeadspc.length === 0) {
+            // Require FU selection always. Yield/LEADSPC only when those option lists exist.
+            const hasYieldOptions = document.querySelectorAll('.scatter-yield-checkbox').length > 0;
+            const hasLeadspcOptions = document.querySelectorAll('.scatter-leadspc-checkbox').length > 0;
+            if (activePlanfu.length === 0 ||
+                (hasYieldOptions && activeYield.length === 0) ||
+                (hasLeadspcOptions && activeLeadspc.length === 0)) {
                 document.getElementById('scatterPlotContainer').style.display = 'none';
-                return; // Don't plot anything if any filter type is not selected
+                document.getElementById('scatterStats').innerHTML =
+                    `<strong>${rawData.length.toLocaleString()}</strong> inventory records loaded` +
+                    `<div class="text-warning small mt-1">Select Forest Unit` +
+                    (hasYieldOptions ? ', Yield' : '') +
+                    (hasLeadspcOptions ? ', and Leading Species' : '') +
+                    ` filters to show scatter</div>`;
+                return;
             }
+
+            // Case-insensitive membership (header/value drift)
+            const planfuSet = new Set(activePlanfu.map(v => String(v).trim().toUpperCase()));
+            const yieldSet = new Set(activeYield.map(v => String(v).trim().toUpperCase()));
+            const leadspcSet = new Set(activeLeadspc.map(v => String(v).trim().toUpperCase()));
             
-            // Filter raw data
+            // Filter raw data via detected columns
             let filteredData = rawData.filter(row => {
-                const age = parseFloat(row.Age);
+                const age = rawRowAge(row);
                 if (isNaN(age) || age < ageMin || age > ageMax) return false;
                 
-                // Apply PLANFU filter using scatter-specific checkboxes
-                const planfu = row.PLANFU?.trim();
-                if (activePlanfu.length > 0 && !activePlanfu.includes(planfu)) return false;
+                const planfu = rawCellStr(row, fuCol, ['PLANFU', 'yFU', 'SFU']).toUpperCase();
+                if (!planfuSet.has(planfu)) return false;
                 
-                // Apply YIELD filter
-                const yieldVal = row.YIELD?.trim();
-                if (activeYield.length > 0 && !activeYield.includes(yieldVal)) return false;
+                if (hasYieldOptions) {
+                    const yieldVal = rawCellStr(row, yldCol, ['YIELD', 'Yield']).toUpperCase();
+                    if (!yieldSet.has(yieldVal)) return false;
+                }
                 
-                // Apply LEADSPC filter
-                const leadspc = row.LEADSPC?.trim();
-                if (activeLeadspc.length > 0 && !activeLeadspc.includes(leadspc)) return false;
+                if (hasLeadspcOptions) {
+                    const leadspc = rawCellStr(row, spcCol, ['LEADSPC', 'LeadSpc']).toUpperCase();
+                    if (!leadspcSet.has(leadspc)) return false;
+                }
                 
                 return true;
             });
             
-            console.log(`✅ Filtered to ${filteredData.length} points`);
+            console.log(`✅ Filtered to ${filteredData.length} points (yCol=${yCol})`);
             
             // Prepare scatter data grouped by BOTH FU and YIELD
             const dataByCombo = {};
             filteredData.forEach(row => {
-                const fu = row.PLANFU?.trim() || 'Unknown';
-                const yieldVal = row.YIELD?.trim() || 'UNKNOWN';
+                const fu = rawCellStr(row, fuCol, ['PLANFU', 'yFU', 'SFU']) || 'Unknown';
+                const yieldVal = rawCellStr(row, yldCol, ['YIELD', 'Yield']) || 'UNKNOWN';
+                const leadspc = rawCellStr(row, spcCol, ['LEADSPC', 'LeadSpc']) || 'N/A';
                 const comboKey = `${fu}__${yieldVal}`;
 
                 if (!dataByCombo[comboKey]) {
                     dataByCombo[comboKey] = { fu, yieldVal, x: [], y: [], text: [] };
                 }
                 
-                const age = parseFloat(row.Age);
-                const yValue = parseFloat(row[yMetric]);
+                const age = rawRowAge(row);
+                const yRaw = yCol ? row[yCol] : undefined;
+                const yValue = parseFloat(yRaw);
                 
                 if (!isNaN(age) && !isNaN(yValue)) {
                     dataByCombo[comboKey].x.push(age);
@@ -4937,8 +5066,8 @@
                         `FU: ${fu}<br>` +
                         `YIELD: ${yieldVal}<br>` +
                         `Age: ${age}<br>` +
-                        `${yMetric}: ${yValue.toFixed(2)}<br>` +
-                        `LEADSPC: ${row.LEADSPC || 'N/A'}`
+                        `${yMetricKey} (${yCol}): ${yValue.toFixed(2)}<br>` +
+                        `LEADSPC: ${leadspc}`
                     );
                 }
             });
@@ -5010,60 +5139,88 @@
                 });
             });
             
-            // Add yield curve overlays if requested
+            // Add yield curve overlays if requested (volume curves only — after Apply Filters)
             const showStrataOverlay = document.getElementById('overlayStrata').checked;
             const showStandOverlay = document.getElementById('overlayStand').checked;
+            const volAgeCol = (columnMap && columnMap.age) || 'AGE';
+            // Map scatter metric to yield-curve column (prefer volume columnMap when available)
+            let overlayYCol = yCol;
+            if (columnMap) {
+                if (yMetricKey === 'BA' && columnMap.basalArea) overlayYCol = columnMap.basalArea;
+                else if (yMetricKey === 'GTV' && columnMap.grossTotalVolume) overlayYCol = columnMap.grossTotalVolume;
+                else if (columnMap.grossTotalVolume) overlayYCol = columnMap.grossTotalVolume;
+            }
             
-            console.log('🎨 Overlay settings:', { showStrataOverlay, showStandOverlay, strataCurvesCount: strataCurves.length, standCurvesCount: standCurves.length });
+            console.log('🎨 Overlay settings:', {
+                showStrataOverlay, showStandOverlay,
+                strataCurvesCount: strataCurves.length, standCurvesCount: standCurves.length,
+                overlayYCol, volAgeCol
+            });
             
             if ((showStrataOverlay || showStandOverlay) && (strataCurves.length > 0 || standCurves.length > 0)) {
-                // Filter yield curves: use Forest Unit from scatter plot, but use yield curve filters for yield scenarios
-                // Get yield curve filter selections (from the main yield curve section, not scatter plot)
+                // Filter yield curves: FU from scatter; yield/species from main yield-curve filters
                 const selectedCurveYields = Array.from(document.querySelectorAll('.strata-yield-checkbox:checked')).map(cb => cb.value);
+                const selectedCurveYieldsU = new Set(selectedCurveYields.map(v => String(v).trim().toUpperCase()));
                 
                 const filteredStrataCurves = strataCurves.filter(row => {
-                    const yfu = row.yFU?.trim();
-                    const yieldVal = row.YIELD?.trim();
-                    
-                    // Match Forest Unit from scatter plot filters
-                    if (activePlanfu.length > 0 && !activePlanfu.includes(yfu)) return false;
-                    // Match yield scenario from yield curve filters (not scatter plot filters)
-                    if (selectedCurveYields.length > 0 && !selectedCurveYields.includes(yieldVal)) return false;
-                    
+                    const yfu = String(
+                        cellByHeader(row, columnMap.forestUnit) ?? row.yFU ?? row.YFU ?? row.PLANFU ?? ''
+                    ).trim();
+                    const yieldVal = String(
+                        cellByHeader(row, columnMap.yieldScenario) ?? row.YIELD ?? ''
+                    ).trim();
+                    if (activePlanfu.length > 0 && !planfuSet.has(yfu.toUpperCase())) return false;
+                    if (selectedCurveYieldsU.size > 0 && !selectedCurveYieldsU.has(yieldVal.toUpperCase())) return false;
                     return true;
                 });
                 
-                // Get stand yield curve filter selections
                 const selectedStandYields = Array.from(document.querySelectorAll('.stand-yield-checkbox:checked')).map(cb => cb.value);
                 const selectedStandLeadspc = Array.from(document.querySelectorAll('.stand-leadspc-checkbox:checked')).map(cb => cb.value);
+                const standYieldU = new Set(selectedStandYields.map(v => String(v).trim().toUpperCase()));
+                const standLeadU = new Set(selectedStandLeadspc.map(v => String(v).trim().toUpperCase()));
                 
                 const filteredStandCurves = standCurves.filter(row => {
-                    const yfu = row.yFU?.trim();
-                    const yieldVal = row.YIELD?.trim();
-                    const leadspc = row.LEADSPC?.trim();
-                    
-                    // Match Forest Unit from scatter plot filters
-                    if (activePlanfu.length > 0 && !activePlanfu.includes(yfu)) return false;
-                    // Match yield and species from yield curve filters (not scatter plot filters)
-                    if (selectedStandYields.length > 0 && !selectedStandYields.includes(yieldVal)) return false;
-                    if (selectedStandLeadspc.length > 0 && !selectedStandLeadspc.includes(leadspc)) return false;
-                    
+                    const yfu = String(
+                        cellByHeader(row, columnMap.forestUnit) ?? row.yFU ?? row.YFU ?? row.PLANFU ?? ''
+                    ).trim();
+                    const yieldVal = String(
+                        cellByHeader(row, columnMap.yieldScenario) ?? row.YIELD ?? ''
+                    ).trim();
+                    const leadspc = String(
+                        cellByHeader(row, columnMap.leadingSpecies) ?? row.LEADSPC ?? ''
+                    ).trim();
+                    if (activePlanfu.length > 0 && !planfuSet.has(yfu.toUpperCase())) return false;
+                    if (standYieldU.size > 0 && !standYieldU.has(yieldVal.toUpperCase())) return false;
+                    if (standLeadU.size > 0 && leadspc && !standLeadU.has(leadspc.toUpperCase())) return false;
                     return true;
                 });
                 
                 console.log('🔍 Filtered curves:', { strataCurvesCount: filteredStrataCurves.length, standCurvesCount: filteredStandCurves.length });
                 
+                function curveAge(r) {
+                    const v = cellByHeader(r, volAgeCol);
+                    if (v != null && v !== '') return Number(v);
+                    return Number(r.AGE ?? r.Age ?? NaN);
+                }
+                function curveY(r) {
+                    const v = cellByHeader(r, overlayYCol);
+                    if (v != null && v !== '') return parseFloat(v);
+                    return parseFloat(r[overlayYCol] ?? r[yMetricKey]);
+                }
+                function curveFU(r) {
+                    return String(cellByHeader(r, columnMap.forestUnit) ?? r.yFU ?? r.YFU ?? r.PLANFU ?? 'Unknown').trim();
+                }
+                function curveYield(r) {
+                    return String(cellByHeader(r, columnMap.yieldScenario) ?? r.YIELD ?? 'Unknown').trim();
+                }
+
                 // Prepare style maps for overlays (FU => color, YIELD => dash)
                 const overlayFUs = [...new Set(
-                    [...filteredStrataCurves, ...filteredStandCurves]
-                        .map(r => (r.yFU || '').toString().trim())
-                        .filter(Boolean)
+                    [...filteredStrataCurves, ...filteredStandCurves].map(curveFU).filter(Boolean)
                 )].sort();
                 const isSingleFUOverlayView = overlayFUs.length <= 1;
                 const overlayYields = [...new Set(
-                    [...filteredStrataCurves, ...filteredStandCurves]
-                        .map(r => (r.YIELD || 'UNKNOWN').toString().trim())
-                        .filter(Boolean)
+                    [...filteredStrataCurves, ...filteredStandCurves].map(curveYield).filter(Boolean)
                 )].sort();
                 const overlayFuColorMap = {};
                 overlayFUs.forEach((fu, idx) => {
@@ -5077,9 +5234,7 @@
 
                 // Group STRATA overlays by full curve identity (SE-safe)
                 if (showStrataOverlay && filteredStrataCurves.length > 0) {
-                    const sampleRow = filteredStrataCurves[0];
-                    console.log('📊 Adding STRATA overlays, sample row:', sampleRow);
-                    console.log('📊 Available columns:', Object.keys(sampleRow));
+                    console.log('📊 Adding STRATA overlays, sample cols:', Object.keys(filteredStrataCurves[0]));
                     const curvesByKey = {};
                     filteredStrataCurves.forEach(row => {
                         const key = getStrataCurveKey(row, columnMap);
@@ -5088,13 +5243,12 @@
                     });
                     
                     Object.keys(curvesByKey).sort().forEach(key => {
-                        const curves = curvesByKey[key].sort((a, b) =>
-                            (Number(a.AGE || a.Age) || 0) - (Number(b.AGE || b.Age) || 0));
+                        const curves = curvesByKey[key].sort((a, b) => (curveAge(a) || 0) - (curveAge(b) || 0));
                         const label = getStrataCurveLabel(curves[0], columnMap);
-                        const fu = cellStr(curves[0], columnMap.forestUnit) || curves[0].yFU?.trim() || 'Unknown';
-                        const yieldScenario = cellStr(curves[0], columnMap.yieldScenario) || curves[0].YIELD?.trim() || 'Unknown';
-                        const xValues = curves.map(r => r.AGE || r.Age);
-                        const yValues = curves.map(r => r[yMetric]);
+                        const fu = curveFU(curves[0]);
+                        const yieldScenario = curveYield(curves[0]);
+                        const xValues = curves.map(curveAge);
+                        const yValues = curves.map(curveY);
                         
                         const curveColor = isSingleFUOverlayView
                             ? (yieldColorPalette[yieldScenario] || '#666666')
@@ -5108,21 +5262,19 @@
                             type: 'scatter',
                             name: `STRATA ${label}`,
                             line: { width: 3, dash: curveDash, color: curveColor },
-                            hovertemplate: `STRATA ${label}<br>Age: %{x}<br>${yMetric}: %{y:.2f}<extra></extra>`
+                            hovertemplate: `STRATA ${label}<br>Age: %{x}<br>${yMetricKey}: %{y:.2f}<extra></extra>`
                         });
                     });
                 }
                 
                 if (showStandOverlay && filteredStandCurves.length > 0) {
-                    const sampleRow = filteredStandCurves[0];
-                    console.log('📊 Adding STAND overlays, sample row:', sampleRow);
-                    console.log('📊 Available columns:', Object.keys(sampleRow));
-                    console.log(`📊 Total filtered STAND curves: ${filteredStandCurves.length}`);
+                    console.log(`📊 Adding STAND overlays: ${filteredStandCurves.length} rows`);
                     
-                    // Group by ID - each stand gets its own curve (already filtered by PLANFU/YIELD/LEADSPC)
+                    // Group by ID - each stand gets its own curve
+                    const idCol = (columnMap && columnMap.polygonID) || 'ID';
                     const curvesByID = {};
                     filteredStandCurves.forEach(row => {
-                        const standId = row.ID;
+                        const standId = String(cellByHeader(row, idCol) ?? row.ID ?? row.id ?? '').trim() || 'unknown';
                         if (!curvesByID[standId]) curvesByID[standId] = [];
                         curvesByID[standId].push(row);
                     });
@@ -5136,7 +5288,6 @@
                         console.warn(`⚠️ WARNING: ${numCurves} STAND curves exceeds safe rendering limit (${MAX_INDIVIDUAL_TRACES}). Rendering in batches instead to prevent browser crash.`);
                         alert(`⚠️ Performance notice: You have ${numCurves} STAND curves selected.\n\nTo prevent browser issues, these will be rendered as grouped batches instead of individual curves.\n\nTo see individual curves, filter to fewer Forest Units or adjust scatter plot filters.`);
                         
-                        // Use batching for large datasets
                         const MAX_CURVES_PER_BATCH = 200;
                         const standIds = Object.keys(curvesByID);
                         
@@ -5148,9 +5299,9 @@
                             const batchYValues = [];
                             
                             batchIds.forEach(standId => {
-                                const curves = curvesByID[standId].sort((a, b) => (a.AGE || a.Age) - (b.AGE || b.Age));
-                                const xValues = curves.map(r => r.AGE || r.Age);
-                                const yValues = curves.map(r => r[yMetric]);
+                                const curves = curvesByID[standId].sort((a, b) => (curveAge(a) || 0) - (curveAge(b) || 0));
+                                const xValues = curves.map(curveAge);
+                                const yValues = curves.map(curveY);
                                 
                                 batchXValues.push(...xValues, null);
                                 batchYValues.push(...yValues, null);
@@ -5158,8 +5309,8 @@
                             
                             const showlegend = batchIdx === 0;
                             const sampleCurve = curvesByID[batchIds[0]] && curvesByID[batchIds[0]][0] ? curvesByID[batchIds[0]][0] : null;
-                            const batchFU = sampleCurve ? (sampleCurve.yFU || 'Unknown') : 'Unknown';
-                            const batchYield = sampleCurve ? (sampleCurve.YIELD || 'Unknown') : 'Unknown';
+                            const batchFU = sampleCurve ? curveFU(sampleCurve) : 'Unknown';
+                            const batchYield = sampleCurve ? curveYield(sampleCurve) : 'Unknown';
                             const batchBaseColor = isSingleFUOverlayView
                                 ? (yieldColorPalette[batchYield] || '#00c800')
                                 : (overlayFuColorMap[batchFU] || '#00c800');
@@ -5176,17 +5327,17 @@
                                 name: `STAND ${batchFU} - ${batchYield} (batch ${Math.floor(batchIdx / MAX_CURVES_PER_BATCH) + 1})`,
                                 line: { width: 0.4, color: batchColor, dash: batchDash },
                                 showlegend: showlegend,
-                                hovertemplate: `STAND curve<br>Age: %{x}<br>${yMetric}: %{y:.2f}<extra></extra>`
+                                hovertemplate: `STAND curve<br>Age: %{x}<br>${yMetricKey}: %{y:.2f}<extra></extra>`
                             });
                         }
                     } else {
                         // Safe to render individual curves
                         Object.keys(curvesByID).forEach(standId => {
-                            const curves = curvesByID[standId].sort((a, b) => (a.AGE || a.Age) - (b.AGE || b.Age));
-                            const xValues = curves.map(r => r.AGE || r.Age);
-                            const yValues = curves.map(r => r[yMetric]);
-                            const fu = curves[0].yFU || 'Unknown';
-                            const yieldScenario = curves[0].YIELD || 'Unknown';
+                            const curves = curvesByID[standId].sort((a, b) => (curveAge(a) || 0) - (curveAge(b) || 0));
+                            const xValues = curves.map(curveAge);
+                            const yValues = curves.map(curveY);
+                            const fu = curveFU(curves[0]);
+                            const yieldScenario = curveYield(curves[0]);
                             const curveBaseColor = isSingleFUOverlayView
                                 ? (yieldColorPalette[yieldScenario] || '#00ff00')
                                 : (overlayFuColorMap[fu] || '#00ff00');
@@ -5203,7 +5354,7 @@
                                 name: `STAND ${standId} (${fu} - ${yieldScenario})`,
                                 line: { width: 0.35, color: curveColor, dash: curveDash },
                                 showlegend: false,
-                                hovertemplate: `STAND ID: ${standId}<br>FU: ${fu}<br>YIELD: ${yieldScenario}<br>Age: %{x}<br>${yMetric}: %{y:.2f}<extra></extra>`
+                                hovertemplate: `STAND ID: ${standId}<br>FU: ${fu}<br>YIELD: ${yieldScenario}<br>Age: %{x}<br>${yMetricKey}: %{y:.2f}<extra></extra>`
                             });
                         });
                         
@@ -5227,21 +5378,29 @@
             const layout = buildAgeSeriesLayout({
                 variant: 'scatter',
                 title: filteredData.length > 0
-                    ? `Age vs ${yMetric} (${filteredData.length.toLocaleString()} points)`
-                    : `Age vs ${yMetric}<br><sub style="color: #6c757d;">No data points match current filters (adjust age range or filters)</sub>`,
+                    ? `Age vs ${yMetricKey} (${filteredData.length.toLocaleString()} points)`
+                    : `Age vs ${yMetricKey}<br><sub style="color: #6c757d;">No data points match current filters (adjust age range or filters)</sub>`,
                 titleSize: 16,
-                yTitle: yMetric === 'GTV' ? 'Gross Total Volume (m³/ha)' : 'Basal Area (m²/ha)',
+                yTitle: scatterYAxisTitle(yMetricKey),
                 zeroline: false,
                 plot_bgcolor: '#ffffff',
                 paper_bgcolor: '#f8f9fa',
                 legend: { bgcolor: 'rgba(255,255,255,0.8)', bordercolor: '#dee2e6' }
             });
             
-            const config = getInteractivePlotConfig({ filename: 'scatter_age_' + yMetric });
+            const config = getInteractivePlotConfig({ filename: 'scatter_age_' + yMetricKey });
             
             // Render plot
             document.getElementById('scatterPlotContainer').style.display = 'block';
             Plotly.newPlot('scatterPlot', traces, layout, config);
+
+            // Refresh stats with plotted point count
+            try {
+                document.getElementById('scatterStats').innerHTML =
+                    `<strong>${rawData.length.toLocaleString()}</strong> inventory records · ` +
+                    `<strong>${filteredData.length.toLocaleString()}</strong> plotted` +
+                    `<div class="text-muted small mt-1">Cols: FU=${fuCol}, Age=${detectedColumns.age}, Y=${yCol}</div>`;
+            } catch (e) { /* ignore */ }
             
             console.log('✅ Scatter plot rendered');
         }
@@ -5269,8 +5428,12 @@
             
             console.log(`🔍 Filter selections - FUs: ${selectedFUs.length}, Yields: ${selectedYields.length}, Species: ${selectedSpecies.length}, Age: ${ageMin}-${ageMax}`);
             
-            // Strict: empty selection on any dimension ⇒ no rows (not default-to-all)
-            if (selectedFUs.length === 0 || selectedYields.length === 0 || selectedSpecies.length === 0) {
+            // Strict empty for dimensions that have options; skip dimensions with no checkboxes
+            const hasYieldOptions = document.querySelectorAll('#scatterYieldCheckboxes input').length > 0;
+            const hasSpeciesOptions = document.querySelectorAll('#scatterLeadspcCheckboxes input').length > 0;
+            if (selectedFUs.length === 0 ||
+                (hasYieldOptions && selectedYields.length === 0) ||
+                (hasSpeciesOptions && selectedSpecies.length === 0)) {
                 console.log('📊 Missing filter selections - returning empty array (strict empty)');
                 return [];
             }
@@ -5280,15 +5443,18 @@
             const selectedSpeciesUpper = selectedSpecies.map(v => v.toUpperCase());
 
             return rawData.filter(row => {
-                const fu = (row[detectedColumns.forestUnit] || '').toString().trim().toUpperCase();
-                const yld = (row[detectedColumns.yieldClass] || '').toString().trim().toUpperCase();
-                const spc = (row[detectedColumns.leadingSpecies] || '').toString().trim().toUpperCase();
-                const age = parseFloat(row.Age || row.AGE);
-                const ageMatch = age >= ageMin && age <= ageMax;
-                return selectedFUsUpper.includes(fu) &&
-                       selectedYieldsUpper.includes(yld) &&
-                       selectedSpeciesUpper.includes(spc) &&
-                       ageMatch;
+                const fu = rawCellStr(row, detectedColumns.forestUnit, ['PLANFU', 'yFU', 'SFU']).toUpperCase();
+                if (!selectedFUsUpper.includes(fu)) return false;
+                if (hasYieldOptions) {
+                    const yld = rawCellStr(row, detectedColumns.yieldClass, ['YIELD', 'Yield']).toUpperCase();
+                    if (!selectedYieldsUpper.includes(yld)) return false;
+                }
+                if (hasSpeciesOptions) {
+                    const spc = rawCellStr(row, detectedColumns.leadingSpecies, ['LEADSPC', 'LeadSpc']).toUpperCase();
+                    if (!selectedSpeciesUpper.includes(spc)) return false;
+                }
+                const age = rawRowAge(row);
+                return !isNaN(age) && age >= ageMin && age <= ageMax;
             });
         }
         
@@ -7328,6 +7494,16 @@
             const table2 = data.table2 || [];
             const table3 = data.table3 || [];
             const isBiomassOnly = !!(data.biomassOnly || (hasBioData && !hasVolumeData));
+            const isFullReport = !!data.isFullReport;
+            const seModeLabel = data.seMode === 'all'
+                ? 'All AGSFRC × SI combinations'
+                : (data.seMode === 'grid' || isFullReport
+                    ? 'Representative AGS/SI grid (0.3/0.6/0.9 · low/mid/high SI when present)'
+                    : null);
+            const glslAgs = Array.from(document.querySelectorAll('.agsfrc-checkbox:checked')).map(cb => cb.value).join(', ') || '—';
+            const glslSi = Array.from(document.querySelectorAll('.strata-si-checkbox:checked')).map(cb => cb.value).join(', ') || '—';
+            const glslCut = Array.from(document.querySelectorAll('.cut-checkbox:checked')).map(cb => cb.value).join(', ') || '—';
+            const glslSil = Array.from(document.querySelectorAll('.silsys-checkbox:checked')).map(cb => cb.value).join(', ') || '—';
             
             let html = `
 <!DOCTYPE html>
@@ -7494,11 +7670,27 @@
     <div class="filter-info">
         <h3 style="margin-top: 0;">📋 Active Filters at Report Generation</h3>
         
+        ${isFullReport ? `
+        <p style="margin-top: 0;"><strong>Report type:</strong> Full Report (auto-selected filters)</p>
+        ${seModeLabel ? `<p><strong>GLSL SE density:</strong> ${seModeLabel}</p>` : ''}
+        ` : '<p style="margin-top: 0;"><strong>Report type:</strong> Filtered Report (sidebar selections after Apply)</p>'}
+        <p class="small" style="color:#555; margin-bottom: 12px;">
+            Chart performance caps (browser stability): up to <strong>${REPORT_MAX_FUS}</strong> Forest Units per module,
+            ~<strong>${REPORT_MAX_STRATA_TRACES}</strong> STRATA curves sampled per panel
+            (even SI/CUT/AGS sample when more exist — dense units like HDSL1 will not draw every SE curve).
+        </p>
+
         ${hasVolumeData ? `
         <h4 style="color: #0d6efd; margin-top: 15px; margin-bottom: 10px;">📊 Yield Curve Selections <span style="font-size: 0.85em; color: #666;">(for volume dashboards)</span></h4>
         <p><strong>Forest Units:</strong> ${yieldCurveFUs}</p>
         <p><strong>Yield Classes:</strong> ${yieldCurveYields}</p>
         <p><strong>Leading Species:</strong> ${yieldCurveSpecies}</p>
+        ${(typeof isGlslVolume !== 'undefined' && isGlslVolume) ? `
+        <p><strong>SILSYS:</strong> ${glslSil}</p>
+        <p><strong>CUT:</strong> ${glslCut}</p>
+        <p><strong>AGSFRC:</strong> ${glslAgs}</p>
+        <p><strong>SI:</strong> ${glslSi}</p>
+        ` : ''}
         
         ${hasRawData ? `
         <h4 style="color: #198754; margin-top: 20px; margin-bottom: 10px;">📋 Raw Data Selections <span style="font-size: 0.85em; color: #666;">(for summary tables)</span></h4>
@@ -7533,6 +7725,15 @@
     <h2>🎯 Forest Unit Dashboards</h2>
     <p style="color: #666; font-style: italic; margin-bottom: 8px;">Per-FU multi-panel charts for this report.</p>
     `;
+                if (dMeta.fuCap || dMeta.fusRequested) {
+                    html += `
+    <p style="color: #666; font-size: 0.9rem; margin-bottom: 12px;">
+        Volume FUs in this report: <strong>${(dMeta.fusRendered && dMeta.fusRendered.length) || Object.keys(data.dashboards).filter(k => k !== '_meta').length}</strong>
+        of <strong>${dMeta.fusRequested != null ? dMeta.fusRequested : '—'}</strong>
+        (cap ${dMeta.fuCap != null ? dMeta.fuCap : REPORT_MAX_FUS}).
+        STRATA series per panel sampled to ~${REPORT_MAX_STRATA_TRACES} curves when denser.
+    </p>`;
+                }
                 if (dMeta.fusSkipped && dMeta.fusSkipped.length) {
                     html += `
     <p style="color:#856404; background:#fff3cd; border:1px solid #ffc107; border-radius:6px; padding:10px 12px; font-size:13px;">
@@ -7768,14 +7969,15 @@
         // GENERATE FULL REPORT (bypasses all filters)
         // ============================================
         async function generateFullReport(metadata) {
-            console.log('📊 Generating FULL report (all data with all filters auto-selected)...');
+            const seMode = (metadata && metadata.seMode) || getFullReportSeMode();
+            console.log(`📊 Generating FULL report (SE mode=${seMode})...`);
             
             // Show loading overlay
             document.getElementById('reportLoadingOverlay').style.display = 'block';
             
             const hasVolume  = !!(csvData && csvData.length > 0);
             const hasBiomass = !!(bioData && bioData.length > 0);
-            console.log(`📊 Full Report inputs — volume: ${hasVolume ? csvData.length : 0}, biomass: ${hasBiomass ? bioData.length : 0}`);
+            console.log(`📊 Full Report inputs — volume: ${hasVolume ? csvData.length : 0}, biomass: ${hasBiomass ? bioData.length : 0}, seMode: ${seMode}`);
 
             if (!hasVolume && !hasBiomass) {
                 document.getElementById('reportLoadingOverlay').style.display = 'none';
@@ -7842,11 +8044,11 @@
                     document.querySelectorAll('.strata-yield-checkbox').forEach(cb => cb.checked = true);
                     document.querySelectorAll('.stand-yield-checkbox').forEach(cb => cb.checked = true);
                     document.querySelectorAll('.stand-leadspc-checkbox').forEach(cb => cb.checked = true);
-                    // GLSL SE: do NOT select all AGSFRC×SI (hundreds of curves) — use representative grid
+                    // GLSL SE: grid (default) or all AGS×SI per user option
                     if (isGlslVolume) {
-                        applyVolumeGlslFullReportDefaults();
+                        applyVolumeGlslFullReportDefaults(seMode);
                     }
-                    console.log('✅ Selected Yield Curve filters (GLSL SE uses representative grid if applicable)');
+                    console.log(`✅ Selected Yield Curve filters (GLSL SE mode=${seMode})`);
                     
                     updateProgress('🔍 Auto-selecting all Raw Data filters...', 25);
                     await new Promise(resolve => setTimeout(resolve, 50));
@@ -7900,9 +8102,9 @@
                     document.querySelectorAll('.bio-yield-checkbox').forEach(cb => cb.checked = true);
                     document.querySelectorAll('.bio-leadspc-checkbox').forEach(cb => cb.checked = true);
                     if (isGlslBiomass) {
-                        applyBiomassGlslFullReportDefaults();
+                        applyBiomassGlslFullReportDefaults(seMode);
                     }
-                    console.log('✅ Selected Biomass filters for full report (GLSL SE grid if applicable)');
+                    console.log(`✅ Selected Biomass filters for full report (GLSL SE mode=${seMode})`);
 
                     updateProgress('🌿 Generating Biomass dashboards...', 85);
                     await new Promise(resolve => setTimeout(resolve, 50));
@@ -7930,6 +8132,7 @@
                     table3,
                     dashboards,
                     isFullReport: true,
+                    seMode,
                     bioDashboardsHtml,
                     volumeOnly: hasVolume && !hasBiomass,
                     biomassOnly: hasBiomass && !hasVolume
@@ -7939,7 +8142,8 @@
                 updateProgress('💾 Saving report...', 96);
                 await new Promise(resolve => setTimeout(resolve, 50));
 
-                const fullReportName = `SLYM_FullReport_${metadata.fmuName.replace(/\s+/g, '_')}_${metadata.planYear}.html`;
+                const seTag = seMode === 'all' ? 'AllSE' : 'SEGrid';
+                const fullReportName = `SLYM_FullReport_${seTag}_${metadata.fmuName.replace(/\s+/g, '_')}_${metadata.planYear}.html`;
                 const saved = await saveReportToFile(reportHTML, fullReportName);
 
                 if (saved) {
@@ -8216,6 +8420,13 @@
                     
                     console.log(`Validation passed: ${filteredStrata.length} STRATA, ${filteredStand.length} STAND volume${hasBiomassData ? ` + ${bioData.length} biomass` : ''} records`);
                     
+                    // Ensure filtered path (not leftover Full Report flags)
+                    const form = document.getElementById('reportMetadataForm');
+                    if (form) {
+                        form.dataset.fullReport = 'false';
+                        form.dataset.seMode = '';
+                    }
+
                     // Show metadata modal
                     const metadataModal = new bootstrap.Modal(document.getElementById('reportMetadataModal'));
                     metadataModal.show();
@@ -8233,16 +8444,32 @@
                         alert('Please upload a Volume yield curve CSV or a Biomass CSV first!');
                         return;
                     }
+
+                    const seMode = getFullReportSeMode();
+                    console.log(`Full Report validation passed: ${(csvData||[]).length} volume, ${(bioData||[]).length} biomass records, seMode=${seMode}`);
+
+                    // Warn when user opts into all SE combinations on GLSL data
+                    if (seMode === 'all' && ((typeof isGlslVolume !== 'undefined' && isGlslVolume) ||
+                                            (typeof isGlslBiomass !== 'undefined' && isGlslBiomass))) {
+                        const ok = confirm(
+                            '⚡ Full Report · All AGSFRC × SI\n\n' +
+                            'This includes every GLSL SE combination in the filtered data.\n' +
+                            'Dense forest units (e.g. HDSL1) can make generation slow and charts still sample ' +
+                            `~${REPORT_MAX_STRATA_TRACES} STRATA curves per panel.\n\n` +
+                            'For a lighter report, cancel and choose “Representative AGS/SI grid”.\n\n' +
+                            'Continue with All AGS × SI?'
+                        );
+                        if (!ok) return;
+                    }
                     
-                    // Full report uses ALL data, no filters needed - just proceed to metadata modal
-                    console.log(`Full Report validation passed: ${(csvData||[]).length} volume, ${(bioData||[]).length} biomass records`);
-                    
-                    // Show metadata modal for full report (skip confirmation since user doesn't need to set filters)
+                    // Mark full report + SE mode for confirm handler
+                    const form = document.getElementById('reportMetadataForm');
+                    form.dataset.fullReport = 'true';
+                    form.dataset.seMode = seMode;
+
+                    // Show metadata modal
                     const metadataModal = new bootstrap.Modal(document.getElementById('reportMetadataModal'));
                     metadataModal.show();
-                    
-                    // Mark that this is a full report so btnConfirmReport knows which function to call
-                    document.getElementById('reportMetadataForm').dataset.fullReport = 'true';
                 });
             } else {
                 console.error('❌ btnGenerateFullReport not found!');
@@ -8272,7 +8499,9 @@
                     bootstrap.Modal.getInstance(document.getElementById('reportMetadataModal')).hide();
                     
                     // Check if this is a full report
-                    const isFullReport = document.getElementById('reportMetadataForm').dataset.fullReport === 'true';
+                    const formEl = document.getElementById('reportMetadataForm');
+                    const isFullReport = formEl.dataset.fullReport === 'true';
+                    const seMode = formEl.dataset.seMode || getFullReportSeMode();
                     
                     // Small delay to allow modal to close smoothly
                     setTimeout(async () => {
@@ -8282,10 +8511,12 @@
                                 fmuName,
                                 planYear,
                                 analystName,
-                                reportPurpose
+                                reportPurpose,
+                                seMode
                             });
-                            // Clear the flag
-                            document.getElementById('reportMetadataForm').dataset.fullReport = 'false';
+                            // Clear the flags
+                            formEl.dataset.fullReport = 'false';
+                            formEl.dataset.seMode = '';
                         } else {
                             await generateReport({
                                 fmuName,
@@ -8498,14 +8729,22 @@
             return getBiomassGlslSelectionsFromState(readBiomassFilterState());
         }
 
-        function applyBiomassGlslFullReportDefaults() {
+        function applyBiomassGlslFullReportDefaults(seMode) {
             if (!isGlslBiomass) return;
+            const mode = seMode === 'all' ? 'all' : 'grid';
             document.querySelectorAll('.bio-silsys-checkbox').forEach(cb => { cb.checked = true; });
             document.querySelectorAll('.bio-cut-checkbox').forEach(cb => { cb.checked = true; });
-            const defAgs = new Set(pickFullReportAgsfrc(uniqueBioAgsfrc));
-            document.querySelectorAll('.bio-agsfrc-checkbox').forEach(cb => { cb.checked = defAgs.has(cb.value); });
-            const defSi = new Set(pickFullReportSI(uniqueBioStrataSI));
-            document.querySelectorAll('.bio-strata-si-checkbox').forEach(cb => { cb.checked = defSi.has(cb.value); });
+            if (mode === 'all') {
+                document.querySelectorAll('.bio-agsfrc-checkbox').forEach(cb => { cb.checked = true; });
+                document.querySelectorAll('.bio-strata-si-checkbox').forEach(cb => { cb.checked = true; });
+                console.log('🌿 Full report biomass GLSL SE mode=all');
+            } else {
+                const defAgs = new Set(pickFullReportAgsfrc(uniqueBioAgsfrc));
+                document.querySelectorAll('.bio-agsfrc-checkbox').forEach(cb => { cb.checked = defAgs.has(cb.value); });
+                const defSi = new Set(pickFullReportSI(uniqueBioStrataSI));
+                document.querySelectorAll('.bio-strata-si-checkbox').forEach(cb => { cb.checked = defSi.has(cb.value); });
+                console.log('🌿 Full report biomass GLSL SE mode=grid — AGSFRC:', [...defAgs], 'SI:', [...defSi]);
+            }
         }
 
         function populateBiomassCheckboxes(containerId, values, cssClass) {
