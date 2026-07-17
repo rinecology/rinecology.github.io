@@ -203,8 +203,12 @@
         #biomassPlotContainer.is-visible {
             display: block !important;
         }
-        #scatterPlot { min-height: 500px; height: 500px; }
-        .plot-container, .scatter-plot-container {
+        #scatterPlot { min-height: 500px; height: 500px; width: 100%; }
+        /* IMPORTANT: do NOT use bare `.plot-container` here — Plotly injects that
+           class on its internal SVG host, and overflow rules can clip / blank traces. */
+        #plotContainer,
+        #scatterPlotContainer,
+        #biomassPlotContainer {
             /* Room for side legends; horizontal scroll if viewport is narrow */
             overflow-x: auto;
             overflow-y: visible;
@@ -5043,6 +5047,11 @@
             
             console.log(`✅ Filtered to ${filteredData.length} points (yCol=${yCol})`);
             
+            // Map radio metric → YIELD_METRIC_CAPS key (same caps as yield-curve plot)
+            const scatterMetricKey = (yMetricKey === 'BA') ? 'basalArea' : 'grossTotalVolume';
+            const scatterYCap = YIELD_METRIC_CAPS[scatterMetricKey] || 1e6;
+            let scatterDroppedBadY = 0;
+
             // Prepare scatter data grouped by BOTH FU and YIELD
             const dataByCombo = {};
             filteredData.forEach(row => {
@@ -5057,19 +5066,27 @@
                 
                 const age = rawRowAge(row);
                 const yRaw = yCol ? row[yCol] : undefined;
-                const yValue = parseFloat(yRaw);
+                const yValue = toFiniteNumber(yRaw);
                 
-                if (!isNaN(age) && !isNaN(yValue)) {
-                    dataByCombo[comboKey].x.push(age);
-                    dataByCombo[comboKey].y.push(yValue);
-                    dataByCombo[comboKey].text.push(
-                        `FU: ${fu}<br>` +
-                        `YIELD: ${yieldVal}<br>` +
-                        `Age: ${age}<br>` +
-                        `${yMetricKey} (${yCol}): ${yValue.toFixed(2)}<br>` +
-                        `LEADSPC: ${leadspc}`
-                    );
+                // Drop non-finite / out-of-cap Y so one 1e199 blow-up cannot crush autorange
+                // into a white empty plot (axes still draw; markers squash to the zero line).
+                if (age == null || !Number.isFinite(age) || age < 0 || age > 500 ||
+                    yValue == null || !isPlausibleYieldMetric(yValue, scatterMetricKey)) {
+                    if (yValue != null && Number.isFinite(yValue) && !isPlausibleYieldMetric(yValue, scatterMetricKey)) {
+                        scatterDroppedBadY++;
+                    }
+                    return;
                 }
+
+                dataByCombo[comboKey].x.push(age);
+                dataByCombo[comboKey].y.push(yValue);
+                dataByCombo[comboKey].text.push(
+                    `FU: ${fu}<br>` +
+                    `YIELD: ${yieldVal}<br>` +
+                    `Age: ${age}<br>` +
+                    `${yMetricKey} (${yCol}): ${yValue.toFixed(2)}<br>` +
+                    `LEADSPC: ${leadspc}`
+                );
             });
 
             // Create Plotly traces - color by FU, symbol by YIELD
@@ -5113,10 +5130,22 @@
             uniqueYields.forEach((yieldVal, idx) => {
                 yieldSymbolMap[yieldVal] = symbolPatterns[idx % symbolPatterns.length];
             });
+
+            // Point count drives renderer: SVG scatter chokes / blanks on tens of thousands
+            // of markers (axes still paint). WebGL scattergl is the reliable path for inventory clouds.
+            let scatterPointCount = 0;
+            Object.keys(dataByCombo).forEach(k => { scatterPointCount += dataByCombo[k].x.length; });
+            const useScatterGL = scatterPointCount >= 2000;
+            const markerTraceType = useScatterGL ? 'scattergl' : 'scatter';
+            console.log(
+                `📌 Scatter points: ${scatterPointCount.toLocaleString()} · type=${markerTraceType}` +
+                (scatterDroppedBadY ? ` · dropped ${scatterDroppedBadY} over-cap Y (>${scatterYCap})` : '')
+            );
             
             // Create traces grouped by FU + YIELD
             Object.keys(dataByCombo).sort().forEach(comboKey => {
                 const combo = dataByCombo[comboKey];
+                if (!combo.x.length) return;
                 const color = isSingleFUScatterView
                     ? (yieldColorPalette[combo.yieldVal] || '#cccccc')
                     : (fuColorMap[combo.fu] || '#cccccc');
@@ -5125,16 +5154,17 @@
                     x: combo.x,
                     y: combo.y,
                     mode: 'markers',
-                    type: 'scatter',
+                    type: markerTraceType,
                     name: `${combo.fu} - ${combo.yieldVal} (${combo.x.length} points)`,
                     text: combo.text,
                     hovertemplate: '%{text}<extra></extra>',
                     marker: {
-                        size: 5,
+                        size: useScatterGL ? 4 : 5,
                         color: color,
                         symbol: symbol,
                         opacity: 0.7,
-                        line: { width: 0.5, color: 'rgba(255,255,255,0.5)' }
+                        // scattergl handles marker outlines poorly at high N — keep simple
+                        line: useScatterGL ? undefined : { width: 0.5, color: 'rgba(255,255,255,0.5)' }
                     }
                 });
             });
@@ -5199,13 +5229,28 @@
                 
                 function curveAge(r) {
                     const v = cellByHeader(r, volAgeCol);
-                    if (v != null && v !== '') return Number(v);
-                    return Number(r.AGE ?? r.Age ?? NaN);
+                    if (v != null && v !== '') return toFiniteNumber(v);
+                    return toFiniteNumber(r.AGE ?? r.Age);
                 }
                 function curveY(r) {
-                    const v = cellByHeader(r, overlayYCol);
-                    if (v != null && v !== '') return parseFloat(v);
-                    return parseFloat(r[overlayYCol] ?? r[yMetricKey]);
+                    // Prefer mapped volume column; fall back to metric name; always cap
+                    let v = cellByHeader(r, overlayYCol);
+                    if (v == null || v === '') v = r[overlayYCol] ?? r[yMetricKey];
+                    const n = toFiniteNumber(v);
+                    if (n == null || !isPlausibleYieldMetric(n, scatterMetricKey)) return null;
+                    return n;
+                }
+                function curveXY(rows) {
+                    const xs = [];
+                    const ys = [];
+                    rows.forEach(r => {
+                        const a = curveAge(r);
+                        const y = curveY(r);
+                        if (a == null || y == null) return;
+                        xs.push(a);
+                        ys.push(y);
+                    });
+                    return { x: xs, y: ys };
                 }
                 function curveFU(r) {
                     return String(cellByHeader(r, columnMap.forestUnit) ?? r.yFU ?? r.YFU ?? r.PLANFU ?? 'Unknown').trim();
@@ -5247,8 +5292,8 @@
                         const label = getStrataCurveLabel(curves[0], columnMap);
                         const fu = curveFU(curves[0]);
                         const yieldScenario = curveYield(curves[0]);
-                        const xValues = curves.map(curveAge);
-                        const yValues = curves.map(curveY);
+                        const xy = curveXY(curves);
+                        if (!xy.x.length) return;
                         
                         const curveColor = isSingleFUOverlayView
                             ? (yieldColorPalette[yieldScenario] || '#666666')
@@ -5256,8 +5301,8 @@
                         const curveDash = overlayDashMap[yieldScenario] || 'dash';
                         
                         traces.push({
-                            x: xValues,
-                            y: yValues,
+                            x: xy.x,
+                            y: xy.y,
                             mode: 'lines',
                             type: 'scatter',
                             name: `STRATA ${label}`,
@@ -5300,11 +5345,10 @@
                             
                             batchIds.forEach(standId => {
                                 const curves = curvesByID[standId].sort((a, b) => (curveAge(a) || 0) - (curveAge(b) || 0));
-                                const xValues = curves.map(curveAge);
-                                const yValues = curves.map(curveY);
-                                
-                                batchXValues.push(...xValues, null);
-                                batchYValues.push(...yValues, null);
+                                const xy = curveXY(curves);
+                                if (!xy.x.length) return;
+                                batchXValues.push(...xy.x, null);
+                                batchYValues.push(...xy.y, null);
                             });
                             
                             const showlegend = batchIdx === 0;
@@ -5334,8 +5378,8 @@
                         // Safe to render individual curves
                         Object.keys(curvesByID).forEach(standId => {
                             const curves = curvesByID[standId].sort((a, b) => (curveAge(a) || 0) - (curveAge(b) || 0));
-                            const xValues = curves.map(curveAge);
-                            const yValues = curves.map(curveY);
+                            const xy = curveXY(curves);
+                            if (!xy.x.length) return;
                             const fu = curveFU(curves[0]);
                             const yieldScenario = curveYield(curves[0]);
                             const curveBaseColor = isSingleFUOverlayView
@@ -5347,8 +5391,8 @@
                             const curveDash = overlayDashMap[yieldScenario] || 'solid';
                             
                             traces.push({
-                                x: xValues,
-                                y: yValues,
+                                x: xy.x,
+                                y: xy.y,
                                 mode: 'lines',
                                 type: 'scatter',
                                 name: `STAND ${standId} (${fu} - ${yieldScenario})`,
@@ -5374,35 +5418,119 @@
                 }
             }
             
-            // Layout — Phase 2 shared side legend
+            // Layout — Phase 2 shared side legend; explicit size so Plotly never paints 0×0
             const layout = buildAgeSeriesLayout({
                 variant: 'scatter',
-                title: filteredData.length > 0
-                    ? `Age vs ${yMetricKey} (${filteredData.length.toLocaleString()} points)`
+                title: scatterPointCount > 0
+                    ? `Age vs ${yMetricKey} (${scatterPointCount.toLocaleString()} points)`
                     : `Age vs ${yMetricKey}<br><sub style="color: #6c757d;">No data points match current filters (adjust age range or filters)</sub>`,
                 titleSize: 16,
                 yTitle: scatterYAxisTitle(yMetricKey),
                 zeroline: false,
                 plot_bgcolor: '#ffffff',
                 paper_bgcolor: '#f8f9fa',
+                height: 500,
+                autosize: true,
                 legend: { bgcolor: 'rgba(255,255,255,0.8)', bordercolor: '#dee2e6' }
             });
             
             const config = getInteractivePlotConfig({ filename: 'scatter_age_' + yMetricKey });
             
-            // Render plot
-            document.getElementById('scatterPlotContainer').style.display = 'block';
-            Plotly.newPlot('scatterPlot', traces, layout, config);
+            // ── Robust reflow: show container → force layout → measure → purge → plot → resize ──
+            // Plotting while the host is still display:none (or mid-reflow) is a classic
+            // "axes paint, traces missing" failure mode for Plotly SVG/WebGL layers.
+            const scatterContainer = document.getElementById('scatterPlotContainer');
+            const scatterEl = document.getElementById('scatterPlot');
+            if (scatterContainer) scatterContainer.style.display = 'block';
+            if (scatterEl) {
+                scatterEl.style.display = 'block';
+                scatterEl.style.width = '100%';
+                scatterEl.style.height = '500px';
+                scatterEl.style.minHeight = '500px';
+            }
+            // Force browser layout so clientWidth is real before Plotly measures
+            void (scatterContainer && scatterContainer.offsetHeight);
+
+            const measuredW = Math.max(
+                (scatterEl && scatterEl.clientWidth) || 0,
+                (scatterContainer && scatterContainer.clientWidth) || 0,
+                400
+            );
+            const layoutSized = Object.assign({}, layout, {
+                width: measuredW,
+                height: 500,
+                autosize: true
+            });
+
+            // Debug: confirm traces are finite and in a human range before paint
+            try {
+                let yMin = Infinity, yMax = -Infinity, nPts = 0;
+                traces.forEach(t => {
+                    if (!t.y) return;
+                    for (let i = 0; i < t.y.length; i++) {
+                        const v = t.y[i];
+                        if (v == null || !Number.isFinite(v)) continue;
+                        nPts++;
+                        if (v < yMin) yMin = v;
+                        if (v > yMax) yMax = v;
+                    }
+                });
+                console.log('🔬 Scatter pre-plot:', {
+                    traces: traces.length,
+                    finitePts: nPts,
+                    yMin: Number.isFinite(yMin) ? yMin : null,
+                    yMax: Number.isFinite(yMax) ? yMax : null,
+                    type: markerTraceType,
+                    width: measuredW
+                });
+            } catch (e) { /* ignore */ }
+
+            function forceScatterReflow(el) {
+                if (!el) return Promise.resolve();
+                return Plotly.Plots.resize(el)
+                    .then(function () {
+                        return Plotly.relayout(el, {
+                            'xaxis.autorange': true,
+                            'yaxis.autorange': true
+                        });
+                    })
+                    .catch(function (err) {
+                        console.warn('scatter reflow:', err);
+                    });
+            }
+
+            try { Plotly.purge(scatterEl || 'scatterPlot'); } catch (e) { /* ignore */ }
+
+            Plotly.newPlot(scatterEl || 'scatterPlot', traces, layoutSized, config)
+                .then(function () {
+                    return forceScatterReflow(scatterEl || 'scatterPlot');
+                })
+                .then(function () {
+                    // Second pass after paint — catches late flex/tab layout
+                    return new Promise(function (resolve) {
+                        setTimeout(function () {
+                            forceScatterReflow(scatterEl || 'scatterPlot').then(resolve);
+                        }, 120);
+                    });
+                })
+                .then(function () {
+                    console.log('✅ Scatter plot rendered + reflowed');
+                })
+                .catch(function (err) {
+                    console.error('❌ Scatter Plotly error:', err);
+                });
 
             // Refresh stats with plotted point count
             try {
                 document.getElementById('scatterStats').innerHTML =
                     `<strong>${rawData.length.toLocaleString()}</strong> inventory records · ` +
-                    `<strong>${filteredData.length.toLocaleString()}</strong> plotted` +
-                    `<div class="text-muted small mt-1">Cols: FU=${fuCol}, Age=${detectedColumns.age}, Y=${yCol}</div>`;
+                    `<strong>${scatterPointCount.toLocaleString()}</strong> plotted` +
+                    (scatterDroppedBadY
+                        ? ` · <span class="text-warning">${scatterDroppedBadY.toLocaleString()} over-cap dropped</span>`
+                        : '') +
+                    `<div class="text-muted small mt-1">Cols: FU=${fuCol}, Age=${detectedColumns.age}, Y=${yCol}` +
+                    ` · renderer=${markerTraceType}</div>`;
             } catch (e) { /* ignore */ }
-            
-            console.log('✅ Scatter plot rendered');
         }
         
         // Helper function to get active checkbox values
@@ -10384,156 +10512,6 @@ SOFTWARE.</pre>
         </div>
     </div>
     
-    <!-- Run SLYM Floating Button -->
-    <button id="btnOpenRunSlym" title="Run SLYM" style="position: fixed; right: 20px; bottom: 20px; z-index: 1050; border: none; border-radius: 50%; width: 56px; height: 56px; background-color: #198754; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">
-            <path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.631.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
-        </svg>
-    </button>
-
-    <!-- Floating Action Panel for SLYM Commands -->
-    <div id="slymActionsPanel" style="position: fixed; right: 20px; bottom: 90px; z-index: 1049; background: #fff; border: 2px solid #0d6efd; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 12px; display: none; width: 280px; overflow: visible; outline: 2px solid red;">
-        <div style="margin-bottom: 12px;">
-            <label for="slymProjectFileInput" style="display: block; font-weight: 600; font-size: 12px; margin-bottom: 6px;">📂 Project File (.txt)</label>
-            <input type="file" id="slymProjectFileInput" accept=".txt" style="width: 100%; padding: 6px; font-size: 12px; border: 1px solid #ddd; border-radius: 4px;">
-            <div id="slymFileLabelPanel" style="font-size: 11px; color: #666; margin-top: 4px;">No file chosen</div>
-        </div>
-        <div style="margin-bottom: 12px;">
-            <label style="display: block; font-weight: 600; font-size: 12px; margin-bottom: 6px;">💻 Command</label>
-            <pre id="slymCommandTextPanel" style="background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px; padding: 6px; font-size: 10px; margin: 0; white-space: pre-wrap; word-break: break-all; max-height: 60px; overflow-y: auto;">.\\SLYMCL.exe "<select a project file>"</pre>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 6px; overflow: visible;">
-            <button id="btnCopySlymCmdPanel" type="button" style="display: block !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; padding: 8px 10px; background: #0d6efd; color: #fff; border: 1px solid #0d6efd; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 500; text-align: center; min-height: 36px;">📋 Copy Command</button>
-            <button id="btnDownloadPs1Panel" type="button" style="display: block !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; padding: 8px 10px; background: #198754; color: #fff; border: 1px solid #198754; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 500; text-align: center; min-height: 36px;">⬇️ Download PS1</button>
-            <button id="btnDownloadLauncherPanel" type="button" style="display: block !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; padding: 8px 10px; background: #0dcaf0; color: #000; border: 1px solid #0dcaf0; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 500; text-align: center; min-height: 36px;">⬇️ GUI Launcher</button>
-            <button id="btnDownloadBatPanel" type="button" style="display: block !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; padding: 8px 10px; background: #6c757d; color: #fff; border: 1px solid #6c757d; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 500; text-align: center; min-height: 36px;">⬇️ Download BAT</button>
-        </div>
-        <button id="btnCloseSlymPanel" type="button" style="position: absolute; top: 4px; right: 4px; background: none; border: none; font-size: 18px; cursor: pointer; color: #666;">✕</button>
-    </div>
-
-
-
-    <script>
-    (function(){
-        console.log('🔧 SLYM Script: Initialization started');
-        let selectedProjectFileName = "";
-        
-        function updateCommandPreview() {
-            const preview = document.getElementById('slymCommandTextPanel');
-            const name = selectedProjectFileName || '<select a project file>';
-            preview.textContent = `.\\SLYMCL.exe "${name}"`;
-        }
-        
-        function downloadFile(filename, content) {
-            const blob = new Blob([content], { type: 'application/octet-stream' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            URL.revokeObjectURL(url);
-        }
-        
-        function buildPs1() {
-            const project = selectedProjectFileName;
-            return `# run_slym.ps1\n$ErrorActionPreference = 'Stop'\n$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path\nSet-Location $scriptDir\n\n$project = '${project}'\nif (!(Test-Path '.\\SLYMCL.exe')) {\n  Write-Error 'SLYMCL.exe not found in this folder.'\n}\nif (!(Test-Path $project)) {\n  Write-Error \"Project file not found: $project\"\n}\n\n& '.\\SLYMCL.exe' $project\n$code = $LASTEXITCODE\nWrite-Host \"SLYMCL exited with code $code\"\n`;
-        }
-        
-        function buildBat() {
-            const project = selectedProjectFileName;
-            return `@echo off\r\nsetlocal\r\ncd /d "%~dp0"\r\nset "PROJECT=${project}"\r\nif not exist "SLYMCL.exe" (\r\n  echo SLYMCL.exe not found in this folder.\r\n  pause\r\n  exit /b 1\r\n)\r\nif not exist "%PROJECT%" (\r\n  echo Project file not found: %PROJECT%\r\n  pause\r\n  exit /b 1\r\n)\r\necho Running SLYMCL.exe "%PROJECT%"\r\nSLYMCL.exe "%PROJECT%"\r\nset "ERR=%ERRORLEVEL%"\r\necho SLYMCL exited with code %ERR%\r\npause\r\n`;
-        }
-        
-        function buildLauncherBat() {
-            return `@echo off\r\ncd /d "%~dp0"\r\npowershell -NoExit -ExecutionPolicy Bypass -File "run_slym_ui.ps1"\r\n`;
-        }
-        
-        document.addEventListener('DOMContentLoaded', function(){
-            console.log('🔧 SLYM Script: DOMContentLoaded fired');
-            
-            const btn = document.getElementById('btnOpenRunSlym');
-            const panel = document.getElementById('slymActionsPanel');
-            const fileInput = document.getElementById('slymProjectFileInput');
-            const fileLabel = document.getElementById('slymFileLabelPanel');
-            
-            const btnCopy = document.getElementById('btnCopySlymCmdPanel');
-            const btnPs1 = document.getElementById('btnDownloadPs1Panel');
-            const btnLauncher = document.getElementById('btnDownloadLauncherPanel');
-            const btnBat = document.getElementById('btnDownloadBatPanel');
-            const btnClose = document.getElementById('btnCloseSlymPanel');
-            
-            console.log('🔍 Panel elements check:');
-            console.log('  panel:', panel ? '✅ Found' : '❌ NOT FOUND');
-            console.log('  fileInput:', fileInput ? '✅ Found' : '❌ NOT FOUND');
-            console.log('  btnCopy:', btnCopy ? '✅ Found' : '❌ NOT FOUND');
-            
-            if (btn) {
-                btn.addEventListener('click', function(){
-                    console.log('🎯 Run SLYM button clicked');
-                    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-                });
-            }
-            
-            if (btnClose) {
-                btnClose.addEventListener('click', function(){
-                    panel.style.display = 'none';
-                });
-            }
-            
-            if (fileInput) {
-                fileInput.addEventListener('change', function(e){
-                    const f = e.target.files && e.target.files[0];
-                    selectedProjectFileName = f ? f.name : '';
-                    fileLabel.textContent = selectedProjectFileName ? `Selected: ${selectedProjectFileName}` : 'No file chosen';
-                    updateCommandPreview();
-                    console.log('📄 File selected:', selectedProjectFileName);
-                });
-            }
-            
-            if (btnCopy) {
-                btnCopy.addEventListener('click', async function(){
-                    console.log('🔘 Copy Command button clicked');
-                    try {
-                        await navigator.clipboard.writeText(document.getElementById('slymCommandTextPanel').textContent);
-                        this.textContent = '✓ Copied!';
-                        setTimeout(()=>{ this.textContent = '📋 Copy'; }, 1200);
-                    } catch (err) {
-                        alert('Copy failed: ' + err.message);
-                    }
-                });
-            }
-            
-            if (btnPs1) {
-                btnPs1.addEventListener('click', function(){
-                    console.log('🔘 Download PS1 button clicked');
-                    if (!selectedProjectFileName) { alert('Please select a project .txt first.'); return; }
-                    downloadFile('run_slym.ps1', buildPs1());
-                });
-            }
-            
-            if (btnLauncher) {
-                btnLauncher.addEventListener('click', function(){
-                    console.log('🔘 Download GUI Launcher button clicked');
-                    downloadFile('run_slym_ui_launcher.bat', buildLauncherBat());
-                });
-            }
-            
-            if (btnBat) {
-                btnBat.addEventListener('click', function(){
-                    console.log('🔘 Download BAT button clicked');
-                    if (!selectedProjectFileName) { alert('Please select a project .txt first.'); return; }
-                    downloadFile('run_slym.bat', buildBat());
-                });
-            }
-            
-            updateCommandPreview();
-            console.log('✅ SLYM Script: All panel elements initialized');
-        });
-    })();
-    </script>
-
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
