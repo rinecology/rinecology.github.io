@@ -766,7 +766,9 @@ const SLYM_RULES = {
         'SILVSYS': ['SILVSYS', 'SILVICULTURE_SYSTEM', 'SILV_SYS', 'SILV'],
         'YIELD': ['YIELD', 'YIELD_CLASS', 'YLD', 'SITE_CLASS'],
         'HECTARES': ['HECTARES', 'AREA_HA', 'HA'],
-        'CDHT': ['CDHT', 'CD_HT', 'CROWN_DEPTH_HT'],
+        'CDHT': ['CDHT', 'CD_HT', 'CROWN_DEPTH_HT',
+                 'OHT', 'OVERSTORY_HT', 'OVERSTORY_HEIGHT', 'OVER_HT',
+                 'HT',  'HEIGHT', 'TREE_HT', 'TREE_HEIGHT'],   // cascade: CDHT → OHT → HT → (0 by createMissingNumericalFields)
         'BA': ['BA', 'BASAL_AREA', 'BASALAREA'],
         'GTV': ['GTV', 'GROSS_TOTAL_VOLUME', 'GROSSTOTALVOLUME'],
         'SI': ['SI', 'SITE_INDEX', 'SITEINDEX'],
@@ -844,7 +846,7 @@ const SLYM_RULES = {
         },
         {
             name: 'createMissingNumericalFields',
-            description: 'Create missing CDHT/BA/GTV/SI fields with 0 values for legacy data',
+            description: 'Create missing CDHT/BA/GTV/SI fields with 0 values for legacy data. CDHT is last-resort fallback — column mapping already cascades CDHT → OHT → HT before reaching here.',
             type: 'create_missing_fields',
             targetFields: ['CDHT', 'BA', 'GTV', 'SI'],
             defaultValue: 0,
@@ -985,10 +987,12 @@ const SLYM_RULES = {
             delimiter: ',',
             header: true,
             skipEmptyLines: false,
-            quotes: false,  // Changed from true - only quote when necessary (e.g., commas in values)
+            quotes: false,  // Quote only when needed (commas in values)
             quoteChar: '"',
             escapeChar: '"',
-            newline: '\r\n'  // Explicitly set Windows line endings
+            // Windows / Excel "CSV (MS-DOS)" style record separator.
+            // SLYM desktop readers often reject LF-only or UTF-8-BOM files.
+            newline: '\r\n'
         }
     }
 };
@@ -1026,6 +1030,120 @@ function generateSequentialId(index, prefix = 'STAND_') {
 
 function roundTo(value, decimals) {
     return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
+}
+
+/**
+ * Sanitize one CSV cell for legacy SLYM / MS-DOS-style readers.
+ * Embedded CR/LF inside fields shifts columns and can make PLANFU "disappear".
+ */
+function sanitizeCsvCell(value) {
+    if (value === null || value === undefined) return '';
+    let s = String(value);
+    if (s === 'null' || s === 'undefined') return '';
+    s = s.replace(/\uFEFF/g, '');   // BOM
+    s = s.replace(/\0/g, '');       // null bytes
+    s = s.replace(/[\r\n]+/g, ' '); // never allow line breaks inside a field
+    return s;
+}
+
+/**
+ * Build SLYM-compatible CSV text (CRLF, no BOM, fixed column order, clean cells).
+ * Matches what Excel "CSV (MS-DOS)" tends to produce for standard inventory content.
+ */
+function buildSlymCompatibleCsv(rows, columnOrder) {
+    const cols = (columnOrder && columnOrder.length)
+        ? columnOrder.slice()
+        : (rows && rows[0] ? Object.keys(rows[0]) : []);
+
+    const cleanRows = (rows || []).map(row => {
+        const o = {};
+        cols.forEach(col => {
+            o[col] = sanitizeCsvCell(row && Object.prototype.hasOwnProperty.call(row, col) ? row[col] : '');
+        });
+        return o;
+    });
+
+    const opts = Object.assign(
+        {
+            quotes: false,
+            quoteChar: '"',
+            escapeChar: '"',
+            delimiter: ',',
+            header: true,
+            newline: '\r\n'
+        },
+        (typeof SLYM_RULES !== 'undefined' && SLYM_RULES.outputConfig)
+            ? (SLYM_RULES.outputConfig.csvOptions || {})
+            : {}
+    );
+    opts.header = true;
+    opts.newline = '\r\n';
+    opts.columns = cols;
+
+    let csv = Papa.unparse(cleanRows, opts);
+
+    // Belt-and-suspenders: force pure CRLF even if Papa ignored newline
+    csv = String(csv).replace(/\r\n/g, '\n').replace(/\r/g, '\n').replace(/\n/g, '\r\n');
+    if (csv.length && csv.charCodeAt(0) === 0xFEFF) csv = csv.slice(1);
+    if (csv.length && !csv.endsWith('\r\n')) csv += '\r\n';
+    return csv;
+}
+
+/**
+ * Encode CSV as raw single-byte bytes (ASCII / Latin-1 range).
+ * Writing a JS string via File System Access API re-encodes as UTF-8;
+ * raw bytes match Excel MS-DOS CSV for typical SLYM (ASCII) content and
+ * avoid a UTF-8 BOM that some SLYM readers treat as part of the first header.
+ */
+function encodeCsvForSlym(csvText) {
+    const s = String(csvText);
+    const bytes = new Uint8Array(s.length);
+    for (let i = 0; i < s.length; i++) {
+        let code = s.charCodeAt(i);
+        if (code > 255) code = 0x3F; // '?' for rare non-Latin-1 glyphs
+        bytes[i] = code;
+    }
+    return bytes;
+}
+
+/**
+ * Save CSV bytes via File System Access API or anchor download.
+ * Always writes the Uint8Array (never a bare string).
+ */
+async function saveCsvBytes(fileName, bytes) {
+    if (typeof window !== 'undefined' && 'showSaveFilePicker' in window) {
+        try {
+            const fileHandle = await window.showSaveFilePicker({
+                suggestedName: fileName,
+                types: [{
+                    description: 'CSV Files',
+                    accept: { 'text/csv': ['.csv'] }
+                }]
+            });
+            const writable = await fileHandle.createWritable();
+            await writable.write(bytes);
+            await writable.close();
+            return { ok: true, method: 'picker' };
+        } catch (err) {
+            if (err && err.name === 'AbortError') {
+                return { ok: false, cancelled: true };
+            }
+            console.warn('File System Access API failed, falling back to download:', err);
+        }
+    }
+
+    // Raw bytes; do not advertise charset=utf-8
+    const blob = new Blob([bytes], { type: 'text/csv' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', fileName);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    return { ok: true, method: 'download' };
 }
 
 // ============================================================================
@@ -2224,50 +2342,37 @@ class SLYMProcessor {
             ? customFileName.trim() 
             : customFileName.trim() + '.csv';
         
-        // Generate CSV with Windows line endings (configured in csvOptions)
-        const csv = Papa.unparse(exportData, SLYM_RULES.outputConfig.csvOptions);
-        
-        // Try File System Access API (modern browsers with location picker)
-        if ('showSaveFilePicker' in window) {
-            console.log('📁 File System Access API is available, showing save dialog...');
-            try {
-                const fileHandle = await window.showSaveFilePicker({
-                    suggestedName: finalFileName,
-                    types: [{
-                        description: 'CSV Files',
-                        accept: { 'text/csv': ['.csv'] }
-                    }]
-                });
-                
-                const writable = await fileHandle.createWritable();
-                await writable.write(csv);
-                await writable.close();
-                
-                alert('✅ CSV file saved successfully!');
-                return;
-            } catch (err) {
-                if (err.name === 'AbortError') {
-                    console.log('User cancelled the save dialog');
-                    return; // User cancelled the save dialog
-                }
-                console.warn('File System Access API failed, falling back to download:', err);
-            }
-        } else {
-            console.log('⚠️ File System Access API not available in this browser, using standard download');
+        // Column order: core SLYM 15, then any optional extras (AU_YC, yFU*, …)
+        const baseCols = (SLYM_RULES.outputConfig.columnOrder || []).slice();
+        const firstRow = exportData[0] || {};
+        const extraCols = Object.keys(firstRow).filter(k => !baseCols.includes(k));
+        const columns = baseCols.concat(extraCols);
+
+        // MS-DOS / SLYM-friendly CSV: CRLF, no BOM, sanitized cells, raw single-byte write
+        const csv = buildSlymCompatibleCsv(exportData, columns);
+        const bytes = encodeCsvForSlym(csv);
+
+        // Diagnostics (helps confirm no LF-only / BOM issues in the field)
+        const crlfCount = (csv.match(/\r\n/g) || []).length;
+        const loneLf = (csv.replace(/\r\n/g, '').match(/\n/g) || []).length;
+        console.log('📄 SLYM CSV export:', {
+            rows: exportData.length,
+            columns: columns.length,
+            bytes: bytes.length,
+            crlfLines: crlfCount,
+            loneLf: loneLf,
+            startsWithBom: csv.charCodeAt(0) === 0xFEFF,
+            headerPreview: csv.slice(0, Math.min(120, csv.length)).replace(/\r/g, '\\r').replace(/\n/g, '\\n')
+        });
+
+        const result = await saveCsvBytes(finalFileName, bytes);
+        if (result.cancelled) {
+            console.log('User cancelled the save dialog');
+            return;
         }
-        
-        // Fallback: Standard download (browser default location)
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        
-        link.setAttribute('href', url);
-        link.setAttribute('download', finalFileName);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        if (result.ok) {
+            alert('✅ CSV file saved successfully!\n\nFormat: Windows CRLF (MS-DOS style), no BOM — ready for SLYM.');
+        }
     }
 
     async downloadLog() {
@@ -2376,57 +2481,18 @@ class SLYMProcessor {
             ? customFileName.trim() 
             : customFileName.trim() + '.csv';
         
-        // Generate CSV with standard Papa Parse settings
-        const csv = Papa.unparse(this.rawData, {
-            quotes: false,
-            quoteChar: '"',
-            escapeChar: '"',
-            delimiter: ",",
-            header: true,
-            newline: "\r\n"
-        });
-        
-        // Try File System Access API (modern browsers with location picker)
-        if ('showSaveFilePicker' in window) {
-            console.log('📁 File System Access API is available, showing save dialog...');
-            try {
-                const fileHandle = await window.showSaveFilePicker({
-                    suggestedName: finalFileName,
-                    types: [{
-                        description: 'CSV Files',
-                        accept: { 'text/csv': ['.csv'] }
-                    }]
-                });
-                
-                const writable = await fileHandle.createWritable();
-                await writable.write(csv);
-                await writable.close();
-                
-                alert('✅ Raw data CSV file saved successfully!');
-                return;
-            } catch (err) {
-                if (err.name === 'AbortError') {
-                    console.log('User cancelled the save dialog');
-                    return; // User cancelled the save dialog
-                }
-                console.warn('File System Access API failed, falling back to download:', err);
-            }
-        } else {
-            console.log('⚠️ File System Access API not available in this browser, using standard download');
+        // Same MS-DOS-friendly writer as SLYM export (CRLF, no BOM, raw bytes)
+        const rawCols = this.rawData[0] ? Object.keys(this.rawData[0]) : [];
+        const csv = buildSlymCompatibleCsv(this.rawData, rawCols);
+        const bytes = encodeCsvForSlym(csv);
+        const result = await saveCsvBytes(finalFileName, bytes);
+        if (result.cancelled) {
+            console.log('User cancelled the save dialog');
+            return;
         }
-        
-        // Fallback: Standard download (browser default location)
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        
-        link.setAttribute('href', url);
-        link.setAttribute('download', finalFileName);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        if (result.ok) {
+            alert('✅ Raw data CSV file saved successfully!');
+        }
     }
 
     showSpinner(show) {
