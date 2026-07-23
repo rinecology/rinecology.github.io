@@ -46,14 +46,26 @@
             height: 100vh;
         }
         
-        /* Sidebar Styles */
+        /* Sidebar Styles — flex column: scrollable filters + pinned report dock */
         .sidebar {
             width: 320px;
+            min-width: 300px;
             background-color: white;
             border-right: 1px solid #dee2e6;
-            overflow-y: auto;
-            padding: 20px;
+            overflow: hidden;
+            padding: 0;
             box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-height: 100vh;
+        }
+        .sidebar-scroll {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 16px 18px 12px;
+            min-height: 0;
         }
         .sidebar h5 {
             color: #0d6efd;
@@ -61,7 +73,166 @@
             font-weight: 600;
         }
         .sidebar hr {
-            margin: 20px 0;
+            margin: 16px 0;
+        }
+        /* Sticky Apply bar — explore action, always above Export dock */
+        .sidebar-apply-dock {
+            flex: 0 0 auto;
+            border-top: 2px solid #198754;
+            background: linear-gradient(180deg, #f3faf6 0%, #ffffff 55%);
+            padding: 10px 14px 10px;
+            box-shadow: 0 -4px 12px rgba(25, 135, 84, 0.08);
+            z-index: 21;
+        }
+        .sidebar-apply-dock .apply-dock-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .sidebar-apply-dock .apply-dock-title {
+            font-weight: 700;
+            font-size: 0.88rem;
+            color: #146c43;
+            margin: 0;
+        }
+        .sidebar-apply-dock .apply-dock-hint {
+            font-size: 0.7rem;
+            color: #6c757d;
+            margin: 0 0 6px;
+            line-height: 1.25;
+        }
+        .sidebar-apply-dock .btn-apply-primary {
+            width: 100%;
+            font-weight: 700;
+            font-size: 0.92rem;
+            padding: 0.55rem 0.75rem;
+            border-radius: 0.4rem;
+            box-shadow: 0 2px 8px rgba(25, 135, 84, 0.25);
+        }
+        .sidebar-apply-dock .btn-apply-primary:hover:not(:disabled) {
+            box-shadow: 0 3px 12px rgba(25, 135, 84, 0.35);
+        }
+        .sidebar-apply-dock .btn-apply-primary:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .sidebar-apply-dock .apply-dock-stats {
+            margin-top: 6px;
+            margin-bottom: 0;
+            padding: 6px 8px;
+            font-size: 0.75rem;
+            max-height: 72px;
+            overflow-y: auto;
+        }
+        .sidebar-apply-dock .apply-dock-stats strong {
+            font-size: 0.78rem;
+        }
+
+        /* Always-visible report dock (export is a primary action, not a buried filter) */
+        .sidebar-report-dock {
+            flex: 0 0 auto;
+            border-top: 2px solid #0d6efd;
+            background: linear-gradient(180deg, #f8fbff 0%, #ffffff 40%);
+            padding: 10px 14px 12px;
+            box-shadow: 0 -6px 16px rgba(13, 110, 253, 0.08);
+            z-index: 20;
+        }
+        .sidebar-report-dock .report-dock-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .sidebar-report-dock .report-dock-title {
+            font-weight: 700;
+            font-size: 0.92rem;
+            color: #212529;
+            margin: 0;
+        }
+        .report-scope-chip {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            padding: 0.15rem 0.55rem;
+            border-radius: 999px;
+            white-space: nowrap;
+            border: 1px solid transparent;
+        }
+        .report-scope-chip.scope-volume {
+            background: #e7f1ff;
+            color: #0a58ca;
+            border-color: #b6d4fe;
+        }
+        .report-scope-chip.scope-biomass {
+            background: #e8f5e9;
+            color: #146c43;
+            border-color: #a3cfbb;
+        }
+        .report-dock-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+        .report-dock-actions .btn {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.4rem 0.35rem;
+            line-height: 1.2;
+            white-space: normal;
+        }
+        .report-dock-actions .btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+        .btn-report-full {
+            background-color: #FF6B35 !important;
+            border-color: #FF6B35 !important;
+            color: #fff !important;
+        }
+        .btn-report-full:hover:not(:disabled) {
+            background-color: #e85a28 !important;
+            border-color: #e85a28 !important;
+            color: #fff !important;
+        }
+        .report-dock-hint {
+            font-size: 0.72rem;
+            color: #6c757d;
+            margin: 0 0 6px;
+            line-height: 1.3;
+        }
+        .report-dock-options {
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            background: #fff;
+            padding: 0.35rem 0.5rem;
+        }
+        .report-dock-options summary {
+            cursor: pointer;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #495057;
+            user-select: none;
+            list-style: none;
+        }
+        .report-dock-options summary::-webkit-details-marker { display: none; }
+        .report-dock-options summary::before {
+            content: '▸ ';
+            color: #0d6efd;
+        }
+        .report-dock-options[open] summary::before {
+            content: '▾ ';
+        }
+        .report-dock-options .report-options-body {
+            margin-top: 0.4rem;
+            padding-top: 0.35rem;
+            border-top: 1px solid #eee;
         }
         .filter-panel { display: none; }
         .filter-panel.active { display: block; }
@@ -81,6 +252,94 @@
             border-radius: 5px;
             padding: 10px;
             background-color: #f8f9fa;
+        }
+        /* Stage 4: compact multi-select (custom open/close — works inside sidebar overflow) */
+        .multi-select-host {
+            position: relative;
+            width: 100%;
+        }
+        .multi-select-host .ms-toggle {
+            width: 100%;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 0.875rem;
+            background: #fff;
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+            color: #212529;
+            padding: 0.4rem 0.65rem;
+            cursor: pointer;
+        }
+        .multi-select-host .ms-toggle:hover,
+        .multi-select-host .ms-toggle:focus {
+            background: #f8f9fa;
+            border-color: #86b7fe;
+            color: #212529;
+            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+        }
+        .multi-select-host .ms-toggle[aria-expanded="true"] {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+        }
+        .multi-select-host .ms-summary {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .multi-select-host .ms-caret {
+            opacity: 0.55;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+            transition: transform 0.15s ease;
+        }
+        .multi-select-host .ms-toggle[aria-expanded="true"] .ms-caret {
+            transform: rotate(180deg);
+        }
+        /* fixed + .show so menus are not clipped by .sidebar { overflow-y: auto } */
+        .multi-select-host .ms-menu {
+            display: none;
+            position: fixed;
+            z-index: 10050;
+            max-height: 240px;
+            overflow-y: auto;
+            padding: 0.45rem 0.6rem;
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+            pointer-events: none; /* never block Apply / sidebar while closed */
+        }
+        .multi-select-host .ms-menu.show {
+            display: block;
+            pointer-events: auto;
+        }
+        /* Legacy backdrop class — force never intercept clicks if left in DOM */
+        .ms-backdrop,
+        #msBackdrop {
+            display: none !important;
+            pointer-events: none !important;
+            visibility: hidden !important;
+        }
+        .multi-select-host .ms-menu .form-check {
+            margin-bottom: 0.2rem;
+            padding-left: 1.5rem;
+        }
+        .multi-select-host .ms-menu .form-check-label {
+            font-weight: 400;
+            font-size: 0.85rem;
+            color: #343a40;
+            cursor: pointer;
+        }
+        .multi-select-host .ms-empty {
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin: 0;
+            padding: 0.25rem 0;
         }
         .form-check {
             margin-bottom: 5px;
@@ -112,18 +371,57 @@
         .header-bar {
             background-color: white;
             border-bottom: 1px solid #dee2e6;
-            padding: 15px 25px;
+            padding: 12px 20px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
         }
         .header-content {
             flex: 1;
+            min-width: 200px;
         }
         .header-logo {
             height: 50px;
             margin-right: 15px;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        .header-report-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 999px;
+            flex-wrap: wrap;
+        }
+        .header-report-group .header-report-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding-left: 4px;
+        }
+        .header-report-group .btn {
+            font-size: 0.78rem;
+            font-weight: 600;
+            border-radius: 999px;
+            padding: 0.28rem 0.7rem;
+            white-space: nowrap;
+        }
+        .header-report-group .btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
         }
         .about-btn {
             white-space: nowrap;
@@ -230,19 +528,20 @@
             color: #084298;
         }
         .fu-dashboard {
-            margin-bottom: 1.75rem;
+            /* Slightly larger gap between per-FU blocks for mental separation */
+            margin-bottom: 2.75rem;
             background: #fff;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            padding: 14px 16px 18px;
+            padding: 16px 18px 20px;
             border: 1px solid #e9ecef;
         }
         .fu-dashboard__title {
-            font-size: 1.15rem;
-            font-weight: 600;
+            font-size: 1.45rem;
+            font-weight: 700;
             color: #0d6efd;
-            margin: 0 0 12px 0;
-            padding-bottom: 8px;
+            margin: 0 0 14px 0;
+            padding-bottom: 10px;
             border-bottom: 2px solid #e7f1ff;
             display: flex;
             justify-content: space-between;
@@ -251,16 +550,20 @@
             gap: 8px;
         }
         .fu-dashboard__meta {
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             font-weight: 500;
             color: #6c757d;
         }
+        /* Official layout: 3 sub-panels per row (app + same intent in report) */
         .fu-dashboard__grid {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 14px;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
         }
-        @media (max-width: 1100px) {
+        @media (max-width: 1400px) {
+            .fu-dashboard__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 900px) {
             .fu-dashboard__grid { grid-template-columns: minmax(0, 1fr); }
         }
         .panel-card {
@@ -380,8 +683,9 @@
 </head>
 <body>
     <div class="main-container">
-        <!-- Sidebar with Filters -->
+        <!-- Sidebar with Filters + pinned report dock -->
         <div class="sidebar">
+            <div class="sidebar-scroll">
             <h5>🔽 FILTERS</h5>
             
             <!-- Volume multi-file upload (hidden on Biomass tab — biomass uses its own Load Biomass CSV) -->
@@ -439,27 +743,25 @@
             
             <hr>
             
-            <!-- STRATA Yield Filter -->
-            <div class="filter-section" id="strataYieldSection">
-                <label>📈 STRATA Yield Scenarios</label>
-                <div class="checkbox-group" id="strataYieldCheckboxes">
+            <!-- Yield scenarios (one list for STRATA + STAND/POLYGON — same YIELD column) -->
+            <div class="filter-section" id="volumeYieldSection">
+                <label>📈 Yield Scenarios</label>
+                <div class="checkbox-group" id="volumeYieldCheckboxes">
                     <p class="text-muted small">Upload a file to see options</p>
                 </div>
+                <div class="small text-muted mb-1">Same YIELD column for STRATA and STAND/POLYGON curves</div>
                 <div class="btn-group-custom">
-                    <button class="btn btn-sm btn-outline-primary" id="selectAllStrataYield">Select All</button>
-                    <button class="btn btn-sm btn-outline-secondary" id="selectNoneStrataYield">Deselect All</button>
+                    <button class="btn btn-sm btn-outline-primary" id="selectAllVolumeYield">Select All</button>
+                    <button class="btn btn-sm btn-outline-secondary" id="selectNoneVolumeYield">Deselect All</button>
                 </div>
             </div>
 
             <!-- GLSL finer STRATA filters (shown only when SILSYS/CUT/AGSFRC present) -->
             <div id="glslVolumeSection" style="display: none;">
-                <div class="alert alert-info py-2 px-2 small mb-2" id="glslVolumeBadge">
-                    <strong>GLSL input detected</strong> — selection (SE) strata use CUT · AGSFRC · SI
-                </div>
                 <div class="filter-section" id="silsysSection">
-                    <label>🪵 Silvicultural System (SILSYS)</label>
+                    <label>🪵 SILSYS</label>
                     <div class="checkbox-group" id="silsysCheckboxes">
-                        <p class="text-muted small">Upload a GLSL file to see options</p>
+                        <p class="text-muted small">Upload a file to see options</p>
                     </div>
                     <div class="btn-group-custom">
                         <button class="btn btn-sm btn-outline-primary" id="selectAllSilSys">Select All</button>
@@ -467,7 +769,7 @@
                     </div>
                 </div>
                 <div class="filter-section" id="cutSection">
-                    <label>✂️ CUT (selection SE) — 0 = not previously harvested, 1 = previously harvested</label>
+                    <label>✂️ CUT</label>
                     <div class="checkbox-group" id="cutCheckboxes"></div>
                     <div class="btn-group-custom">
                         <button class="btn btn-sm btn-outline-primary" id="selectAllCut">Select All</button>
@@ -475,38 +777,20 @@
                     </div>
                 </div>
                 <div class="filter-section" id="agsfrcSection">
-                    <label>📐 AGS Fraction (AGSFRC, SE)</label>
+                    <label>📐 AGSFRC</label>
                     <div class="checkbox-group" id="agsfrcCheckboxes" style="max-height: 140px;"></div>
                     <div class="btn-group-custom">
                         <button class="btn btn-sm btn-outline-primary" id="selectAllAgsfrc">Select All</button>
                         <button class="btn btn-sm btn-outline-secondary" id="selectNoneAgsfrc">Deselect All</button>
                     </div>
-                    <small class="text-muted">Defaults to a single AGS level — expand to compare more SE strata curves.</small>
                 </div>
-                <div class="filter-section" id="strataSiSection">
-                    <label>📏 Site Index SI (SE strata)</label>
-                    <div class="checkbox-group" id="strataSiCheckboxes" style="max-height: 140px;"></div>
-                    <div class="btn-group-custom">
-                        <button class="btn btn-sm btn-outline-primary" id="selectAllStrataSi">Select All</button>
-                        <button class="btn btn-sm btn-outline-secondary" id="selectNoneStrataSi">Deselect All</button>
-                    </div>
-                    <small class="text-muted">Defaults to median SI — each SI is a separate SE curve.</small>
+                <!-- SI for GLSL uses min/max range UI (borealSiRangeSection), not multi-select -->
+                <div class="filter-section" id="strataSiSection" style="display: none;" aria-hidden="true">
+                    <div class="checkbox-group" id="strataSiCheckboxes" style="display:none;"></div>
                 </div>
             </div>
             
-            <!-- STAND Yield Filter -->
-            <div class="filter-section" id="standYieldSection" style="display: none;">
-                <label>📉 STAND Yield Scenarios</label>
-                <div class="checkbox-group" id="standYieldCheckboxes">
-                    <p class="text-muted small">Upload a file to see options</p>
-                </div>
-                <div class="btn-group-custom">
-                    <button class="btn btn-sm btn-outline-primary" id="selectAllStandYield">Select All</button>
-                    <button class="btn btn-sm btn-outline-secondary" id="selectNoneStandYield">Deselect All</button>
-                </div>
-            </div>
-            
-            <!-- STAND Leading Species Filter -->
+            <!-- STAND Leading Species Filter (yield uses shared list above) -->
             <div class="filter-section" id="standLeadspcSection" style="display: none;">
                 <label>🌲 STAND Leading Species</label>
                 <div class="checkbox-group" id="standLeadspcCheckboxes">
@@ -515,6 +799,35 @@
                 <div class="btn-group-custom">
                     <button class="btn btn-sm btn-outline-primary" id="selectAllStandLeadspc">Select All</button>
                     <button class="btn btn-sm btn-outline-secondary" id="selectNoneStandLeadspc">Deselect All</button>
+                </div>
+            </div>
+
+            <!-- Polygon / Stand ID (STAND/POLYGON curves only; empty = no restriction) -->
+            <div class="filter-section" id="polygonIdSection" style="display: none;">
+                <label>🆔 Polygon ID</label>
+                <div id="polygonIdCheckboxMode">
+                    <div class="checkbox-group" id="polygonIdCheckboxes" style="max-height: 140px;">
+                        <p class="text-muted small">Upload a file to see options</p>
+                    </div>
+                    <div class="btn-group-custom">
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="selectAllPolygonId">Select All</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="selectNonePolygonId">Deselect All</button>
+                    </div>
+                </div>
+                <div id="polygonIdTextMode" style="display: none;">
+                    <input type="text" class="form-control form-control-sm" id="polygonIdTextFilter"
+                           placeholder="Optional: ID1, ID2, … (blank = all)" autocomplete="off">
+                    <div class="small text-muted mt-1" id="polygonIdTextHint"></div>
+                </div>
+            </div>
+
+            <!-- SI range (Boreal + GLSL): min/max; blank = open end / all SI -->
+            <div class="filter-section" id="borealSiRangeSection" style="display: none;">
+                <label>📏 SI range</label>
+                <div class="d-flex gap-2 align-items-center">
+                    <input type="number" class="form-control form-control-sm" id="siMin" placeholder="Min" step="any" style="width: 90px;" title="Minimum SI (blank = no lower bound)">
+                    <span class="text-muted">–</span>
+                    <input type="number" class="form-control form-control-sm" id="siMax" placeholder="Max" step="any" style="width: 90px;" title="Maximum SI (blank = no upper bound)">
                 </div>
             </div>
             
@@ -533,23 +846,7 @@
                 </select>
             </div>
             
-            <hr>
-            
-            <!-- Apply/Reset Buttons (Manual Apply: no auto-plot on checkbox/metric change) -->
-            <div class="d-grid gap-2">
-                <button class="btn btn-success" id="applyFilters" title="Plots update only when you click Apply. Empty checkbox groups exclude all rows.">
-                    ✓ Apply Filters
-                </button>
-                <small class="text-muted">Plots refresh only on Apply. “None” = exclude all (not default-to-all).</small>
-            </div>
-            
-            <!-- Stats Display -->
-            <div class="stats-box" id="statsBox" style="display: none;">
-                <div><strong>Status:</strong></div>
-                <div id="strataCount">STRATA: <span class="text-muted">none selected</span></div>
-                <div id="standCount">STAND: <span class="text-muted">none selected</span></div>
-                <div id="totalRows" class="mt-2 text-muted small">Select filters above</div>
-            </div>
+            <!-- Apply + volume status live in sticky .sidebar-apply-dock -->
             
             <!-- Scatter Plot Section -->
             <hr class="scatter-section">
@@ -557,9 +854,8 @@
             
             <!-- Raw Data Upload -->
             <div class="filter-section">
-                <label>Raw Data (required for report generation)</label>
+                <label>Raw Data</label>
                 <input type="file" id="rawDataFile" class="form-control form-control-sm" accept=".csv">
-                <small class="text-muted">SLYM-compliant inventory with LiDAR-derived attributes (a.k.a. SLYM input)</small>
             </div>
             
             <!-- Scatter Plot Filters -->
@@ -601,7 +897,6 @@
                 <button class="btn btn-success w-100" id="downloadFilteredDataBtn">
                     📥 Download Filtered Data (CSV)
                 </button>
-                <small class="text-muted d-block mt-1">Download currently filtered raw data for verification</small>
             </div>
             
             <!-- Age Range Slider -->
@@ -642,7 +937,6 @@
                         Show STAND curves
                     </label>
                 </div>
-                <small class="text-muted">⚠️ Requires: Upload yield curve CSVs above, then click "Apply Filters" to generate curves first</small>
             </div>
             
             </div><!-- end #volumeFilters -->
@@ -654,6 +948,7 @@
             <div class="filter-section">
                 <label>🌿 Biomass Yield Curve CSV</label>
                 <button class="btn btn-success btn-sm w-100 mb-2" id="bioUploadBtn">📁 Load Biomass CSV</button>
+                <button class="btn btn-outline-danger btn-sm w-100 mb-2" id="bioClearBtn" style="display: none;">🗑️ Clear Biomass Data</button>
                 <input type="file" id="bioFileInput" accept=".csv" style="display:none;" aria-label="Upload biomass yield curve CSV">
                 <div id="bioFileStatus" class="small text-muted mt-1">No file loaded</div>
             </div>
@@ -709,11 +1004,35 @@
                 </div>
             </div>
 
+            <!-- Biomass Polygon / Stand ID -->
+            <div class="filter-section" id="bioPolygonIdSection" style="display:none;">
+                <label>🆔 Polygon ID</label>
+                <div id="bioPolygonIdCheckboxMode">
+                    <div class="checkbox-group" id="bioPolygonIdCheckboxes" style="max-height:140px;"></div>
+                    <div class="btn-group-custom">
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="selectAllBioPolygonId">All</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="selectNoneBioPolygonId">None</button>
+                    </div>
+                </div>
+                <div id="bioPolygonIdTextMode" style="display:none;">
+                    <input type="text" class="form-control form-control-sm" id="bioPolygonIdTextFilter"
+                           placeholder="Optional: ID1, ID2, … (blank = all)" autocomplete="off">
+                    <div class="small text-muted mt-1" id="bioPolygonIdTextHint"></div>
+                </div>
+            </div>
+
+            <!-- Biomass SI range (Boreal + GLSL): min/max; blank = open end / all SI -->
+            <div class="filter-section" id="bioBorealSiRangeSection" style="display:none;">
+                <label>📏 SI range</label>
+                <div class="d-flex gap-2 align-items-center">
+                    <input type="number" class="form-control form-control-sm" id="bioSiMin" placeholder="Min" step="any" style="width: 90px;" title="Minimum SI (blank = no lower bound)">
+                    <span class="text-muted">–</span>
+                    <input type="number" class="form-control form-control-sm" id="bioSiMax" placeholder="Max" step="any" style="width: 90px;" title="Maximum SI (blank = no upper bound)">
+                </div>
+            </div>
+
             <!-- Biomass GLSL finer STRATA filters -->
             <div id="glslBiomassSection" style="display:none;">
-                <div class="alert alert-info py-2 px-2 small mb-2">
-                    <strong>GLSL biomass</strong> — SE strata use CUT · AGSFRC · SI
-                </div>
                 <div class="filter-section">
                     <label>🪵 SILSYS</label>
                     <div class="checkbox-group" id="bioSilSysCheckboxes"></div>
@@ -723,7 +1042,7 @@
                     </div>
                 </div>
                 <div class="filter-section">
-                    <label>✂️ CUT (SE)</label>
+                    <label>✂️ CUT</label>
                     <div class="checkbox-group" id="bioCutCheckboxes"></div>
                     <div class="btn-group-custom">
                         <button class="btn btn-sm btn-outline-primary" id="selectAllBioCut">All</button>
@@ -731,20 +1050,16 @@
                     </div>
                 </div>
                 <div class="filter-section">
-                    <label>📐 AGSFRC (SE)</label>
+                    <label>📐 AGSFRC</label>
                     <div class="checkbox-group" id="bioAgsfrcCheckboxes" style="max-height:140px;"></div>
                     <div class="btn-group-custom">
                         <button class="btn btn-sm btn-outline-primary" id="selectAllBioAgsfrc">All</button>
                         <button class="btn btn-sm btn-outline-secondary" id="selectNoneBioAgsfrc">None</button>
                     </div>
                 </div>
-                <div class="filter-section">
-                    <label>📏 SI (SE strata)</label>
-                    <div class="checkbox-group" id="bioStrataSiCheckboxes" style="max-height:140px;"></div>
-                    <div class="btn-group-custom">
-                        <button class="btn btn-sm btn-outline-primary" id="selectAllBioStrataSi">All</button>
-                        <button class="btn btn-sm btn-outline-secondary" id="selectNoneBioStrataSi">None</button>
-                    </div>
+                <!-- SI multi-select hidden; use bioBorealSiRangeSection min/max instead -->
+                <div class="filter-section" id="bioStrataSiSection" style="display:none;" aria-hidden="true">
+                    <div class="checkbox-group" id="bioStrataSiCheckboxes" style="display:none;"></div>
                 </div>
             </div>
             
@@ -762,93 +1077,102 @@
                 </select>
             </div>
             
-            <hr>
-            
-            <!-- Biomass Apply (Manual Apply only) -->
-            <div class="d-grid gap-2">
-                <button class="btn btn-success" id="applyBiomassFilters" title="Plots update only when you click Apply. Empty checkbox groups exclude all rows.">✓ Apply Filters</button>
-                <small class="text-muted">Plots refresh only on Apply. “None” = exclude all (not default-to-all).</small>
-            </div>
-            
-            <!-- Biomass Stats -->
-            <div class="stats-box" id="bioStatsBox" style="display:none;">
-                <div><strong>Biomass Status:</strong></div>
-                <div id="bioStrataCount">STRATA: <span class="text-muted">none</span></div>
-                <div id="bioStandCount">STAND: <span class="text-muted">none</span></div>
-            </div>
+            <!-- Apply + biomass status live in sticky .sidebar-apply-dock -->
             
             </div><!-- end #biomassFilters -->
             
-            <hr>
-            
-            <!-- Report Generation Section -->
-            <div class="filter-section report-section">
-                <label><strong>📊 Generate Report</strong></label>
-                <p class="text-muted small">Create comprehensive analysis report with charts and tables</p>
-                
-                <button class="btn btn-success w-100 mb-2" id="btnGenerateReport">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-text" viewBox="0 0 16 16" style="vertical-align: text-bottom; margin-right: 6px;">
-                        <path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5z"/>
-                        <path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5L9.5 0zm0 1v2A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
-                    </svg>
-                    Generate Filtered Report
-                </button>
-
-                <button class="btn btn-primary w-100 mb-2" id="btnGenerateFullReport" style="background-color: #FF6B35; border-color: #FF6B35;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16" style="vertical-align: text-bottom; margin-right: 6px;">
-                        <path d="M8 5a.5.5 0 0 1 .5.5v3.362l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 9.362V5.5A.5.5 0 0 1 8 5z"/>
-                        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
-                    </svg>
-                    ⚡ Full Report (All FUs)
-                </button>
-
-                <div class="border rounded p-2 mb-2 bg-light" id="fullReportSeModeBox">
-                    <label class="form-label small fw-semibold mb-1">Full Report · GLSL SE density</label>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="fullReportSeMode" id="fullReportSeGrid" value="grid" checked>
-                        <label class="form-check-label small" for="fullReportSeGrid">
-                            Representative AGS/SI grid <span class="text-muted">(recommended)</span>
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="fullReportSeMode" id="fullReportSeAll" value="all">
-                        <label class="form-check-label small" for="fullReportSeAll">
-                            All AGSFRC × SI combinations
-                        </label>
-                    </div>
-                    <small class="text-muted d-block mt-1">
-                        Grid picks AGS 0.3/0.6/0.9 and low·mid·high SI (when present).
-                        “All” can be slow on dense units (e.g. HDSL1). Charts still sample up to
-                        <strong id="reportCapHint">~60</strong> STRATA curves per panel for browser stability.
-                    </small>
-                </div>
-
-                <div class="border rounded p-2 mb-2 bg-light" id="reportFuCapBox">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="reportLimitFus" value="1">
-                        <label class="form-check-label small" for="reportLimitFus">
-                            Limit report to <strong id="reportFuCapLabel">10</strong> Forest Units
-                            <span class="text-muted">(optional · faster / older browsers)</span>
-                        </label>
-                    </div>
-                    <small class="text-muted d-block mt-1">
-                        <strong>Default (unchecked):</strong> include <em>all</em> selected FUs (e.g. FSF’s 22 in one report).
-                        Per-panel STRATA sampling remains the main stability guard — not FU count.
-                    </small>
-                </div>
-                
-                <small class="text-muted d-block">
-                    💡 <strong>Active module only:</strong> Report uses the open tab (Volume or Biomass) — never merges both. Volume and biomass curves use different methodologies; keep them in separate reports.<br>
-                    💡 <strong>Filtered:</strong> Uses that module’s sidebar selections (after Apply) — can be denser than Full if you Select All on SE.<br>
-                    💡 <strong>Full:</strong> Auto-selects all FUs / yields / species for the active module; GLSL SE uses the density option above. All FUs are included unless the limit box above is checked.
-                </small>
-            </div>
-            
-            <!-- Scatter Plot Stats -->
-            <div class="stats-box">
+            <!-- Scatter Plot Stats (volume raw-data status; scrolls with filters) -->
+            <div class="stats-box" id="scatterStatsBox">
                 <div id="scatterStats">No raw data loaded</div>
             </div>
-        </div>
+            </div><!-- end .sidebar-scroll -->
+
+            <!-- Sticky Apply bar — explore (always above Export; no scroll required) -->
+            <div class="sidebar-apply-dock" id="applyDock" aria-label="Apply filters">
+                <div class="apply-dock-header">
+                    <p class="apply-dock-title">✓ Apply filters</p>
+                    <span class="report-scope-chip scope-volume" id="applyScopeChip" title="Apply redraws charts for the active tab">Volume</span>
+                </div>
+                <p class="apply-dock-hint" id="applyDockHint">
+                    Plots update only when you click Apply (not on each checkbox)
+                </p>
+
+                <div id="applyDockVolume">
+                    <button type="button" class="btn btn-success btn-apply-primary" id="applyFilters"
+                            title="Apply current volume filters and redraw overview + per-FU panels">
+                        ✓ Apply Filters
+                    </button>
+                    <div class="stats-box apply-dock-stats" id="statsBox" style="display: none;">
+                        <div><strong>Status:</strong></div>
+                        <div id="strataCount">STRATA: <span class="text-muted">none selected</span></div>
+                        <div id="standCount">STAND: <span class="text-muted">none selected</span></div>
+                        <div id="totalRows" class="mt-1 text-muted small">Select filters above, then Apply</div>
+                    </div>
+                </div>
+
+                <div id="applyDockBiomass" style="display: none;">
+                    <button type="button" class="btn btn-success btn-apply-primary" id="applyBiomassFilters"
+                            title="Apply current biomass filters and redraw overview + A–K panels">
+                        ✓ Apply Filters
+                    </button>
+                    <div class="stats-box apply-dock-stats" id="bioStatsBox" style="display:none;">
+                        <div><strong>Biomass status:</strong></div>
+                        <div id="bioStrataCount">STRATA: <span class="text-muted">none</span></div>
+                        <div id="bioStandCount">STAND: <span class="text-muted">none</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pinned report dock — always visible without scrolling the filter stack -->
+            <div class="sidebar-report-dock" id="reportDock" aria-label="Generate reports">
+                <div class="report-dock-header">
+                    <p class="report-dock-title">📊 Export report</p>
+                    <span class="report-scope-chip scope-volume" id="reportScopeChip" title="Reports use the active dashboard tab">Volume</span>
+                </div>
+                <p class="report-dock-hint" id="reportDockHint">
+                    Uses active tab · Filtered = current filters · Full = all FUs
+                </p>
+                <div class="report-dock-actions">
+                    <button type="button" class="btn btn-success" id="btnGenerateReport"
+                            title="HTML report for the active module using current sidebar filters">
+                        Filtered report
+                    </button>
+                    <button type="button" class="btn btn-report-full" id="btnGenerateFullReport"
+                            title="HTML report for all Forest Units in the active module (SE density options below)">
+                        ⚡ Full report
+                    </button>
+                </div>
+                <details class="report-dock-options" id="reportDockOptions">
+                    <summary>Report options</summary>
+                    <div class="report-options-body">
+                        <div class="mb-2" id="fullReportSeModeBox">
+                            <label class="form-label small fw-semibold mb-1">GLSL SE density (Full report)</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="fullReportSeMode" id="fullReportSeGrid" value="grid" checked>
+                                <label class="form-check-label small" for="fullReportSeGrid">
+                                    Representative AGS/SI grid
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="fullReportSeMode" id="fullReportSeAll" value="all">
+                                <label class="form-check-label small" for="fullReportSeAll">
+                                    All AGSFRC × SI
+                                </label>
+                            </div>
+                            <span id="reportCapHint" class="visually-hidden">~60</span>
+                        </div>
+                        <div id="reportFuCapBox">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="reportLimitFus" value="1">
+                                <label class="form-check-label small" for="reportLimitFus">
+                                    Limit report to <strong id="reportFuCapLabel">10</strong> Forest Units
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+            </div>
+        </div><!-- end .sidebar -->
         
         <!-- Content Area -->
         <div class="content-area">
@@ -859,12 +1183,26 @@
                     <h4 class="mb-0">🌲 Ontario SLYM Cutter (Release: ⚾ Fast Ball)</h4>
                     <p class="mb-0 text-muted small">Yield Curve Analysis & Raw Data Scatter Plots • Comprehensive Forest Management Visualization</p>
                 </div>
-                <button class="btn about-btn" data-bs-toggle="modal" data-bs-target="#aboutModal">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16" style="vertical-align: text-bottom; margin-right: 6px;">
-                        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
-                    </svg>
-                    About
-                </button>
+                <div class="header-actions">
+                    <div class="header-report-group" id="headerReportGroup" title="Reports follow the active Volume / Biomass tab">
+                        <span class="header-report-label">Report</span>
+                        <span class="report-scope-chip scope-volume" id="headerReportScopeChip">Volume</span>
+                        <button type="button" class="btn btn-outline-success btn-sm" id="btnHeaderGenerateReport"
+                                title="Same as sidebar: filtered report for active module">
+                            Filtered
+                        </button>
+                        <button type="button" class="btn btn-sm btn-report-full" id="btnHeaderGenerateFullReport"
+                                title="Same as sidebar: full report for active module">
+                            ⚡ Full
+                        </button>
+                    </div>
+                    <button class="btn about-btn" data-bs-toggle="modal" data-bs-target="#aboutModal">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16" style="vertical-align: text-bottom; margin-right: 6px;">
+                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                        </svg>
+                        About
+                    </button>
+                </div>
             </div>
             
             <!-- ── Dashboard Navigation Tabs ────────────────────────────── -->
@@ -1497,6 +1835,30 @@
             return String(v).trim() !== '';
         }
 
+        // ============================================
+        // PERFORMANCE / REPORT CAPS (declare early — used by processData UI copy)
+        // Must be above processData / filter UI to avoid TDZ on const access.
+        // ============================================
+        const DASHBOARD_MAX_FUS = 3;
+        const DASHBOARD_MAX_STAND_TRACES = 80;
+        const DASHBOARD_MAX_STRATA_TRACES = 48;
+        const DASHBOARD_PANEL_HEIGHT = 380;
+        const DASHBOARD_PANEL_WIDE_HEIGHT = 420;
+
+        const REPORT_OPTIONAL_FU_CAP = 10;
+        const REPORT_SOFT_WARN_FUS = 25;
+        const REPORT_MAX_STAND_TRACES = 80;
+        const REPORT_MAX_STRATA_TRACES = 60;
+        const REPORT_MAX_LOG_SERIES = 10;
+        const REPORT_PNG_W = 700;
+        const REPORT_PNG_H = 400;
+        const REPORT_PNG_WIDE_W = 900;
+        const REPORT_PNG_WIDE_H = 420;
+        const REPORT_MAX_STAND_CLOUD_IDS = 150;
+        const REPORT_QUIET = true;
+        /** @deprecated use getReportFuCap() */
+        const REPORT_MAX_FUS = REPORT_OPTIONAL_FU_CAP;
+
         /**
          * Strict membership test.
          * Empty selected array ⇒ false (filter out everything for this dimension).
@@ -1518,7 +1880,8 @@
          * - Schema without SILSYS+CUT+AGSFRC ⇒ N/A (pass).
          * - Row without SILSYS value ⇒ N/A for GLSL dims (pass) — typical STAND.
          * - Row with SILSYS ⇒ must match selected SILSYS (empty selection ⇒ exclude).
-         * - SE rows also require CUT + AGSFRC + SI (strict; "0" is valid AGSFRC).
+         * - SE rows require CUT + AGSFRC (strict; "0" is valid AGSFRC).
+         * - SI is filtered via numeric min/max range in rowMatchesUnifiedFilters (not checkboxes).
          */
         function matchesGlslFilters(row, cmap, selections) {
             if (!isGlslColumnMap(cmap)) return true;
@@ -1537,14 +1900,17 @@
 
             if (!isSelectionSilSys(sil)) return true;
 
-            // SE: apply finer filters strictly (empty selection ⇒ exclude).
-            // AGSFRC 0 / 0.0 both normalize to "0" and match.
+            // SE: CUT + AGSFRC strict. SI uses range inputs (blank = all SI).
             const cutVal = cellByHeader(row, cmap.cut);
             const agsVal = cellByHeader(row, cmap.agsfrc);
-            const siVal = cellByHeader(row, cmap.siteIndex);
-            return valuesMatchSelected(cutVal, selections.cut, v => String(v ?? '').trim()) &&
-                   valuesMatchSelected(agsVal, selections.agsfrc, normalizeAgsfrc) &&
-                   valuesMatchSelected(siVal, selections.si, normalizeSi);
+            const cutOk = valuesMatchSelected(cutVal, selections.cut, v => String(v ?? '').trim());
+            const agsOk = valuesMatchSelected(agsVal, selections.agsfrc, normalizeAgsfrc);
+            // Optional legacy SI checkbox list (if ever populated)
+            if (selections.si && selections.si.length > 0) {
+                const siVal = cellByHeader(row, cmap.siteIndex);
+                return cutOk && agsOk && valuesMatchSelected(siVal, selections.si, normalizeSi);
+            }
+            return cutOk && agsOk;
         }
 
         /** @deprecated name — use matchesGlslFilters; kept for call-site compatibility */
@@ -1556,25 +1922,71 @@
             return Array.from(document.querySelectorAll(selector + ':checked')).map(cb => cb.value);
         }
 
+        /** Parse optional free-text polygon IDs (comma / space / semicolon separated). */
+        function parsePolygonIdText(raw) {
+            if (raw == null || String(raw).trim() === '') return [];
+            return String(raw).split(/[,;\s]+/).map(s => s.trim()).filter(Boolean);
+        }
+
+        /**
+         * Polygon ID selection: empty = no restriction (all STAND/POLYGON IDs).
+         * Checkbox mode when few IDs; text mode when many.
+         */
+        function readPolygonIdFilter(opts) {
+            opts = opts || {};
+            const textModeEl = document.getElementById(opts.textModeId || 'polygonIdTextMode');
+            const textInput = document.getElementById(opts.textInputId || 'polygonIdTextFilter');
+            const checkboxSel = opts.checkboxSelector || '.polygon-id-checkbox';
+            if (textModeEl && textModeEl.style.display !== 'none' && textInput) {
+                return parsePolygonIdText(textInput.value);
+            }
+            return getCheckedValues(checkboxSel);
+        }
+
+        function readSiRangeInputs(minId, maxId) {
+            const minEl = document.getElementById(minId);
+            const maxEl = document.getElementById(maxId);
+            let siMin = minEl && minEl.value !== '' ? Number(minEl.value) : null;
+            let siMax = maxEl && maxEl.value !== '' ? Number(maxEl.value) : null;
+            if (siMin != null && !Number.isFinite(siMin)) siMin = null;
+            if (siMax != null && !Number.isFinite(siMax)) siMax = null;
+            // Swap if user inverted range
+            if (siMin != null && siMax != null && siMin > siMax) {
+                const t = siMin; siMin = siMax; siMax = t;
+            }
+            return { siMin, siMax };
+        }
+
         /** Volume sidebar → unified filter object (pure data; no validation). */
         function readVolumeFilterState() {
+            const siRange = readSiRangeInputs('siMin', 'siMax');
             return {
                 showStrata: !!(document.getElementById('typeStrata') && document.getElementById('typeStrata').checked),
                 showStand: !!(document.getElementById('typeStand') && document.getElementById('typeStand').checked),
                 yfu: getCheckedValues('.yfu-checkbox'),
-                strataYield: getCheckedValues('.strata-yield-checkbox'),
-                standYield: getCheckedValues('.stand-yield-checkbox'),
-                yield: null, // volume uses strataYield / standYield separately
+                // Single YIELD list for STRATA + STAND/POLYGON (same column)
+                strataYield: getCheckedValues('.volume-yield-checkbox'),
+                standYield: getCheckedValues('.volume-yield-checkbox'),
+                yield: getCheckedValues('.volume-yield-checkbox'),
                 leadspc: getCheckedValues('.stand-leadspc-checkbox'),
                 silsys: getCheckedValues('.silsys-checkbox'),
                 cut: getCheckedValues('.cut-checkbox'),
                 agsfrc: getCheckedValues('.agsfrc-checkbox').map(normalizeAgsfrc).filter(isNormalizedPresent),
-                si: getCheckedValues('.strata-si-checkbox')
+                // GLSL: discrete SI checkboxes; Boreal: siMin/siMax range
+                si: getCheckedValues('.strata-si-checkbox'),
+                siMin: siRange.siMin,
+                siMax: siRange.siMax,
+                polygonIds: readPolygonIdFilter({
+                    textModeId: 'polygonIdTextMode',
+                    textInputId: 'polygonIdTextFilter',
+                    checkboxSelector: '.polygon-id-checkbox'
+                })
             };
         }
 
         /** Biomass sidebar → unified filter object. */
         function readBiomassFilterState() {
+            const siRange = readSiRangeInputs('bioSiMin', 'bioSiMax');
             return {
                 showStrata: !!(document.getElementById('bioTypeStrata') && document.getElementById('bioTypeStrata').checked),
                 showStand: !!(document.getElementById('bioTypeStand') && document.getElementById('bioTypeStand').checked),
@@ -1586,7 +1998,14 @@
                 silsys: getCheckedValues('.bio-silsys-checkbox'),
                 cut: getCheckedValues('.bio-cut-checkbox'),
                 agsfrc: getCheckedValues('.bio-agsfrc-checkbox').map(normalizeAgsfrc).filter(isNormalizedPresent),
-                si: getCheckedValues('.bio-strata-si-checkbox')
+                si: getCheckedValues('.bio-strata-si-checkbox'),
+                siMin: siRange.siMin,
+                siMax: siRange.siMax,
+                polygonIds: readPolygonIdFilter({
+                    textModeId: 'bioPolygonIdTextMode',
+                    textInputId: 'bioPolygonIdTextFilter',
+                    checkboxSelector: '.bio-polygon-id-checkbox'
+                })
             };
         }
 
@@ -1667,7 +2086,7 @@
                 // blank LEADSPC on row ⇒ N/A
             }
 
-            // ── GLSL (SILSYS / CUT / AGSFRC / SI) — both types when present ──
+            // ── GLSL (SILSYS / CUT / AGSFRC / SI checkboxes) — both types when present ──
             if (!matchesGlslFilters(row, cmap, {
                 silsys: filters.silsys,
                 cut: filters.cut,
@@ -1675,6 +2094,33 @@
                 si: filters.si
             })) {
                 return false;
+            }
+
+            // ── SI numeric range (Boreal + GLSL): optional min–max; blank ends are open ──
+            if ((filters.siMin != null || filters.siMax != null) && cmap.siteIndex) {
+                const rawSi = cellByHeader(row, cmap.siteIndex);
+                if (rawSi != null && String(rawSi).trim() !== '') {
+                    const siNum = Number(normalizeSi(rawSi));
+                    if (Number.isFinite(siNum)) {
+                        if (filters.siMin != null && siNum < filters.siMin) return false;
+                        if (filters.siMax != null && siNum > filters.siMax) return false;
+                    }
+                }
+                // Missing SI on row ⇒ N/A (pass)
+            }
+
+            // ── Polygon / Stand ID — STAND/POLYGON only; empty list = no restriction ──
+            if (requireType === 'STAND' && filters.polygonIds && filters.polygonIds.length > 0) {
+                const idCol = cmap.polygonID || cmap.standId;
+                if (idCol) {
+                    if (!valuesMatchSelected(
+                        cellByHeader(row, idCol),
+                        filters.polygonIds,
+                        v => String(v ?? '').trim()
+                    )) {
+                        return false;
+                    }
+                }
             }
 
             return true;
@@ -2144,8 +2590,9 @@
         let csvData = null;
         let columnMap = {};
         let uniqueYFUs = [];
-        let strataYieldTypes = [];
-        let standYieldTypes = [];
+        let volumeYieldTypes = []; // shared STRATA + STAND/POLYGON YIELD list
+        let strataYieldTypes = []; // alias of volumeYieldTypes (compat)
+        let standYieldTypes = [];  // alias of volumeYieldTypes (compat)
         let standLeadingSpecies = [];
         let loadedFiles = []; // Track loaded file names
         let strataCurves = [];  // For scatter plot overlays
@@ -2156,6 +2603,9 @@
         let uniqueCut = [];
         let uniqueAgsfrc = [];
         let uniqueStrataSI = [];
+        let uniquePolygonIDs = [];   // STAND/POLYGON IDs for volume filter
+        let uniqueBorealSI = [];     // SI values when not GLSL (range filter)
+        const MAX_POLYGON_ID_CHECKBOXES = 400; // above this, use text-entry mode
 
         // ── Biomass module state ────────────────────────────────────
         let bioData        = null;
@@ -2170,6 +2620,9 @@
         let uniqueBioCut = [];
         let uniqueBioAgsfrc = [];
         let uniqueBioStrataSI = [];
+        let uniqueBioPolygonIDs = [];
+        let uniqueBioBorealSI = [];
+        let _pendingBiomassPlot = null; // deferred Plotly paint while tab hidden
 
         // Large CSV: Phase A (catalog) + Phase B (stream filter) — biomass & volume
         const BIO_LARGE_FILE_BYTES = 200 * 1024 * 1024;   // 200 MB — intercept with safe modal
@@ -2240,112 +2693,140 @@
 
         document.getElementById('typeStand').addEventListener('change', (e) => {
             const isChecked = e.target.checked;
-            document.getElementById('standYieldSection').style.display = isChecked ? 'block' : 'none';
-            document.getElementById('standLeadspcSection').style.display = isChecked ? 'block' : 'none';
+            // Yield is shared (volumeYieldSection); only LEADSPC is STAND-specific
+            const leadSec = document.getElementById('standLeadspcSection');
+            if (leadSec) leadSec.style.display = isChecked ? 'block' : 'none';
         });
 
+        function setCheckboxesAndRefresh(selector, checked, hostId) {
+            document.querySelectorAll(selector).forEach(cb => { cb.checked = !!checked; });
+            if (hostId) {
+                refreshMultiSelectLabel(document.getElementById(hostId));
+            } else {
+                refreshAllMultiSelectLabels();
+            }
+        }
+
         document.getElementById('selectAllYFU').addEventListener('click', () => {
-            document.querySelectorAll('#yFUCheckboxes input[type="checkbox"]').forEach(cb => {
-                cb.checked = true;
-            });
+            setCheckboxesAndRefresh('#yFUCheckboxes input[type="checkbox"]', true, 'yFUCheckboxes');
         });
 
         document.getElementById('selectNoneYFU').addEventListener('click', () => {
-            document.querySelectorAll('#yFUCheckboxes input[type="checkbox"]').forEach(cb => {
-                cb.checked = false;
-            });
+            setCheckboxesAndRefresh('#yFUCheckboxes input[type="checkbox"]', false, 'yFUCheckboxes');
         });
 
-        document.getElementById('selectAllStrataYield').addEventListener('click', () => {
-            document.querySelectorAll('.strata-yield-checkbox').forEach(cb => {
-                cb.checked = true;
-            });
+        document.getElementById('selectAllVolumeYield').addEventListener('click', () => {
+            setCheckboxesAndRefresh('.volume-yield-checkbox', true, 'volumeYieldCheckboxes');
         });
-
-        document.getElementById('selectNoneStrataYield').addEventListener('click', () => {
-            document.querySelectorAll('.strata-yield-checkbox').forEach(cb => {
-                cb.checked = false;
-            });
+        document.getElementById('selectNoneVolumeYield').addEventListener('click', () => {
+            setCheckboxesAndRefresh('.volume-yield-checkbox', false, 'volumeYieldCheckboxes');
         });
-
-        document.getElementById('selectAllStandYield').addEventListener('click', () => {
-            document.querySelectorAll('.stand-yield-checkbox').forEach(cb => {
-                cb.checked = true;
-            });
-        });
-
-        document.getElementById('selectNoneStandYield').addEventListener('click', () => {
-            document.querySelectorAll('.stand-yield-checkbox').forEach(cb => {
-                cb.checked = false;
-            });
-        });
-
         document.getElementById('selectAllStandLeadspc').addEventListener('click', () => {
-            document.querySelectorAll('.stand-leadspc-checkbox').forEach(cb => {
-                cb.checked = true;
-            });
+            setCheckboxesAndRefresh('.stand-leadspc-checkbox', true, 'standLeadspcCheckboxes');
         });
-
         document.getElementById('selectNoneStandLeadspc').addEventListener('click', () => {
-            document.querySelectorAll('.stand-leadspc-checkbox').forEach(cb => {
-                cb.checked = false;
-            });
+            setCheckboxesAndRefresh('.stand-leadspc-checkbox', false, 'standLeadspcCheckboxes');
         });
 
         // GLSL volume filter buttons
         document.getElementById('selectAllSilSys').addEventListener('click', () => {
-            document.querySelectorAll('.silsys-checkbox').forEach(cb => { cb.checked = true; });
+            setCheckboxesAndRefresh('.silsys-checkbox', true, 'silsysCheckboxes');
         });
         document.getElementById('selectNoneSilSys').addEventListener('click', () => {
-            document.querySelectorAll('.silsys-checkbox').forEach(cb => { cb.checked = false; });
+            setCheckboxesAndRefresh('.silsys-checkbox', false, 'silsysCheckboxes');
         });
         document.getElementById('selectAllCut').addEventListener('click', () => {
-            document.querySelectorAll('.cut-checkbox').forEach(cb => { cb.checked = true; });
+            setCheckboxesAndRefresh('.cut-checkbox', true, 'cutCheckboxes');
         });
         document.getElementById('selectNoneCut').addEventListener('click', () => {
-            document.querySelectorAll('.cut-checkbox').forEach(cb => { cb.checked = false; });
+            setCheckboxesAndRefresh('.cut-checkbox', false, 'cutCheckboxes');
         });
         document.getElementById('selectAllAgsfrc').addEventListener('click', () => {
-            document.querySelectorAll('.agsfrc-checkbox').forEach(cb => { cb.checked = true; });
+            setCheckboxesAndRefresh('.agsfrc-checkbox', true, 'agsfrcCheckboxes');
         });
         document.getElementById('selectNoneAgsfrc').addEventListener('click', () => {
-            document.querySelectorAll('.agsfrc-checkbox').forEach(cb => { cb.checked = false; });
+            setCheckboxesAndRefresh('.agsfrc-checkbox', false, 'agsfrcCheckboxes');
         });
-        document.getElementById('selectAllStrataSi').addEventListener('click', () => {
-            document.querySelectorAll('.strata-si-checkbox').forEach(cb => { cb.checked = true; });
-        });
-        document.getElementById('selectNoneStrataSi').addEventListener('click', () => {
-            document.querySelectorAll('.strata-si-checkbox').forEach(cb => { cb.checked = false; });
-        });
+        // SI All/None removed — SI uses min/max range (#siMin/#siMax). Guard if legacy buttons reappear.
+        const selAllStrataSi = document.getElementById('selectAllStrataSi');
+        const selNoneStrataSi = document.getElementById('selectNoneStrataSi');
+        if (selAllStrataSi) {
+            selAllStrataSi.addEventListener('click', () => {
+                setCheckboxesAndRefresh('.strata-si-checkbox', true, 'strataSiCheckboxes');
+            });
+        }
+        if (selNoneStrataSi) {
+            selNoneStrataSi.addEventListener('click', () => {
+                setCheckboxesAndRefresh('.strata-si-checkbox', false, 'strataSiCheckboxes');
+            });
+        }
+
+        // Volume polygon ID All/None
+        const selAllPoly = document.getElementById('selectAllPolygonId');
+        const selNonePoly = document.getElementById('selectNonePolygonId');
+        if (selAllPoly) {
+            selAllPoly.addEventListener('click', () => {
+                setCheckboxesAndRefresh('.polygon-id-checkbox', true, 'polygonIdCheckboxes');
+            });
+        }
+        if (selNonePoly) {
+            selNonePoly.addEventListener('click', () => {
+                setCheckboxesAndRefresh('.polygon-id-checkbox', false, 'polygonIdCheckboxes');
+            });
+        }
 
         // GLSL biomass filter buttons
         document.getElementById('selectAllBioSilSys').addEventListener('click', () => {
-            document.querySelectorAll('.bio-silsys-checkbox').forEach(cb => { cb.checked = true; });
+            setCheckboxesAndRefresh('.bio-silsys-checkbox', true, 'bioSilSysCheckboxes');
         });
         document.getElementById('selectNoneBioSilSys').addEventListener('click', () => {
-            document.querySelectorAll('.bio-silsys-checkbox').forEach(cb => { cb.checked = false; });
+            setCheckboxesAndRefresh('.bio-silsys-checkbox', false, 'bioSilSysCheckboxes');
         });
         document.getElementById('selectAllBioCut').addEventListener('click', () => {
-            document.querySelectorAll('.bio-cut-checkbox').forEach(cb => { cb.checked = true; });
+            setCheckboxesAndRefresh('.bio-cut-checkbox', true, 'bioCutCheckboxes');
         });
         document.getElementById('selectNoneBioCut').addEventListener('click', () => {
-            document.querySelectorAll('.bio-cut-checkbox').forEach(cb => { cb.checked = false; });
+            setCheckboxesAndRefresh('.bio-cut-checkbox', false, 'bioCutCheckboxes');
         });
         document.getElementById('selectAllBioAgsfrc').addEventListener('click', () => {
-            document.querySelectorAll('.bio-agsfrc-checkbox').forEach(cb => { cb.checked = true; });
+            setCheckboxesAndRefresh('.bio-agsfrc-checkbox', true, 'bioAgsfrcCheckboxes');
         });
         document.getElementById('selectNoneBioAgsfrc').addEventListener('click', () => {
-            document.querySelectorAll('.bio-agsfrc-checkbox').forEach(cb => { cb.checked = false; });
+            setCheckboxesAndRefresh('.bio-agsfrc-checkbox', false, 'bioAgsfrcCheckboxes');
         });
-        document.getElementById('selectAllBioStrataSi').addEventListener('click', () => {
-            document.querySelectorAll('.bio-strata-si-checkbox').forEach(cb => { cb.checked = true; });
-        });
-        document.getElementById('selectNoneBioStrataSi').addEventListener('click', () => {
-            document.querySelectorAll('.bio-strata-si-checkbox').forEach(cb => { cb.checked = false; });
-        });
+        // Bio SI All/None removed — SI uses min/max range (#bioSiMin/#bioSiMax).
+        const selAllBioStrataSi = document.getElementById('selectAllBioStrataSi');
+        const selNoneBioStrataSi = document.getElementById('selectNoneBioStrataSi');
+        if (selAllBioStrataSi) {
+            selAllBioStrataSi.addEventListener('click', () => {
+                setCheckboxesAndRefresh('.bio-strata-si-checkbox', true, 'bioStrataSiCheckboxes');
+            });
+        }
+        if (selNoneBioStrataSi) {
+            selNoneBioStrataSi.addEventListener('click', () => {
+                setCheckboxesAndRefresh('.bio-strata-si-checkbox', false, 'bioStrataSiCheckboxes');
+            });
+        }
+
+        const selAllBioPoly = document.getElementById('selectAllBioPolygonId');
+        const selNoneBioPoly = document.getElementById('selectNoneBioPolygonId');
+        if (selAllBioPoly) {
+            selAllBioPoly.addEventListener('click', () => {
+                setCheckboxesAndRefresh('.bio-polygon-id-checkbox', true, 'bioPolygonIdCheckboxes');
+            });
+        }
+        if (selNoneBioPoly) {
+            selNoneBioPoly.addEventListener('click', () => {
+                setCheckboxesAndRefresh('.bio-polygon-id-checkbox', false, 'bioPolygonIdCheckboxes');
+            });
+        }
 
         // Manual Apply only: plot updates exclusively via Apply Filters (not metric/checkbox change)
-        document.getElementById('applyFilters').addEventListener('click', applyFiltersAndPlot);
+        document.getElementById('applyFilters').addEventListener('click', () => {
+            closeAllMultiSelectMenus();
+            destroyMultiSelectBackdrop();
+            applyFiltersAndPlot();
+        });
         // Metric change does not replot — user must click Apply Filters
         document.getElementById('volumeMetric').addEventListener('change', () => {
             console.log('ℹ️ Volume metric changed — click Apply Filters to update the plot');
@@ -2364,6 +2845,27 @@
             if (volFiles) volFiles.style.display = isVolume ? '' : 'none';
             if (volFilt) volFilt.style.display = isVolume ? '' : 'none';
             if (bioFilt) bioFilt.style.display = isVolume ? 'none' : '';
+            // Sticky Apply dock: show Volume or Biomass Apply control
+            const applyVol = document.getElementById('applyDockVolume');
+            const applyBio = document.getElementById('applyDockBiomass');
+            if (applyVol) applyVol.style.display = isVolume ? '' : 'none';
+            if (applyBio) applyBio.style.display = isVolume ? 'none' : '';
+            const applyChip = document.getElementById('applyScopeChip');
+            if (applyChip) {
+                applyChip.textContent = isVolume ? 'Volume' : 'Biomass';
+                applyChip.classList.remove('scope-volume', 'scope-biomass');
+                applyChip.classList.add(isVolume ? 'scope-volume' : 'scope-biomass');
+            }
+            const applyHint = document.getElementById('applyDockHint');
+            if (applyHint) {
+                applyHint.textContent = isVolume
+                    ? 'Volume · plots update only when you click Apply (not on each checkbox)'
+                    : 'Biomass · plots update only when you click Apply (not on each checkbox)';
+            }
+            // Scatter status is volume-only; keep report dock free of noise on Biomass
+            const scatterBox = document.getElementById('scatterStatsBox');
+            if (scatterBox) scatterBox.style.display = isVolume ? '' : 'none';
+            if (typeof updateReportUiState === 'function') updateReportUiState();
         }
         document.getElementById('nav-volume-tab').addEventListener('shown.bs.tab', function () {
             setSidebarModule('volume');
@@ -2387,6 +2889,16 @@
         document.getElementById('bioFileInput').addEventListener('change', (e) => {
             if (e.target.files.length > 0) handleBiomassFile(e.target.files[0]);
         });
+
+        // Clear loaded biomass data (mirrors volume clearAllFiles)
+        const bioClearBtnEl = document.getElementById('bioClearBtn');
+        if (bioClearBtnEl) {
+            bioClearBtnEl.addEventListener('click', () => {
+                closeAllMultiSelectMenus();
+                destroyMultiSelectBackdrop();
+                clearBiomassData();
+            });
+        }
 
         // Make the Biomass drop zone clickable
         document.getElementById('bioUploadZone').addEventListener('click', () => {
@@ -2417,28 +2929,37 @@
         });
 
         // Biomass filters — Manual Apply only (no auto-plot on checkbox/metric change)
-        document.getElementById('applyBiomassFilters').addEventListener('click', updateBiomassPlot);
+        document.getElementById('applyBiomassFilters').addEventListener('click', () => {
+            closeAllMultiSelectMenus();
+            destroyMultiSelectBackdrop();
+            try {
+                updateBiomassPlot();
+            } catch (err) {
+                console.error('🌿 Apply Filters failed:', err);
+                alert('Apply Filters failed: ' + (err && err.message ? err.message : String(err)));
+            }
+        });
         document.getElementById('biomassMetric').addEventListener('change', () => {
             console.log('ℹ️ Biomass metric changed — click Apply Filters to update the plot');
         });
 
         document.getElementById('selectAllBioYYC').addEventListener('click', () => {
-            document.querySelectorAll('.bio-yyc-checkbox').forEach(cb => cb.checked = true);
+            setCheckboxesAndRefresh('.bio-yyc-checkbox', true, 'bioYYCCheckboxes');
         });
         document.getElementById('selectNoneBioYYC').addEventListener('click', () => {
-            document.querySelectorAll('.bio-yyc-checkbox').forEach(cb => cb.checked = false);
+            setCheckboxesAndRefresh('.bio-yyc-checkbox', false, 'bioYYCCheckboxes');
         });
         document.getElementById('selectAllBioYield').addEventListener('click', () => {
-            document.querySelectorAll('.bio-yield-checkbox').forEach(cb => cb.checked = true);
+            setCheckboxesAndRefresh('.bio-yield-checkbox', true, 'bioYieldCheckboxes');
         });
         document.getElementById('selectNoneBioYield').addEventListener('click', () => {
-            document.querySelectorAll('.bio-yield-checkbox').forEach(cb => cb.checked = false);
+            setCheckboxesAndRefresh('.bio-yield-checkbox', false, 'bioYieldCheckboxes');
         });
         document.getElementById('selectAllBioLeadspc').addEventListener('click', () => {
-            document.querySelectorAll('.bio-leadspc-checkbox').forEach(cb => cb.checked = true);
+            setCheckboxesAndRefresh('.bio-leadspc-checkbox', true, 'bioLeadspcCheckboxes');
         });
         document.getElementById('selectNoneBioLeadspc').addEventListener('click', () => {
-            document.querySelectorAll('.bio-leadspc-checkbox').forEach(cb => cb.checked = false);
+            setCheckboxesAndRefresh('.bio-leadspc-checkbox', false, 'bioLeadspcCheckboxes');
         });
         // Curve type: UI visibility only — does NOT replot until Apply
         document.getElementById('bioTypeStand').addEventListener('change', (e) => {
@@ -2539,17 +3060,11 @@
             on('volSafeSelectNoneYfu', 'click', () => {
                 document.querySelectorAll('.vol-safe-yfu-checkbox').forEach(cb => { cb.checked = false; });
             });
-            on('volSafeSelectAllStrataYield', 'click', () => {
-                document.querySelectorAll('.vol-safe-strata-yield-checkbox').forEach(cb => { cb.checked = true; });
+            on('volSafeSelectAllYield', 'click', () => {
+                document.querySelectorAll('.vol-safe-yield-checkbox').forEach(cb => { cb.checked = true; });
             });
-            on('volSafeSelectNoneStrataYield', 'click', () => {
-                document.querySelectorAll('.vol-safe-strata-yield-checkbox').forEach(cb => { cb.checked = false; });
-            });
-            on('volSafeSelectAllStandYield', 'click', () => {
-                document.querySelectorAll('.vol-safe-stand-yield-checkbox').forEach(cb => { cb.checked = true; });
-            });
-            on('volSafeSelectNoneStandYield', 'click', () => {
-                document.querySelectorAll('.vol-safe-stand-yield-checkbox').forEach(cb => { cb.checked = false; });
+            on('volSafeSelectNoneYield', 'click', () => {
+                document.querySelectorAll('.vol-safe-yield-checkbox').forEach(cb => { cb.checked = false; });
             });
             on('volSafeSelectAllLeadspc', 'click', () => {
                 document.querySelectorAll('.vol-safe-leadspc-checkbox').forEach(cb => { cb.checked = true; });
@@ -2583,20 +3098,9 @@
             });
             on('volSafeTypeStand', 'change', (e) => {
                 const leadSec = document.getElementById('volSafeLeadspcSection');
-                const standYldSec = document.getElementById('volSafeStandYieldSection');
                 const cat = pendingVolCatalog;
                 if (leadSec && cat && cat.leadspc && cat.leadspc.length) {
                     leadSec.style.display = e.target.checked ? 'block' : 'none';
-                }
-                if (standYldSec && cat && cat.standYield && cat.standYield.length) {
-                    standYldSec.style.display = e.target.checked ? 'block' : 'none';
-                }
-            });
-            on('volSafeTypeStrata', 'change', (e) => {
-                const sec = document.getElementById('volSafeStrataYieldSection');
-                const cat = pendingVolCatalog;
-                if (sec && cat && cat.strataYield && cat.strataYield.length) {
-                    sec.style.display = e.target.checked ? 'block' : 'none';
                 }
             });
             on('btnStartSafeVol', 'click', () => { startVolumeSafeExtraction(); });
@@ -2682,6 +3186,11 @@
             let filesProcessed = 0;
             let failed = false;
 
+            if (!csvFiles || !csvFiles.length) {
+                hideLoadingSpinner();
+                return;
+            }
+
             csvFiles.forEach(file => {
                 Papa.parse(file, {
                     header: true,
@@ -2697,8 +3206,22 @@
                         filesProcessed++;
 
                         if (filesProcessed === csvFiles.length) {
-                            combineAndProcessData(parsedDataSets);
-                            hideLoadingSpinner();
+                            // Always clear spinner even if processData throws or is slow
+                            try {
+                                updateLoadingSpinner(
+                                    'Processing data...',
+                                    'Building filters and column map…'
+                                );
+                                combineAndProcessData(parsedDataSets);
+                            } catch (err) {
+                                console.error('❌ Volume processData failed:', err);
+                                alert(
+                                    'Volume file parsed, but processing failed:\n' +
+                                    (err && err.message ? err.message : String(err))
+                                );
+                            } finally {
+                                hideLoadingSpinner();
+                            }
                         }
                     },
                     error: function(error) {
@@ -2736,10 +3259,20 @@
          * Does not change combineAndProcessData used by the small-file path.
          */
         function finishVolumeLoadFromSafeExtract(rows, fileNames) {
-            csvData = rows || [];
-            loadedFiles = (fileNames || []).slice();
-            updateFileListDisplay();
-            processData();
+            try {
+                csvData = rows || [];
+                loadedFiles = (fileNames || []).slice();
+                updateFileListDisplay();
+                processData();
+            } catch (err) {
+                console.error('❌ Safe-extract processData failed:', err);
+                alert(
+                    'Volume data loaded, but processing failed:\n' +
+                    (err && err.message ? err.message : String(err))
+                );
+            } finally {
+                hideLoadingSpinner();
+            }
         }
 
         function updateFileListDisplay() {
@@ -2753,6 +3286,7 @@
                 ).join('');
                 document.getElementById('clearFilesBtn').style.display = 'block';
             }
+            if (typeof updateReportUiState === 'function') updateReportUiState();
         }
 
         function clearAllFiles() {
@@ -2760,6 +3294,7 @@
             loadedFiles = [];
             columnMap = {};
             uniqueYFUs = [];
+            volumeYieldTypes = [];
             strataYieldTypes = [];
             standYieldTypes = [];
             
@@ -2801,14 +3336,120 @@
             document.getElementById('scatterStats').innerHTML = '';
             
             // Clear filter UI
-            document.getElementById('yFUCheckboxes').innerHTML = '<p class="text-muted small">Upload a file to see options</p>';
-            document.getElementById('strataYieldCheckboxes').innerHTML = '<p class="text-muted small">Upload a file to see options</p>';
-            document.getElementById('standYieldCheckboxes').innerHTML = '<p class="text-muted small">Upload a file to see options</p>';
-            document.getElementById('standLeadspcCheckboxes').innerHTML = '<p class="text-muted small">Upload a file to see options</p>';
+            ['yFUCheckboxes', 'volumeYieldCheckboxes', 'standLeadspcCheckboxes',
+             'silsysCheckboxes', 'cutCheckboxes', 'agsfrcCheckboxes', 'strataSiCheckboxes', 'polygonIdCheckboxes'
+            ].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.className = 'multi-select-host';
+                    el.innerHTML = '<p class="ms-empty">Upload a file to see options</p>';
+                }
+            });
             isGlslVolume = false;
             uniqueSilSys = []; uniqueCut = []; uniqueAgsfrc = []; uniqueStrataSI = [];
+            uniquePolygonIDs = []; uniqueBorealSI = [];
             const glslSec = document.getElementById('glslVolumeSection');
             if (glslSec) glslSec.style.display = 'none';
+            const polySec = document.getElementById('polygonIdSection');
+            if (polySec) polySec.style.display = 'none';
+            const borealSiSec = document.getElementById('borealSiRangeSection');
+            if (borealSiSec) borealSiSec.style.display = 'none';
+            const polyBox = document.getElementById('polygonIdCheckboxes');
+            if (polyBox) polyBox.innerHTML = '<p class="text-muted small">Upload a file to see options</p>';
+            const polyText = document.getElementById('polygonIdTextFilter');
+            if (polyText) polyText.value = '';
+            const siMinEl = document.getElementById('siMin');
+            const siMaxEl = document.getElementById('siMax');
+            if (siMinEl) siMinEl.value = '';
+            if (siMaxEl) siMaxEl.value = '';
+            if (typeof updateReportUiState === 'function') updateReportUiState();
+        }
+
+        /** Clear all loaded biomass state and restore empty sidebar/plot UI. */
+        function clearBiomassData() {
+            closeAllMultiSelectMenus();
+            destroyMultiSelectBackdrop();
+
+            bioData = null;
+            bioStrataCurves = [];
+            bioStandCurves = [];
+            bioColumnMap = {};
+            uniqueBioYYCs = [];
+            bioYieldTypes = [];
+            bioLeadspcTypes = [];
+            isGlslBiomass = false;
+            uniqueBioSilSys = [];
+            uniqueBioCut = [];
+            uniqueBioAgsfrc = [];
+            uniqueBioStrataSI = [];
+            uniqueBioPolygonIDs = [];
+            uniqueBioBorealSI = [];
+            pendingBioFile = null;
+            pendingBioCatalog = null;
+            _pendingBiomassPlot = null;
+
+            const bioFileInput = document.getElementById('bioFileInput');
+            if (bioFileInput) bioFileInput.value = '';
+
+            const bioClearBtn = document.getElementById('bioClearBtn');
+            if (bioClearBtn) bioClearBtn.style.display = 'none';
+
+            const bioFileStatus = document.getElementById('bioFileStatus');
+            if (bioFileStatus) bioFileStatus.textContent = 'No file loaded';
+
+            const bioUploadZone = document.getElementById('bioUploadZone');
+            if (bioUploadZone) bioUploadZone.style.display = 'block';
+
+            const bioColAlert = document.getElementById('bioColumnMappingAlert');
+            if (bioColAlert) bioColAlert.style.display = 'none';
+
+            const bioStats = document.getElementById('bioStatsBox');
+            if (bioStats) bioStats.style.display = 'none';
+
+            showBiomassPlotContainer(false);
+            try {
+                const plotEl = document.getElementById('biomassPlot');
+                if (plotEl) {
+                    try { Plotly.purge(plotEl); } catch (e) { /* ignore */ }
+                    plotEl.innerHTML = '';
+                }
+            } catch (e) { /* ignore */ }
+
+            try { clearBiomassDashboards(''); } catch (e) { /* ignore */ }
+
+            // Reset multi-select filter hosts
+            ['bioYYCCheckboxes', 'bioYieldCheckboxes', 'bioLeadspcCheckboxes',
+             'bioSilSysCheckboxes', 'bioCutCheckboxes', 'bioAgsfrcCheckboxes',
+             'bioStrataSiCheckboxes', 'bioPolygonIdCheckboxes'
+            ].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.className = 'multi-select-host';
+                    el.innerHTML = '<p class="ms-empty">Upload a file to see options</p>';
+                }
+            });
+
+            ['bioYYCSection', 'bioYieldSection', 'bioLeadspcSection',
+             'bioPolygonIdSection', 'bioBorealSiRangeSection', 'glslBiomassSection'
+            ].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+
+            const bioPolyText = document.getElementById('bioPolygonIdTextFilter');
+            if (bioPolyText) bioPolyText.value = '';
+            const bioSiMin = document.getElementById('bioSiMin');
+            const bioSiMax = document.getElementById('bioSiMax');
+            if (bioSiMin) bioSiMin.value = '';
+            if (bioSiMax) bioSiMax.value = '';
+
+            const bioTypeStrata = document.getElementById('bioTypeStrata');
+            const bioTypeStand = document.getElementById('bioTypeStand');
+            if (bioTypeStrata) bioTypeStrata.checked = true;
+            if (bioTypeStand) bioTypeStand.checked = true;
+
+            console.log('🗑️ Biomass data cleared');
+            if (typeof updateReportUiState === 'function') updateReportUiState();
         }
 
         // ============================================
@@ -2819,6 +3460,8 @@
                 alert('No data found in file(s).');
                 return;
             }
+
+            console.log('📋 processData: rows=', csvData.length);
 
             // Normalize keys again (tabs/spaces in headers e.g. "\tBA", " AGE")
             csvData = normalizeDataRowKeys(csvData);
@@ -2851,6 +3494,7 @@
 
             // Build filter UI
             buildFilterUI();
+            if (typeof updateReportUiState === 'function') updateReportUiState();
 
             // Display column mapping
             displayColumnMapping();
@@ -2886,7 +3530,7 @@
                             </li>
                             <li>
                                 <strong style="color: #fd7e14;">Full Report</strong> (orange button): auto-selects all FUs / yields.
-                                <br><small style="color: #6c757d;">GLSL SE uses a representative AGS/SI grid by default (or choose “All AGS×SI”). Charts sample ~${typeof REPORT_MAX_STRATA_TRACES !== 'undefined' ? REPORT_MAX_STRATA_TRACES : 60} STRATA curves/panel. Filtered Report uses your sidebar selections and can be denser if you Select All on SE.</small>
+                                <br><small style="color: #6c757d;">GLSL SE uses a representative AGS/SI grid by default (or choose “All AGS×SI”). Charts sample ~${REPORT_MAX_STRATA_TRACES} STRATA curves/panel. Filtered Report uses your sidebar selections and can be denser if you Select All on SE.</small>
                             </li>
                             <li>
                                 <strong>Scatter:</strong> upload Raw Data under Scatter Plot — filters default to All and plot immediately.
@@ -2906,18 +3550,18 @@
             // Get unique yFUs
             uniqueYFUs = [...new Set(csvData.map(row => row[yFUCol]))].filter(v => v != null && String(v).trim() !== '').map(v => String(v).trim()).sort();
 
-            // Get unique YIELD types by TYPE (POLYGON ≡ STAND)
-            if (typeCol && yieldCol) {
-                strataYieldTypes = [...new Set(
-                    csvData.filter(row => isStrataType(row[typeCol])).map(row => row[yieldCol])
+            // Unique YIELD values (union of STRATA + STAND/POLYGON — one shared UI list)
+            if (yieldCol) {
+                volumeYieldTypes = [...new Set(
+                    csvData.map(row => row[yieldCol])
                 )].filter(v => v != null && String(v).trim() !== '').map(v => String(v).trim()).sort();
-
-                standYieldTypes = [...new Set(
-                    csvData.filter(row => isStandType(row[typeCol])).map(row => row[yieldCol])
-                )].filter(v => v != null && String(v).trim() !== '').map(v => String(v).trim()).sort();
-            } else if (yieldCol) {
-                // No TYPE column, assume all are strata yields
-                strataYieldTypes = [...new Set(csvData.map(row => row[yieldCol]))].filter(v => v != null && String(v).trim() !== '').map(v => String(v).trim()).sort();
+                // Keep aliases for any legacy references
+                strataYieldTypes = volumeYieldTypes;
+                standYieldTypes = volumeYieldTypes;
+            } else {
+                volumeYieldTypes = [];
+                strataYieldTypes = [];
+                standYieldTypes = [];
             }
 
             // Get unique LEADSPC for STAND / POLYGON curves
@@ -2952,106 +3596,364 @@
                 )].sort((a, b) => Number(a) - Number(b));
                 console.log(`🪵 GLSL volume detected — SILSYS:${uniqueSilSys.join(',')}, SE CUT:${uniqueCut.length}, AGSFRC:[${uniqueAgsfrc.join(',')}], SI:${uniqueStrataSI.length}`);
             }
+
+            // Polygon IDs from STAND/POLYGON rows (cap collection — huge POLYGON sets froze load)
+            uniquePolygonIDs = [];
+            const idColVol = columnMap.polygonID;
+            if (idColVol && csvData && csvData.length) {
+                const typeColP = columnMap.curveType;
+                const idSet = new Set();
+                let overCap = false;
+                for (let i = 0; i < csvData.length; i++) {
+                    const r = csvData[i];
+                    if (typeColP && !isStandType(cellByHeader(r, typeColP))) continue;
+                    const id = String(cellByHeader(r, idColVol) ?? '').trim();
+                    if (!id) continue;
+                    idSet.add(id);
+                    // Stop once we know text-mode is required (+ a few extras unused)
+                    if (idSet.size > MAX_POLYGON_ID_CHECKBOXES) {
+                        overCap = true;
+                        break;
+                    }
+                }
+                if (overCap) {
+                    // Length > MAX forces text-entry mode in populatePolygonIdFilterUI
+                    uniquePolygonIDs = new Array(MAX_POLYGON_ID_CHECKBOXES + 1)
+                        .fill(0)
+                        .map((_, i) => '__many_' + i);
+                    console.log(
+                        `🆔 Polygon IDs: >${MAX_POLYGON_ID_CHECKBOXES} unique — using text filter mode (fast path)`
+                    );
+                } else {
+                    uniquePolygonIDs = [...idSet].sort((a, b) => {
+                        const na = Number(a), nb = Number(b);
+                        if (Number.isFinite(na) && Number.isFinite(nb)) return na - nb;
+                        return String(a).localeCompare(String(b), undefined, { numeric: true });
+                    });
+                }
+            }
+
+            // Boreal SI list (all rows with SI) when not GLSL — single pass, capped uniqueness
+            uniqueBorealSI = [];
+            if (!isGlslVolume && columnMap.siteIndex && csvData && csvData.length) {
+                const siSet = new Set();
+                for (let i = 0; i < csvData.length; i++) {
+                    const s = normalizeSi(cellByHeader(csvData[i], columnMap.siteIndex));
+                    if (isNormalizedPresent(s)) siSet.add(s);
+                    if (siSet.size > 5000) break; // enough for min/max placeholders
+                }
+                uniqueBorealSI = [...siSet].sort((a, b) => Number(a) - Number(b));
+            }
         }
 
-        function populateCheckboxGroup(containerId, values, cssClass, idPrefix, defaultSelected) {
+        /**
+         * Populate Polygon ID UI: checkboxes if few IDs; text entry if many.
+         * Empty selection / blank text = no restriction.
+         */
+        function populatePolygonIdFilterUI(cfg) {
+            cfg = cfg || {};
+            const section = document.getElementById(cfg.sectionId);
+            const cbMode = document.getElementById(cfg.checkboxModeId);
+            const textMode = document.getElementById(cfg.textModeId);
+            const textHint = document.getElementById(cfg.textHintId);
+            const textInput = document.getElementById(cfg.textInputId);
+            const ids = cfg.ids || [];
+            if (!section) return;
+
+            if (!ids.length) {
+                section.style.display = 'none';
+                return;
+            }
+            section.style.display = '';
+
+            const manyIds = ids.length > MAX_POLYGON_ID_CHECKBOXES ||
+                (ids[0] && String(ids[0]).indexOf('__many_') === 0);
+
+            if (manyIds) {
+                if (cbMode) cbMode.style.display = 'none';
+                if (textMode) textMode.style.display = '';
+                if (textHint) {
+                    textHint.textContent =
+                        'Many polygon IDs — leave blank for all, or type a subset (comma-separated).';
+                }
+                if (textInput) textInput.value = '';
+            } else {
+                if (cbMode) cbMode.style.display = '';
+                if (textMode) textMode.style.display = 'none';
+                if (textInput) textInput.value = '';
+                // Default: none checked = no restriction
+                populateCheckboxGroup(
+                    cfg.checkboxContainerId,
+                    ids,
+                    cfg.cssClass,
+                    cfg.idPrefix,
+                    [] // empty defaults ⇒ all unchecked
+                );
+            }
+        }
+
+        function populateBorealSiRangeUI(sectionId, minId, maxId, siValues) {
+            const section = document.getElementById(sectionId);
+            const minEl = document.getElementById(minId);
+            const maxEl = document.getElementById(maxId);
+            if (!section) return;
+            const list = siValues || [];
+            if (!list.length) {
+                section.style.display = 'none';
+                if (minEl) minEl.value = '';
+                if (maxEl) maxEl.value = '';
+                return;
+            }
+            section.style.display = '';
+            const nums = list.map(Number).filter(Number.isFinite);
+            if (minEl) {
+                minEl.placeholder = nums.length ? String(Math.min(...nums)) : 'Min';
+                minEl.value = '';
+            }
+            if (maxEl) {
+                maxEl.placeholder = nums.length ? String(Math.max(...nums)) : 'Max';
+                maxEl.value = '';
+            }
+        }
+
+        /**
+         * Update the closed-state summary on a multi-select host
+         * (e.g. "3 of 12 selected", "All (12)", "None selected").
+         */
+        function refreshMultiSelectLabel(host) {
+            if (!host) return;
+            const summary = host.querySelector('.ms-summary');
+            if (!summary) return;
+            const boxes = host.querySelectorAll('input[type="checkbox"]');
+            const checked = host.querySelectorAll('input[type="checkbox"]:checked');
+            const n = boxes.length;
+            const c = checked.length;
+            if (n === 0) {
+                summary.textContent = 'None found';
+                return;
+            }
+            if (c === 0) {
+                summary.textContent = 'None selected';
+                return;
+            }
+            if (c === n) {
+                summary.textContent = `All (${n})`;
+                return;
+            }
+            if (c <= 2) {
+                summary.textContent = Array.from(checked).map(cb => {
+                    const lab = host.querySelector(`label[for="${cb.id}"]`);
+                    return lab ? lab.textContent.trim() : cb.value;
+                }).join(', ');
+                return;
+            }
+            summary.textContent = `${c} of ${n} selected`;
+        }
+
+        function refreshAllMultiSelectLabels(root) {
+            const scope = root || document;
+            scope.querySelectorAll('.multi-select-host').forEach(refreshMultiSelectLabel);
+        }
+
+        /**
+         * Populate a multi-select dropdown (default) or flat checkbox list (opts.flat).
+         * Checkboxes keep the same cssClass so getCheckedValues / All-None still work.
+         * @param {string[]|null} defaultSelected — if null/undefined and not opts.requireExplicitDefaults,
+         *   all values are selected; pass [] for none selected.
+         */
+        function populateCheckboxGroup(containerId, values, cssClass, idPrefix, defaultSelected, opts) {
+            opts = opts || {};
             const container = document.getElementById(containerId);
             if (!container) return;
-            container.innerHTML = '';
-            const isAgs = /agsfrc/i.test(cssClass) || /agsfrc/i.test(idPrefix);
-            // Normalize AGS list so 0 and 0.0 become a single checkbox value "0"
+            const flat = !!opts.flat;
+            const isAgs = /agsfrc/i.test(cssClass || '') || /agsfrc/i.test(idPrefix || '');
             let list = values || [];
             if (isAgs) {
                 list = [...new Set(list.map(normalizeAgsfrc).filter(isNormalizedPresent))]
                     .sort((a, b) => Number(a) - Number(b));
             }
-            const defaults = new Set(
-                (defaultSelected || list).map(v => isAgs ? normalizeAgsfrc(v) : String(v))
-            );
-            list.forEach(val => {
+
+            // defaultSelected: undefined → all; [] → none; array → those values
+            let defaults;
+            if (defaultSelected === undefined || defaultSelected === null) {
+                defaults = new Set(list.map(v => isAgs ? normalizeAgsfrc(v) : String(v)));
+            } else {
+                defaults = new Set(
+                    (defaultSelected || []).map(v => isAgs ? normalizeAgsfrc(v) : String(v))
+                );
+            }
+
+            container.innerHTML = '';
+            if (!list.length) {
+                if (flat) {
+                    container.className = 'checkbox-group';
+                    container.innerHTML = '<p class="text-muted small mb-0">None found</p>';
+                } else {
+                    container.className = 'multi-select-host';
+                    container.innerHTML = '<p class="ms-empty">None found</p>';
+                }
+                return;
+            }
+
+            const makeCheck = (val) => {
                 const safeVal = String(val);
                 const safeId = `${idPrefix}_${safeVal}`.replace(/[^a-zA-Z0-9_\-.]/g, '_');
                 const div = document.createElement('div');
                 div.className = 'form-check';
                 const checked = defaults.has(safeVal) ? 'checked' : '';
                 const labelText = isAgs ? formatAgsfrcLabel(safeVal) : safeVal;
-                div.innerHTML = `
-                    <input class="form-check-input ${cssClass}" type="checkbox" value="${safeVal.replace(/"/g, '&quot;')}" id="${safeId}" ${checked}>
-                    <label class="form-check-label" for="${safeId}">${labelText}</label>
-                `;
-                container.appendChild(div);
+                div.innerHTML =
+                    `<input class="form-check-input ${cssClass}" type="checkbox" value="${safeVal.replace(/"/g, '&quot;')}" id="${safeId}" ${checked}>` +
+                    `<label class="form-check-label" for="${safeId}">${labelText}</label>`;
+                return div;
+            };
+
+            if (flat) {
+                container.className = 'checkbox-group';
+                list.forEach(val => container.appendChild(makeCheck(val)));
+                return;
+            }
+
+            // Custom multi-select (not Bootstrap Dropdown — sidebar overflow broke those)
+            container.className = 'multi-select-host';
+            const uid = `ms_${containerId}`.replace(/[^a-zA-Z0-9_\-]/g, '_');
+            const toggleId = `${uid}_toggle`;
+            const menuId = `${uid}_menu`;
+            container.innerHTML =
+                `<button class="btn ms-toggle" type="button" id="${toggleId}" ` +
+                `aria-expanded="false" aria-haspopup="listbox" aria-controls="${menuId}">` +
+                `<span class="ms-summary">…</span><span class="ms-caret" aria-hidden="true">▼</span></button>` +
+                `<div class="ms-menu" id="${menuId}" role="listbox"></div>`;
+            const menu = container.querySelector('.ms-menu');
+            const btn = container.querySelector('.ms-toggle');
+            list.forEach(val => menu.appendChild(makeCheck(val)));
+            menu.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.addEventListener('change', () => refreshMultiSelectLabel(container));
             });
-            if (!list || list.length === 0) {
-                container.innerHTML = '<p class="text-muted small">None found</p>';
+            bindMultiSelectToggle(container, btn, menu);
+            refreshMultiSelectLabel(container);
+        }
+
+        /** Remove any leftover full-screen multi-select blocker (caused unresponsive Apply/Report). */
+        function destroyMultiSelectBackdrop() {
+            document.querySelectorAll('#msBackdrop, .ms-backdrop').forEach(el => {
+                try { el.remove(); } catch (e) { /* ignore */ }
+            });
+        }
+
+        /** Close every open multi-select menu (except optional menu still open). */
+        function closeAllMultiSelectMenus(exceptMenu) {
+            destroyMultiSelectBackdrop();
+            document.querySelectorAll('.multi-select-host .ms-menu.show').forEach(m => {
+                if (exceptMenu && m === exceptMenu) return;
+                m.classList.remove('show');
+                m.style.left = '';
+                m.style.top = '';
+                m.style.width = '';
+                m.style.maxHeight = '';
+            });
+            document.querySelectorAll('.multi-select-host .ms-toggle[aria-expanded="true"]').forEach(b => {
+                if (exceptMenu) {
+                    const host = b.closest('.multi-select-host');
+                    if (host && host.querySelector('.ms-menu') === exceptMenu) return;
+                }
+                b.setAttribute('aria-expanded', 'false');
+            });
+        }
+
+        /** Position menu with fixed coords so it is not clipped by sidebar scroll. */
+        function positionMultiSelectMenu(btn, menu) {
+            const r = btn.getBoundingClientRect();
+            const maxH = 200;
+            const spaceBelow = window.innerHeight - r.bottom - 8;
+            const spaceAbove = r.top - 8;
+            let top = r.bottom + 2;
+            let maxHeight = Math.min(maxH, Math.max(100, spaceBelow));
+            if (spaceBelow < 120 && spaceAbove > spaceBelow) {
+                maxHeight = Math.min(maxH, Math.max(100, spaceAbove));
+                top = Math.max(8, r.top - maxHeight - 2);
+            }
+            // Prefer opening upward if the control is low in the sidebar (near Apply)
+            if (r.bottom > window.innerHeight * 0.55 && spaceAbove > 120) {
+                maxHeight = Math.min(maxH, Math.max(100, spaceAbove));
+                top = Math.max(8, r.top - maxHeight - 2);
+            }
+            menu.style.left = Math.max(8, Math.min(r.left, window.innerWidth - Math.max(r.width, 160) - 8)) + 'px';
+            menu.style.top = top + 'px';
+            menu.style.width = Math.max(r.width, 160) + 'px';
+            menu.style.maxHeight = maxHeight + 'px';
+        }
+
+        function bindMultiSelectToggle(host, btn, menu) {
+            if (!host || !btn || !menu || btn.dataset.msBound === '1') return;
+            btn.dataset.msBound = '1';
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const willOpen = !menu.classList.contains('show');
+                closeAllMultiSelectMenus(willOpen ? menu : null);
+                if (willOpen) {
+                    positionMultiSelectMenu(btn, menu);
+                    menu.classList.add('show');
+                    btn.setAttribute('aria-expanded', 'true');
+                } else {
+                    menu.classList.remove('show');
+                    btn.setAttribute('aria-expanded', 'false');
+                }
+            });
+            // Keep menu open while ticking options
+            menu.addEventListener('mousedown', (e) => { e.stopPropagation(); });
+            menu.addEventListener('click', (e) => { e.stopPropagation(); });
+        }
+
+        // Global closers — no full-screen backdrop (it blocked Apply / Report)
+        if (!window._slymMultiSelectDocCloseV3) {
+            window._slymMultiSelectDocCloseV3 = true;
+            destroyMultiSelectBackdrop();
+            document.addEventListener('mousedown', (e) => {
+                const t = e.target;
+                if (!t || !t.closest) return;
+                // Keep open only for clicks on the open menu or its toggle
+                if (t.closest('.ms-menu.show') || t.closest('.ms-toggle')) return;
+                closeAllMultiSelectMenus();
+            }, true);
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeAllMultiSelectMenus();
+            });
+            window.addEventListener('resize', () => closeAllMultiSelectMenus());
+            // Scroll lives on .sidebar-scroll (report dock is pinned outside it)
+            const sidebarScroll = document.querySelector('.sidebar-scroll') || document.querySelector('.sidebar');
+            if (sidebarScroll) {
+                sidebarScroll.addEventListener('scroll', () => closeAllMultiSelectMenus(), { passive: true });
+            }
+            const content = document.querySelector('.content-area');
+            if (content) {
+                content.addEventListener('scroll', () => closeAllMultiSelectMenus(), { passive: true });
             }
         }
 
         function buildFilterUI() {
-            // Build yFU checkboxes (default: unchecked - user must select)
-            const yFUContainer = document.getElementById('yFUCheckboxes');
-            yFUContainer.innerHTML = '';
-            uniqueYFUs.forEach(yfu => {
-                const div = document.createElement('div');
-                div.className = 'form-check';
-                div.innerHTML = `
-                    <input class="form-check-input yfu-checkbox" type="checkbox" value="${yfu}" id="yfu_${yfu}">
-                    <label class="form-check-label" for="yfu_${yfu}">${yfu}</label>
-                `;
-                yFUContainer.appendChild(div);
-            });
+            // Volume multi-selects (default: none selected — user must choose)
+            populateCheckboxGroup('yFUCheckboxes', uniqueYFUs, 'yfu-checkbox', 'yfu', []);
+            // One YIELD list for STRATA + STAND/POLYGON
+            populateCheckboxGroup(
+                'volumeYieldCheckboxes',
+                volumeYieldTypes,
+                'volume-yield-checkbox',
+                'volume_yield',
+                []
+            );
+            populateCheckboxGroup(
+                'standLeadspcCheckboxes',
+                standLeadingSpecies,
+                'stand-leadspc-checkbox',
+                'stand_leadspc',
+                []
+            );
+            const yldSec = document.getElementById('volumeYieldSection');
+            if (yldSec) yldSec.style.display = volumeYieldTypes.length ? 'block' : 'none';
 
-            // Build STRATA yield checkboxes (default: unchecked - user must select)
-            const strataYieldContainer = document.getElementById('strataYieldCheckboxes');
-            strataYieldContainer.innerHTML = '';
-            if (strataYieldTypes.length > 0) {
-                strataYieldTypes.forEach(yield_type => {
-                    const div = document.createElement('div');
-                    div.className = 'form-check';
-                    div.innerHTML = `
-                        <input class="form-check-input strata-yield-checkbox" type="checkbox" value="${yield_type}" id="strata_yield_${yield_type}">
-                        <label class="form-check-label" for="strata_yield_${yield_type}">${yield_type}</label>
-                    `;
-                    strataYieldContainer.appendChild(div);
-                });
-            } else {
-                strataYieldContainer.innerHTML = '<p class="text-muted small">No STRATA yields found</p>';
-            }
-
-            // Build STAND yield checkboxes (default: unchecked - user must select)
-            const standYieldContainer = document.getElementById('standYieldCheckboxes');
-            standYieldContainer.innerHTML = '';
-            if (standYieldTypes.length > 0) {
-                standYieldTypes.forEach(yield_type => {
-                    const div = document.createElement('div');
-                    div.className = 'form-check';
-                    div.innerHTML = `
-                        <input class="form-check-input stand-yield-checkbox" type="checkbox" value="${yield_type}" id="stand_yield_${yield_type}">
-                        <label class="form-check-label" for="stand_yield_${yield_type}">${yield_type}</label>
-                    `;
-                    standYieldContainer.appendChild(div);
-                });
-            } else {
-                standYieldContainer.innerHTML = '<p class="text-muted small">No STAND yields found</p>';
-            }
-
-            // Build STAND LEADSPC checkboxes (default: unchecked - user must select)
-            const standLeadspcContainer = document.getElementById('standLeadspcCheckboxes');
-            standLeadspcContainer.innerHTML = '';
-            if (standLeadingSpecies.length > 0) {
-                standLeadingSpecies.forEach(leadspc => {
-                    const div = document.createElement('div');
-                    div.className = 'form-check';
-                    div.innerHTML = `
-                        <input class="form-check-input stand-leadspc-checkbox" type="checkbox" value="${leadspc}" id="stand_leadspc_${leadspc}">
-                        <label class="form-check-label" for="stand_leadspc_${leadspc}">${leadspc}</label>
-                    `;
-                    standLeadspcContainer.appendChild(div);
-                });
-            } else {
-                standLeadspcContainer.innerHTML = '<p class="text-muted small">No LEADSPC found</p>';
-            }
-
-            // GLSL finer STRATA filters (restrictive SE defaults)
+            // GLSL finer STRATA filters (SI uses min/max range UI, not multi-select)
             const glslSec = document.getElementById('glslVolumeSection');
             if (glslSec) {
                 if (isGlslVolume) {
@@ -3059,11 +3961,30 @@
                     populateCheckboxGroup('silsysCheckboxes', uniqueSilSys, 'silsys-checkbox', 'silsys', uniqueSilSys);
                     populateCheckboxGroup('cutCheckboxes', uniqueCut, 'cut-checkbox', 'cut', pickDefaultCut(uniqueCut));
                     populateCheckboxGroup('agsfrcCheckboxes', uniqueAgsfrc, 'agsfrc-checkbox', 'agsfrc', pickDefaultAgsfrc(uniqueAgsfrc));
-                    populateCheckboxGroup('strataSiCheckboxes', uniqueStrataSI, 'strata-si-checkbox', 'strata_si', pickDefaultSI(uniqueStrataSI));
                 } else {
                     glslSec.style.display = 'none';
                 }
             }
+
+            // Polygon ID + SI range (Boreal and GLSL when SI values exist)
+            populatePolygonIdFilterUI({
+                sectionId: 'polygonIdSection',
+                checkboxModeId: 'polygonIdCheckboxMode',
+                textModeId: 'polygonIdTextMode',
+                checkboxContainerId: 'polygonIdCheckboxes',
+                textHintId: 'polygonIdTextHint',
+                textInputId: 'polygonIdTextFilter',
+                ids: uniquePolygonIDs,
+                cssClass: 'polygon-id-checkbox',
+                idPrefix: 'poly_id'
+            });
+            const volumeSiForRange = isGlslVolume ? uniqueStrataSI : uniqueBorealSI;
+            populateBorealSiRangeUI(
+                'borealSiRangeSection',
+                'siMin',
+                'siMax',
+                volumeSiForRange
+            );
         }
 
         function displayColumnMapping() {
@@ -3082,6 +4003,11 @@
                 keyMappings['CUT'] = columnMap.cut;
                 keyMappings['AGSFRC'] = columnMap.agsfrc;
                 keyMappings['SI'] = columnMap.siteIndex || 'N/A';
+            } else if (columnMap.siteIndex) {
+                keyMappings['SI'] = columnMap.siteIndex;
+            }
+            if (uniquePolygonIDs && uniquePolygonIDs.length) {
+                keyMappings['Polygon IDs'] = uniquePolygonIDs.length;
             }
 
             for (const [concept, column] of Object.entries(keyMappings)) {
@@ -3103,8 +4029,8 @@
             document.querySelectorAll('.cut-checkbox').forEach(cb => { cb.checked = defCut.has(cb.value); });
             const defAgs = new Set(pickDefaultAgsfrc(uniqueAgsfrc));
             document.querySelectorAll('.agsfrc-checkbox').forEach(cb => { cb.checked = defAgs.has(cb.value); });
-            const defSi = new Set(pickDefaultSI(uniqueStrataSI));
-            document.querySelectorAll('.strata-si-checkbox').forEach(cb => { cb.checked = defSi.has(cb.value); });
+            // SI uses min/max range inputs (not checkboxes)
+            refreshAllMultiSelectLabels(document.getElementById('glslVolumeSection'));
         }
 
         /** Read Full Report GLSL SE density mode: 'grid' | 'all'. */
@@ -3126,15 +4052,26 @@
             document.querySelectorAll('.cut-checkbox').forEach(cb => { cb.checked = true; });
             if (mode === 'all') {
                 document.querySelectorAll('.agsfrc-checkbox').forEach(cb => { cb.checked = true; });
-                document.querySelectorAll('.strata-si-checkbox').forEach(cb => { cb.checked = true; });
-                console.log('🪵 Full report GLSL SE mode=all — every AGSFRC × SI selected');
+                // SI range blank = all SI for full report
+                const siMinEl = document.getElementById('siMin');
+                const siMaxEl = document.getElementById('siMax');
+                if (siMinEl) siMinEl.value = '';
+                if (siMaxEl) siMaxEl.value = '';
+                console.log('🪵 Full report GLSL SE mode=all — every AGSFRC; SI range open (all SI)');
             } else {
                 const defAgs = new Set(pickFullReportAgsfrc(uniqueAgsfrc));
                 document.querySelectorAll('.agsfrc-checkbox').forEach(cb => { cb.checked = defAgs.has(cb.value); });
-                const defSi = new Set(pickFullReportSI(uniqueStrataSI));
-                document.querySelectorAll('.strata-si-checkbox').forEach(cb => { cb.checked = defSi.has(cb.value); });
-                console.log('🪵 Full report GLSL SE mode=grid — AGSFRC:', [...defAgs], 'SI:', [...defSi]);
+                // Grid: optional low–high SI from representative SI set
+                const gridSi = pickFullReportSI(uniqueStrataSI).map(Number).filter(Number.isFinite);
+                const siMinEl = document.getElementById('siMin');
+                const siMaxEl = document.getElementById('siMax');
+                if (gridSi.length && siMinEl && siMaxEl) {
+                    siMinEl.value = String(Math.min(...gridSi));
+                    siMaxEl.value = String(Math.max(...gridSi));
+                }
+                console.log('🪵 Full report GLSL SE mode=grid — AGSFRC:', [...defAgs], 'SI range:', siMinEl && siMinEl.value, '–', siMaxEl && siMaxEl.value);
             }
+            refreshAllMultiSelectLabels(document.getElementById('glslVolumeSection'));
         }
 
 
@@ -3165,7 +4102,10 @@
                 silsys: filters.silsys.length,
                 cut: filters.cut.length,
                 agsfrc: filters.agsfrc.length,
-                si: filters.si.length
+                si: filters.si.length,
+                siMin: filters.siMin,
+                siMax: filters.siMax,
+                polygonIds: (filters.polygonIds || []).length
             });
 
             // ── Validation layer (does not change pure filter semantics) ──
@@ -3183,18 +4123,21 @@
                 return false;
             }
 
-            if (filters.showStrata && filters.strataYield.length === 0 && strataYieldTypes.length > 0) {
+            // Shared YIELD list applies to both STRATA and STAND/POLYGON when those types are on
+            if ((filters.showStrata || filters.showStand) &&
+                volumeYieldTypes.length > 0 &&
+                (!filters.yield || filters.yield.length === 0) &&
+                (!filters.strataYield || filters.strataYield.length === 0)) {
                 if (!skipValidation) {
-                    alert('⚠️ Please select at least one STRATA Yield Scenario.\n\nTip: Use "Select All" button to choose all scenarios.\n\nNote: empty selection filters out all STRATA (does not default to all).');
+                    alert('⚠️ Please select at least one Yield Scenario.\n\n' +
+                          'Tip: Use "Select All" on Yield Scenarios.\n\n' +
+                          'Note: empty selection filters out all curves (STRATA and STAND share the same YIELD list).');
                 }
                 return false;
             }
 
             if (filters.showStand) {
                 const missingFilters = [];
-                if (standYieldTypes.length > 0 && filters.standYield.length === 0) {
-                    missingFilters.push('• Stand Yield Scenario');
-                }
                 if (standLeadingSpecies.length > 0 && filters.leadspc.length === 0) {
                     missingFilters.push('• Stand Leading Species');
                 }
@@ -3221,11 +4164,11 @@
                     const missing = [];
                     if (uniqueCut.length > 0 && filters.cut.length === 0) missing.push('CUT');
                     if (uniqueAgsfrc.length > 0 && filters.agsfrc.length === 0) missing.push('AGSFRC');
-                    if (uniqueStrataSI.length > 0 && filters.si.length === 0) missing.push('SI');
+                    // SI uses min/max range (blank = all SI) — not required multi-select
                     if (missing.length) {
                         alert('⚠️ GLSL selection (SE) strata need finer filters:\n\n• ' +
                               missing.join('\n• ') +
-                              '\n\nTip: defaults pick a small slice — use Select All to expand the cloud.\n\nNote: empty AGSFRC/CUT/SI excludes all SE (AGSFRC 0 is a valid selectable value).');
+                              '\n\nTip: use Select All to expand CUT/AGSFRC.\nSI: use SI range min/max (blank = all SI).\nNote: AGSFRC 0 is a valid selectable value.');
                         return false;
                     }
                 }
@@ -3679,36 +4622,9 @@
         // PHASE 3 — PER-FU MULTI-PANEL DASHBOARD
         // Biomass official grid A–K (same order in app + report)
         // STRATA foreground · POLYGON thin background when selected
+        // Cap constants (DASHBOARD_MAX_*, REPORT_MAX_*) are declared earlier
+        // (before processData) to avoid temporal-dead-zone errors.
         // ============================================
-
-        /** Performance guardrails for interactive multi-panel dashboards. */
-        const DASHBOARD_MAX_FUS = 3;
-        // POLYGON as thin background on BOTH panels (rough-idea cloud; main overview stays above)
-        const DASHBOARD_MAX_STAND_TRACES = 80;
-        const DASHBOARD_MAX_STRATA_TRACES = 48;
-        const DASHBOARD_PANEL_HEIGHT = 380;
-        const DASHBOARD_PANEL_WIDE_HEIGHT = 420;
-
-        /**
-         * Report generation caps.
-         * FU count is no longer hard-capped by default (FSF has ~22 units; a fixed 10
-         * forced multi-batch reports). Optional 10-FU limit is a user checkbox.
-         * Real browser safety comes from per-panel STRATA sampling + minimal STAND traces.
-         */
-        const REPORT_OPTIONAL_FU_CAP = 10;   // only when #reportLimitFus is checked
-        const REPORT_SOFT_WARN_FUS = 25;     // confirm when more FUs than this (time, not hard fail)
-        const REPORT_MAX_STAND_TRACES = 80;  // POLYGON background sample on BOTH panels
-        const REPORT_MAX_STRATA_TRACES = 60; // SE even-sample cap per panel (was 36)
-        const REPORT_MAX_LOG_SERIES = 10;   // Log_XX series; each SE key × log is capped overall
-        const REPORT_PNG_W = 700;
-        const REPORT_PNG_H = 400;
-        const REPORT_PNG_WIDE_W = 900;
-        const REPORT_PNG_WIDE_H = 420;
-        const REPORT_MAX_STAND_CLOUD_IDS = 150;
-        const REPORT_QUIET = true; // suppress per-panel console noise during report
-
-        /** @deprecated use getReportFuCap() — kept as alias for any external refs */
-        const REPORT_MAX_FUS = REPORT_OPTIONAL_FU_CAP;
 
         /**
          * Active report FU limit. Infinity = all selected/all FUs (default).
@@ -3904,7 +4820,7 @@
                 yLabel: 'Biomass (Mg/ha)',
                 multiCol: true,
                 multiColKind: 'bioComponents',
-                wide: true,
+                // Same 3-column grid as A–J (not full-width)
                 sourceModule: 'biomass'
             }
         ];
@@ -4288,16 +5204,19 @@
                             : `STAND ${g.yld}`;
                         const showLegend = !legendAdded[seriesName];
                         if (showLegend) legendAdded[seriesName] = true;
-                        traces.push({
+                        // User feedback: BA / GTV / Height polygon curves get a start-of-curve dot
+                        const polyStartDot = def.metric === 'ba' || def.metric === 'gtv' || def.metric === 'cdht';
+                        const lineColor = hexToRgbaDash(base, yColsUse.length > 1 ? 0.22 : 0.15);
+                        const standTrace = {
                             x: cleaned.ages,
                             y: cleaned.values,
-                            mode: 'lines',
+                            mode: polyStartDot ? 'lines+markers' : 'lines',
                             type: 'scatter',
                             name: showLegend ? seriesName : undefined,
                             legendgroup: `stand_${g.yld}_${colLabel}`,
                             showlegend: showLegend,
                             line: {
-                                color: hexToRgbaDash(base, yColsUse.length > 1 ? 0.22 : 0.15),
+                                color: lineColor,
                                 width: 0.7,
                                 dash: styleCtx.yieldDashMap[g.yld] || 'solid'
                             },
@@ -4305,7 +5224,22 @@
                                 `<b>Stand ${g.sid}</b><br>YIELD: ${g.yld}` +
                                 (yColsUse.length > 1 ? `<br>${colLabel}` : '') +
                                 `<br>Age: %{x}<br>%{y:.2f}<extra></extra>`
-                        });
+                        };
+                        if (polyStartDot) {
+                            // Marker only at the first age point (not every age)
+                            const n = cleaned.ages.length;
+                            const sizes = new Array(n).fill(0);
+                            const opacities = new Array(n).fill(0);
+                            sizes[0] = 7;
+                            opacities[0] = 0.85;
+                            standTrace.marker = {
+                                size: sizes,
+                                opacity: opacities,
+                                color: lineColor,
+                                line: { width: 0 }
+                            };
+                        }
+                        traces.push(standTrace);
                     });
                 });
             }
@@ -5751,8 +6685,8 @@
             });
             
             if ((showStrataOverlay || showStandOverlay) && (strataCurves.length > 0 || standCurves.length > 0)) {
-                // Filter yield curves: FU from scatter; yield/species from main yield-curve filters
-                const selectedCurveYields = Array.from(document.querySelectorAll('.strata-yield-checkbox:checked')).map(cb => cb.value);
+                // Filter yield curves: FU from scatter; shared YIELD + LEADSPC from main filters
+                const selectedCurveYields = Array.from(document.querySelectorAll('.volume-yield-checkbox:checked')).map(cb => cb.value);
                 const selectedCurveYieldsU = new Set(selectedCurveYields.map(v => String(v).trim().toUpperCase()));
                 
                 const filteredStrataCurves = strataCurves.filter(row => {
@@ -5767,9 +6701,7 @@
                     return true;
                 });
                 
-                const selectedStandYields = Array.from(document.querySelectorAll('.stand-yield-checkbox:checked')).map(cb => cb.value);
                 const selectedStandLeadspc = Array.from(document.querySelectorAll('.stand-leadspc-checkbox:checked')).map(cb => cb.value);
-                const standYieldU = new Set(selectedStandYields.map(v => String(v).trim().toUpperCase()));
                 const standLeadU = new Set(selectedStandLeadspc.map(v => String(v).trim().toUpperCase()));
                 
                 const filteredStandCurves = standCurves.filter(row => {
@@ -5783,7 +6715,7 @@
                         cellByHeader(row, columnMap.leadingSpecies) ?? row.LEADSPC ?? ''
                     ).trim();
                     if (activePlanfu.length > 0 && !planfuSet.has(yfu.toUpperCase())) return false;
-                    if (standYieldU.size > 0 && !standYieldU.has(yieldVal.toUpperCase())) return false;
+                    if (selectedCurveYieldsU.size > 0 && !selectedCurveYieldsU.has(yieldVal.toUpperCase())) return false;
                     if (standLeadU.size > 0 && leadspc && !standLeadU.has(leadspc.toUpperCase())) return false;
                     return true;
                 });
@@ -7925,18 +8857,20 @@
                 }
             }
 
+            // 3 panels per row (matches in-app official grid for all panels, including K)
             let html = `
-        <div class="report-panel-grid" style="display:flex; flex-wrap:wrap; gap:16px; margin-bottom:24px;">`;
+        <div class="report-panel-grid" style="display:flex; flex-wrap:wrap; gap:14px; margin-bottom:28px;">`;
 
             defs.forEach(def => {
                 const src = panels[def.id] || null;
                 const reason = (meta[def.id] && meta[def.id].reason)
                     ? meta[def.id].reason
                     : 'No chart produced (missing column, empty filters, or no plottable points).';
-                const wide = def.wide;
+                // Keep wide support for any future full-span panels; K is standard 1/3 width
+                const wide = !!def.wide;
                 const flex = wide
-                    ? 'flex: 1 1 100%; min-width: 100%;'
-                    : 'flex: 1 1 calc(50% - 16px); min-width: 280px;';
+                    ? 'flex: 1 1 100%; min-width: 100%; max-width: 100%;'
+                    : 'flex: 1 1 calc(33.333% - 14px); min-width: 240px; max-width: calc(33.333% - 10px);';
                 html += `
             <div class="chart-container" style="${flex} page-break-inside: avoid; background:#fff; border:1px solid #e9ecef; border-radius:8px; padding:12px; box-sizing:border-box;">
                 <h4 style="margin:0 0 8px 0; color:#495057; font-size:14px;">
@@ -8173,7 +9107,7 @@
             
             // Get active filters for YIELD CURVES (from yield curve sidebar)
             const yieldCurveFUs = Array.from(document.querySelectorAll('.yfu-checkbox:checked')).map(cb => cb.value).join(', ') || 'None';
-            const yieldCurveYields = Array.from(document.querySelectorAll('.strata-yield-checkbox:checked')).map(cb => cb.value).join(', ') || 'All';
+            const yieldCurveYields = Array.from(document.querySelectorAll('.volume-yield-checkbox:checked')).map(cb => cb.value).join(', ') || 'All';
             const yieldCurveSpecies = Array.from(document.querySelectorAll('.stand-leadspc-checkbox:checked')).map(cb => cb.value).join(', ') || 'All';
             
             // Get active filters for RAW DATA (from scatter plot section)
@@ -8480,11 +9414,11 @@
                     const gridDefs = (panels.catalog === 'volume' || isVolCatalog) ? VOLUME_PANEL_DEFS : DASHBOARD_PANEL_DEFS;
 
                     html += `
-    <div style="page-break-before: always; margin-top: 40px;">
-        <h3 style="color: #0d6efd; font-size: 22px; border-bottom: 3px solid #0d6efd; padding-bottom: 10px; page-break-after: avoid;">
+    <div style="page-break-before: always; margin-top: 56px;">
+        <h3 style="color: #0d6efd; font-size: 26px; font-weight: 700; border-bottom: 3px solid #0d6efd; padding-bottom: 12px; page-break-after: avoid;">
             📊 Forest Unit: ${fu}
         </h3>
-        <p style="color:#666; font-size:13px; margin: 6px 0 18px 0;">
+        <p style="color:#666; font-size:14px; margin: 8px 0 20px 0;">
             STRATA: <strong>${metaStrata}</strong> · POLYGON: <strong>${metaStand}</strong> · Raw inventory rows: <strong>${metaRaw}</strong>
         </p>
         ${renderReportEightPanelGridHTML(fu, panels, gridDefs)}
@@ -8760,6 +9694,64 @@
             return raw === 'biomass' ? 'biomass' : 'volume';
         }
 
+        /**
+         * Keep pinned dock + header report controls in sync with active tab and loaded data.
+         * Disabled until the active module has CSV data (clear tooltips explain why).
+         */
+        function updateReportUiState() {
+            const scope = getActiveReportModule();
+            const isBio = scope === 'biomass';
+            const hasData = isBio
+                ? !!(bioData && bioData.length)
+                : !!(csvData && csvData.length);
+            const label = isBio ? 'Biomass' : 'Volume';
+            const chipClass = isBio ? 'scope-biomass' : 'scope-volume';
+
+            const setChip = (el) => {
+                if (!el) return;
+                el.textContent = label;
+                el.classList.remove('scope-volume', 'scope-biomass');
+                el.classList.add(chipClass);
+            };
+            setChip(document.getElementById('reportScopeChip'));
+            setChip(document.getElementById('headerReportScopeChip'));
+
+            const hint = document.getElementById('reportDockHint');
+            if (hint) {
+                if (!hasData) {
+                    hint.textContent = isBio
+                        ? 'Load a Biomass CSV to enable reports for this tab'
+                        : 'Load a Volume CSV to enable reports for this tab';
+                } else {
+                    hint.textContent = isBio
+                        ? 'Biomass · Filtered = current filters · Full = all yYC (SE options below)'
+                        : 'Volume · Filtered = current filters · Full = all yFU (SE options below)';
+                }
+            }
+
+            const disableTip = isBio
+                ? 'Load a Biomass CSV first (active tab is Biomass)'
+                : 'Load a Volume CSV first (active tab is Volume)';
+            const enableTipFiltered = 'HTML report for the active module using current sidebar filters';
+            const enableTipFull = 'HTML report for all Forest Units in the active module';
+
+            const ids = [
+                'btnGenerateReport',
+                'btnGenerateFullReport',
+                'btnHeaderGenerateReport',
+                'btnHeaderGenerateFullReport'
+            ];
+            ids.forEach(id => {
+                const btn = document.getElementById(id);
+                if (!btn) return;
+                btn.disabled = !hasData;
+                const isFull = id.toLowerCase().indexOf('full') >= 0;
+                btn.title = hasData
+                    ? (isFull ? enableTipFull : enableTipFiltered)
+                    : disableTip;
+            });
+        }
+
         // ============================================
         // GENERATE FULL REPORT (bypasses all filters)
         // ============================================
@@ -8796,12 +9788,14 @@
             let savedBioYYC, savedBioYield, savedBioLeadspc, savedBioTypeStrata, savedBioTypeStand;
             let savedSilSys, savedCut, savedAgsfrc, savedStrataSi;
             let savedBioSilSys, savedBioCut, savedBioAgsfrc, savedBioStrataSi;
+            // SI range is interactive-only; Full Report must not keep user min/max permanently
+            let savedSiMin, savedSiMax, savedBioSiMin, savedBioSiMax;
             
             try {
                 // Save current filter state (volume + biomass)
                 savedYFUCheckboxes = Array.from(document.querySelectorAll('.yfu-checkbox')).map(cb => ({ el: cb, checked: cb.checked }));
-                savedStrataYields = Array.from(document.querySelectorAll('.strata-yield-checkbox')).map(cb => ({ el: cb, checked: cb.checked }));
-                savedStandYields = Array.from(document.querySelectorAll('.stand-yield-checkbox')).map(cb => ({ el: cb, checked: cb.checked }));
+                savedStrataYields = Array.from(document.querySelectorAll('.volume-yield-checkbox')).map(cb => ({ el: cb, checked: cb.checked }));
+                savedStandYields = []; // legacy var; shared yield list restored via savedStrataYields
                 savedStandSpecies = Array.from(document.querySelectorAll('.stand-leadspc-checkbox')).map(cb => ({ el: cb, checked: cb.checked }));
                 savedScatterPlanfu = Array.from(document.querySelectorAll('.scatter-planfu-checkbox')).map(cb => ({ el: cb, checked: cb.checked }));
                 savedScatterYield = Array.from(document.querySelectorAll('.scatter-yield-checkbox')).map(cb => ({ el: cb, checked: cb.checked }));
@@ -8810,6 +9804,15 @@
                 savedCut = Array.from(document.querySelectorAll('.cut-checkbox')).map(cb => ({ el: cb, checked: cb.checked }));
                 savedAgsfrc = Array.from(document.querySelectorAll('.agsfrc-checkbox')).map(cb => ({ el: cb, checked: cb.checked }));
                 savedStrataSi = Array.from(document.querySelectorAll('.strata-si-checkbox')).map(cb => ({ el: cb, checked: cb.checked }));
+                // Interactive SI range (Apply / Filtered Report only — not Full Report scope)
+                const siMinElSave = document.getElementById('siMin');
+                const siMaxElSave = document.getElementById('siMax');
+                const bioSiMinElSave = document.getElementById('bioSiMin');
+                const bioSiMaxElSave = document.getElementById('bioSiMax');
+                savedSiMin = siMinElSave ? siMinElSave.value : '';
+                savedSiMax = siMaxElSave ? siMaxElSave.value : '';
+                savedBioSiMin = bioSiMinElSave ? bioSiMinElSave.value : '';
+                savedBioSiMax = bioSiMaxElSave ? bioSiMaxElSave.value : '';
                 
                 const typeStrataEl = document.getElementById('typeStrata');
                 const typeStandEl = document.getElementById('typeStand');
@@ -8828,7 +9831,7 @@
                 savedBioTypeStrata = bioTypeStrataEl ? bioTypeStrataEl.checked : false;
                 savedBioTypeStand = bioTypeStandEl ? bioTypeStandEl.checked : false;
                 
-                console.log('✅ Saved current filter state');
+                console.log('✅ Saved current filter state (incl. SI range for restore)');
 
                 let table1 = [];
                 let table2 = [];
@@ -8846,14 +9849,18 @@
                     updateProgress('🔍 Auto-selecting all Yield Curve filters...', 15);
                     await new Promise(resolve => setTimeout(resolve, 50));
                     document.querySelectorAll('.yfu-checkbox').forEach(cb => cb.checked = true);
-                    document.querySelectorAll('.strata-yield-checkbox').forEach(cb => cb.checked = true);
-                    document.querySelectorAll('.stand-yield-checkbox').forEach(cb => cb.checked = true);
+                    document.querySelectorAll('.volume-yield-checkbox').forEach(cb => cb.checked = true);
                     document.querySelectorAll('.stand-leadspc-checkbox').forEach(cb => cb.checked = true);
-                    // GLSL SE: grid (default) or all AGS×SI per user option
+                    // Full Report ignores interactive SI range: GLSL uses SE density mode; Boreal opens SI fully
                     if (isGlslVolume) {
                         applyVolumeGlslFullReportDefaults(seMode);
+                    } else {
+                        const siMinEl = document.getElementById('siMin');
+                        const siMaxEl = document.getElementById('siMax');
+                        if (siMinEl) siMinEl.value = '';
+                        if (siMaxEl) siMaxEl.value = '';
                     }
-                    console.log(`✅ Selected Yield Curve filters (GLSL SE mode=${seMode})`);
+                    console.log(`✅ Selected Yield Curve filters (Full Report SI independent of sidebar range; SE mode=${seMode})`);
                     
                     updateProgress('🔍 Auto-selecting all Raw Data filters...', 25);
                     await new Promise(resolve => setTimeout(resolve, 50));
@@ -8908,10 +9915,16 @@
                     document.querySelectorAll('.bio-yyc-checkbox').forEach(cb => cb.checked = true);
                     document.querySelectorAll('.bio-yield-checkbox').forEach(cb => cb.checked = true);
                     document.querySelectorAll('.bio-leadspc-checkbox').forEach(cb => cb.checked = true);
+                    // Full Report ignores interactive bio SI range: GLSL uses SE density mode; Boreal opens SI fully
                     if (isGlslBiomass) {
                         applyBiomassGlslFullReportDefaults(seMode);
+                    } else {
+                        const bioSiMin = document.getElementById('bioSiMin');
+                        const bioSiMax = document.getElementById('bioSiMax');
+                        if (bioSiMin) bioSiMin.value = '';
+                        if (bioSiMax) bioSiMax.value = '';
                     }
-                    console.log(`✅ Selected Biomass filters for full report (GLSL SE mode=${seMode})`);
+                    console.log(`✅ Selected Biomass filters for full report (SI independent of sidebar range; SE mode=${seMode})`);
 
                     updateProgress('🌿 Generating Biomass A–K dashboards (all FUs)...', 18);
                     await new Promise(resolve => setTimeout(resolve, 50));
@@ -9016,8 +10029,20 @@
                     const bioTypeStandEl = document.getElementById('bioTypeStand');
                     if (bioTypeStrataEl && typeof savedBioTypeStrata === 'boolean') bioTypeStrataEl.checked = savedBioTypeStrata;
                     if (bioTypeStandEl && typeof savedBioTypeStand === 'boolean') bioTypeStandEl.checked = savedBioTypeStand;
+
+                    // Restore interactive SI range (Full Report must not leave grid/blank values behind)
+                    const siMinElR = document.getElementById('siMin');
+                    const siMaxElR = document.getElementById('siMax');
+                    const bioSiMinElR = document.getElementById('bioSiMin');
+                    const bioSiMaxElR = document.getElementById('bioSiMax');
+                    if (siMinElR && typeof savedSiMin === 'string') siMinElR.value = savedSiMin;
+                    if (siMaxElR && typeof savedSiMax === 'string') siMaxElR.value = savedSiMax;
+                    if (bioSiMinElR && typeof savedBioSiMin === 'string') bioSiMinElR.value = savedBioSiMin;
+                    if (bioSiMaxElR && typeof savedBioSiMax === 'string') bioSiMaxElR.value = savedBioSiMax;
+
+                    refreshAllMultiSelectLabels();
                     
-                    console.log('✅ Filter state restored (interactive plots were never rendered - resources saved!)');
+                    console.log('✅ Filter state restored (incl. SI range; interactive plots were never rendered)');
                 }, 100);
                 
                 hideReportLoadingOverlay();
@@ -9197,12 +10222,32 @@
         
         function initializeReportEventListeners() {
             console.log('🔧 Initializing report event listeners...');
+            // Ensure no leftover multi-select blocker can swallow report clicks
+            destroyMultiSelectBackdrop();
+            updateReportUiState();
+
+            // Header buttons mirror the pinned dock (same handlers, always in view)
+            const wireHeaderAlias = (headerId, dockId) => {
+                const h = document.getElementById(headerId);
+                const d = document.getElementById(dockId);
+                if (!h || !d || h.dataset.bound === '1') return;
+                h.dataset.bound = '1';
+                h.addEventListener('click', () => {
+                    if (h.disabled) return;
+                    d.click();
+                });
+            };
+            wireHeaderAlias('btnHeaderGenerateReport', 'btnGenerateReport');
+            wireHeaderAlias('btnHeaderGenerateFullReport', 'btnGenerateFullReport');
             
             // Initialize report generation button
             const btnGenerateReport = document.getElementById('btnGenerateReport');
             if (btnGenerateReport) {
                 console.log('✅ Found btnGenerateReport, attaching listener');
                 btnGenerateReport.addEventListener('click', function() {
+                    if (this.disabled) return;
+                    closeAllMultiSelectMenus();
+                    destroyMultiSelectBackdrop();
                     const reportScope = getActiveReportModule();
                     const hasVolumeCurves = csvData && csvData.length > 0;
                     const hasBiomassData  = bioData  && bioData.length  > 0;
@@ -9330,6 +10375,9 @@
             if (btnGenerateFullReport) {
                 console.log('✅ Found btnGenerateFullReport, attaching listener');
                 btnGenerateFullReport.addEventListener('click', function() {
+                    if (this.disabled) return;
+                    closeAllMultiSelectMenus();
+                    destroyMultiSelectBackdrop();
                     const reportScope = getActiveReportModule();
                     const hasVolumeCurves = csvData && csvData.length > 0;
                     const hasBiomassData  = bioData  && bioData.length  > 0;
@@ -10493,12 +11541,15 @@
         }
 
         function readVolSafeModalFilters() {
+            const ylds = getCheckedValues('.vol-safe-yield-checkbox').map(v => String(v).trim().toUpperCase());
             return {
                 showStrata: !!(document.getElementById('volSafeTypeStrata') && document.getElementById('volSafeTypeStrata').checked),
                 showStand: !!(document.getElementById('volSafeTypeStand') && document.getElementById('volSafeTypeStand').checked),
                 yfu: getCheckedValues('.vol-safe-yfu-checkbox').map(v => String(v).trim().toUpperCase()),
-                strataYield: getCheckedValues('.vol-safe-strata-yield-checkbox').map(v => String(v).trim().toUpperCase()),
-                standYield: getCheckedValues('.vol-safe-stand-yield-checkbox').map(v => String(v).trim().toUpperCase()),
+                // Shared YIELD for STRATA + STAND/POLYGON
+                strataYield: ylds,
+                standYield: ylds,
+                yield: ylds,
                 leadspc: getCheckedValues('.vol-safe-leadspc-checkbox'),
                 applyLeadspc: !!(document.getElementById('volSafeTypeStand') && document.getElementById('volSafeTypeStand').checked),
                 silsys: getCheckedValues('.vol-safe-silsys-checkbox').map(v => String(v).trim().toUpperCase()),
@@ -10515,13 +11566,12 @@
             if (!filters.yfu || filters.yfu.length === 0) {
                 return 'Select at least one Forest Unit (yFU). Empty means nothing is loaded.';
             }
-            if (filters.showStrata && catalog.strataYield && catalog.strataYield.length > 0 &&
+            const catalogYields = [
+                ...new Set([...(catalog.strataYield || []), ...(catalog.standYield || []), ...(catalog.yield || [])])
+            ];
+            if ((filters.showStrata || filters.showStand) && catalogYields.length > 0 &&
                 (!filters.strataYield || filters.strataYield.length === 0)) {
-                return 'Select at least one STRATA YIELD scenario. Empty means no STRATA rows are loaded.';
-            }
-            if (filters.showStand && catalog.standYield && catalog.standYield.length > 0 &&
-                (!filters.standYield || filters.standYield.length === 0)) {
-                return 'Select at least one STAND/POLYGON YIELD scenario.';
+                return 'Select at least one Yield Scenario. Empty means no rows with YIELD are loaded.';
             }
             if (filters.showStand && catalog.leadspc && catalog.leadspc.length > 0 &&
                 filters.applyLeadspc && (!filters.leadspc || filters.leadspc.length === 0)) {
@@ -10562,9 +11612,10 @@
             }
             const stats = document.getElementById('volLargeFileCatalogStats');
             if (stats) {
+                const unionYield = [...new Set([...(catalog.strataYield || []), ...(catalog.standYield || [])])].sort();
                 stats.textContent =
                     `Types: ${catalog.types.join(', ') || 'n/a (legacy STRATA)'} · ` +
-                    `STRATA YIELDs: ${catalog.strataYield.length} · STAND YIELDs: ${catalog.standYield.length} · LEADSPC: ${catalog.leadspc.length}` +
+                    `YIELDs: ${unionYield.length} · LEADSPC: ${catalog.leadspc.length}` +
                     (catalog.isGlsl ? ` · GLSL SILSYS: ${catalog.silsys.join(', ')}` : ' · not GLSL');
             }
 
@@ -10576,23 +11627,14 @@
             const yfuDefaults = catalog.yfu.length > 3 ? [catalog.yfu[0]] : catalog.yfu.slice();
             populateSafeCheckboxGroup('volSafeYfuCheckboxes', catalog.yfu, 'vol-safe-yfu-checkbox', 'vol_safe_yfu', yfuDefaults, false);
 
-            const strataYldSec = document.getElementById('volSafeStrataYieldSection');
-            if (strataYldSec) {
-                if (catalog.strataYield.length) {
-                    strataYldSec.style.display = 'block';
-                    populateSafeCheckboxGroup('volSafeStrataYieldCheckboxes', catalog.strataYield, 'vol-safe-strata-yield-checkbox', 'vol_safe_sy', catalog.strataYield, false);
+            const unionYield = [...new Set([...(catalog.strataYield || []), ...(catalog.standYield || [])])].sort();
+            const yldSec = document.getElementById('volSafeYieldSection');
+            if (yldSec) {
+                if (unionYield.length) {
+                    yldSec.style.display = 'block';
+                    populateSafeCheckboxGroup('volSafeYieldCheckboxes', unionYield, 'vol-safe-yield-checkbox', 'vol_safe_y', unionYield, false);
                 } else {
-                    strataYldSec.style.display = 'none';
-                }
-            }
-
-            const standYldSec = document.getElementById('volSafeStandYieldSection');
-            if (standYldSec) {
-                if (catalog.standYield.length) {
-                    standYldSec.style.display = 'none'; // until STAND checked
-                    populateSafeCheckboxGroup('volSafeStandYieldCheckboxes', catalog.standYield, 'vol-safe-stand-yield-checkbox', 'vol_safe_sty', catalog.standYield, false);
-                } else {
-                    standYldSec.style.display = 'none';
+                    yldSec.style.display = 'none';
                 }
             }
 
@@ -10848,6 +11890,45 @@
             populateBiomassCheckboxes('bioYieldCheckboxes',   bioYieldTypes,   'bio-yield-checkbox');
             populateBiomassCheckboxes('bioLeadspcCheckboxes', bioLeadspcTypes, 'bio-leadspc-checkbox');
 
+            // Polygon IDs from STAND/POLYGON biomass rows (cap for large POLYGON files)
+            uniqueBioPolygonIDs = [];
+            const bioIdCol = bioColumnMap.standId || bioColumnMap.polygonID;
+            if (bioIdCol && bioStandCurves && bioStandCurves.length) {
+                const idSet = new Set();
+                let overCap = false;
+                for (let i = 0; i < bioStandCurves.length; i++) {
+                    const r = bioStandCurves[i];
+                    const id = String(cellByHeader(r, bioIdCol) ?? r[bioIdCol] ?? '').trim();
+                    if (!id) continue;
+                    idSet.add(id);
+                    if (idSet.size > MAX_POLYGON_ID_CHECKBOXES) {
+                        overCap = true;
+                        break;
+                    }
+                }
+                if (overCap) {
+                    uniqueBioPolygonIDs = new Array(MAX_POLYGON_ID_CHECKBOXES + 1)
+                        .fill(0).map((_, i) => '__many_' + i);
+                } else {
+                    uniqueBioPolygonIDs = [...idSet].sort((a, b) => {
+                        const na = Number(a), nb = Number(b);
+                        if (Number.isFinite(na) && Number.isFinite(nb)) return na - nb;
+                        return String(a).localeCompare(String(b), undefined, { numeric: true });
+                    });
+                }
+            }
+
+            uniqueBioBorealSI = [];
+            if (!isGlslBiomass && bioColumnMap.siteIndex) {
+                const siSet = new Set();
+                for (let i = 0; i < data.length; i++) {
+                    const s = normalizeSi(cellByHeader(data[i], bioColumnMap.siteIndex));
+                    if (isNormalizedPresent(s)) siSet.add(s);
+                    if (siSet.size > 5000) break;
+                }
+                uniqueBioBorealSI = [...siSet].sort((a, b) => Number(a) - Number(b));
+            }
+
             const glslBioSec = document.getElementById('glslBiomassSection');
             if (glslBioSec) {
                 if (isGlslBiomass) {
@@ -10855,11 +11936,30 @@
                     populateCheckboxGroup('bioSilSysCheckboxes', uniqueBioSilSys, 'bio-silsys-checkbox', 'bio_silsys', uniqueBioSilSys);
                     populateCheckboxGroup('bioCutCheckboxes', uniqueBioCut, 'bio-cut-checkbox', 'bio_cut', pickDefaultCut(uniqueBioCut));
                     populateCheckboxGroup('bioAgsfrcCheckboxes', uniqueBioAgsfrc, 'bio-agsfrc-checkbox', 'bio_agsfrc', pickDefaultAgsfrc(uniqueBioAgsfrc));
-                    populateCheckboxGroup('bioStrataSiCheckboxes', uniqueBioStrataSI, 'bio-strata-si-checkbox', 'bio_si', pickDefaultSI(uniqueBioStrataSI));
+                    // SI: min/max range UI (not multi-select)
                 } else {
                     glslBioSec.style.display = 'none';
                 }
             }
+
+            populatePolygonIdFilterUI({
+                sectionId: 'bioPolygonIdSection',
+                checkboxModeId: 'bioPolygonIdCheckboxMode',
+                textModeId: 'bioPolygonIdTextMode',
+                checkboxContainerId: 'bioPolygonIdCheckboxes',
+                textHintId: 'bioPolygonIdTextHint',
+                textInputId: 'bioPolygonIdTextFilter',
+                ids: uniqueBioPolygonIDs,
+                cssClass: 'bio-polygon-id-checkbox',
+                idPrefix: 'bio_poly_id'
+            });
+            const bioSiForRange = isGlslBiomass ? uniqueBioStrataSI : uniqueBioBorealSI;
+            populateBorealSiRangeUI(
+                'bioBorealSiRangeSection',
+                'bioSiMin',
+                'bioSiMax',
+                bioSiForRange
+            );
 
             // Large multi-FU files: default to first FU only so the first plot stays responsive
             let defaultNote = '';
@@ -10867,6 +11967,7 @@
                 document.querySelectorAll('.bio-yyc-checkbox').forEach((cb, i) => {
                     cb.checked = i === 0;
                 });
+                refreshMultiSelectLabel(document.getElementById('bioYYCCheckboxes'));
                 defaultNote = ` Showing ${uniqueBioYYCs[0]} by default — select more FUs and click Apply.`;
             }
 
@@ -10889,6 +11990,8 @@
 
             document.getElementById('bioUploadZone').style.display         = 'none';
             document.getElementById('bioFileStatus').textContent           = fileName;
+            const bioClearBtnShow = document.getElementById('bioClearBtn');
+            if (bioClearBtnShow) bioClearBtnShow.style.display = 'block';
             document.getElementById('bioColumnMappingAlert').style.display = 'block';
             document.getElementById('bioColumnMappingText').textContent    =
                 `Loaded ${data.length.toLocaleString()} rows · ${isGlslBiomass ? 'GLSL' : 'BOREAL'} · FU: "${fuCol}" · ID: "${bioColumnMap.standId}" · AGE: "${bioColumnMap.age}" · Biomass: "${bioColumnMap.bioTotalBiomass || bioColumnMap.bioWood}" · STRATA: ${bioStrataCurves.length.toLocaleString()} · STAND/POLYGON: ${bioStandCurves.length.toLocaleString()}.${defaultNote}`;
@@ -10916,6 +12019,7 @@
             } catch (e) {
                 setTimeout(() => updateBiomassPlot(), 80);
             }
+            if (typeof updateReportUiState === 'function') updateReportUiState();
         }
 
         function getBiomassGlslSelections() {
@@ -10929,29 +12033,31 @@
             document.querySelectorAll('.bio-cut-checkbox').forEach(cb => { cb.checked = true; });
             if (mode === 'all') {
                 document.querySelectorAll('.bio-agsfrc-checkbox').forEach(cb => { cb.checked = true; });
-                document.querySelectorAll('.bio-strata-si-checkbox').forEach(cb => { cb.checked = true; });
-                console.log('🌿 Full report biomass GLSL SE mode=all');
+                const bioSiMin = document.getElementById('bioSiMin');
+                const bioSiMax = document.getElementById('bioSiMax');
+                if (bioSiMin) bioSiMin.value = '';
+                if (bioSiMax) bioSiMax.value = '';
+                console.log('🌿 Full report biomass GLSL SE mode=all — SI range open');
             } else {
                 const defAgs = new Set(pickFullReportAgsfrc(uniqueBioAgsfrc));
                 document.querySelectorAll('.bio-agsfrc-checkbox').forEach(cb => { cb.checked = defAgs.has(cb.value); });
-                const defSi = new Set(pickFullReportSI(uniqueBioStrataSI));
-                document.querySelectorAll('.bio-strata-si-checkbox').forEach(cb => { cb.checked = defSi.has(cb.value); });
-                console.log('🌿 Full report biomass GLSL SE mode=grid — AGSFRC:', [...defAgs], 'SI:', [...defSi]);
+                const gridSi = pickFullReportSI(uniqueBioStrataSI).map(Number).filter(Number.isFinite);
+                const bioSiMin = document.getElementById('bioSiMin');
+                const bioSiMax = document.getElementById('bioSiMax');
+                if (gridSi.length && bioSiMin && bioSiMax) {
+                    bioSiMin.value = String(Math.min(...gridSi));
+                    bioSiMax.value = String(Math.max(...gridSi));
+                }
+                console.log('🌿 Full report biomass GLSL SE mode=grid — AGSFRC:', [...defAgs], 'SI range:', bioSiMin && bioSiMin.value, '–', bioSiMax && bioSiMax.value);
             }
+            refreshAllMultiSelectLabels(document.getElementById('glslBiomassSection'));
         }
 
         function populateBiomassCheckboxes(containerId, values, cssClass) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
-            values.forEach(val => {
-                const safeVal = String(val);
-                const safeId  = `bio_cb_${containerId}_${safeVal}`.replace(/[^a-zA-Z0-9_\-]/g, '_');
-                const div = document.createElement('div');
-                div.className = 'form-check';
-                div.innerHTML = `<input class="form-check-input ${cssClass}" type="checkbox" value="${safeVal.replace(/"/g, '&quot;')}" id="${safeId}" checked>
-                    <label class="form-check-label" for="${safeId}">${safeVal}</label>`;
-                container.appendChild(div);
-            });
+            // Multi-select dropdown; default all selected (existing biomass behaviour)
+            const list = values || [];
+            const prefix = `bio_cb_${containerId}`;
+            populateCheckboxGroup(containerId, list, cssClass, prefix, list);
         }
 
         // ============================================================================
@@ -11028,10 +12134,10 @@
                     const missing = [];
                     if (uniqueBioCut.length > 0 && filters.cut.length === 0) missing.push('CUT');
                     if (uniqueBioAgsfrc.length > 0 && filters.agsfrc.length === 0) missing.push('AGSFRC');
-                    if (uniqueBioStrataSI.length > 0 && filters.si.length === 0) missing.push('SI');
+                    // SI uses min/max range (blank = all SI)
                     if (missing.length) {
                         alert('⚠️ GLSL SE biomass needs finer filters:\n\n• ' + missing.join('\n• ') +
-                              '\n\nNote: AGSFRC 0 is a valid value; empty selection excludes all SE.');
+                              '\n\nNote: AGSFRC 0 is a valid value; empty selection excludes all SE.\nSI: use SI range min/max (blank = all).');
                         return;
                     }
                 }
@@ -11379,7 +12485,7 @@
         }
 
         // ── Biomass plot host helpers (tab-safe Plotly rendering) ──────────
-        let _pendingBiomassPlot = null;
+        // (_pendingBiomassPlot declared with other biomass state above)
 
         function showBiomassPlotContainer(visible) {
             const box = document.getElementById('biomassPlotContainer');
@@ -11601,11 +12707,14 @@
                 const miss = [];
                 if (uniqueBioCut.length > 0 && (!f.cut || !f.cut.length)) miss.push('CUT');
                 if (uniqueBioAgsfrc.length > 0 && (!f.agsfrc || !f.agsfrc.length)) miss.push('AGSFRC');
-                if (uniqueBioStrataSI.length > 0 && (!f.si || !f.si.length)) miss.push('SI');
+                // SI uses min/max range (blank = all); only flag legacy checkbox SI if present
+                if (f.si && f.si.length === 0 && document.querySelectorAll('.bio-strata-si-checkbox').length > 0) {
+                    miss.push('SI');
+                }
                 if (miss.length) {
                     return {
                         summary: 'GLSL SE is selected but finer filters are empty: ' + miss.join(', ') + '.',
-                        detail: 'Select CUT / AGSFRC / SI values (AGSFRC 0 is valid), then Apply.'
+                        detail: 'Select CUT / AGSFRC (AGSFRC 0 is valid). SI: use SI range min/max (blank = all), then Apply.'
                     };
                 }
             }
@@ -12153,6 +13262,8 @@
                     cut: isGlslBiomass ? cutForReport : (bioFilters.cut || []),
                     agsfrc: isGlslBiomass ? agsForReport : (bioFilters.agsfrc || []),
                     si: isGlslBiomass ? siForReport : (bioFilters.si || [])
+                    // siMin/siMax come from bioFilters as set by Full Report defaults
+                    // (open or SE grid) or from the interactive sidebar for Filtered Report
                 });
                 const fuSplit = splitFilteredByType(bioData, fuFilterState, bioColumnMap, {
                     strataYield: yieldForReport,
@@ -12329,11 +13440,11 @@
                 const metaStand = panels.standCount != null ? panels.standCount : '—';
 
                 html += `
-    <div style="page-break-before:always; margin-top:40px;">
-        <h3 style="color:#0d6efd; font-size:22px; border-bottom:3px solid #0d6efd; padding-bottom:10px; page-break-after:avoid;">
+    <div style="page-break-before:always; margin-top:56px;">
+        <h3 style="color:#0d6efd; font-size:26px; font-weight:700; border-bottom:3px solid #0d6efd; padding-bottom:12px; page-break-after:avoid;">
             🌿 Forest Unit: ${yYC}
         </h3>
-        <p style="color:#666; font-size:13px; margin:6px 0 16px 0;">
+        <p style="color:#666; font-size:14px; margin:8px 0 20px 0;">
             STRATA: <strong>${metaStrata}</strong> · POLYGON: <strong>${metaStand}</strong>
         </p>
         <h4 style="color:#198754; margin:16px 0 8px 0;">Per-FU dashboard (A–K)</h4>
@@ -12533,18 +13644,15 @@ SOFTWARE.</pre>
                                 <button type="button" class="btn btn-sm btn-outline-secondary" id="volSafeSelectNoneYfu">None</button>
                             </div>
                         </div>
-                        <div class="col-md-6" id="volSafeStrataYieldSection" style="display:none;">
-                            <label class="form-label fw-semibold">📈 STRATA YIELD *</label>
-                            <div class="checkbox-group" id="volSafeStrataYieldCheckboxes" style="max-height:140px;"></div>
-                            <div class="btn-group-custom">
-                                <button type="button" class="btn btn-sm btn-outline-primary" id="volSafeSelectAllStrataYield">All</button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary" id="volSafeSelectNoneStrataYield">None</button>
+                        <div class="col-md-6" id="volSafeYieldSection" style="display:none;">
+                            <label class="form-label small fw-semibold">Yield Scenarios (STRATA + STAND)</label>
+                            <div class="checkbox-group" id="volSafeYieldCheckboxes" style="max-height:140px;"></div>
+                            <div class="btn-group-custom mt-1">
+                                <button type="button" class="btn btn-sm btn-outline-primary" id="volSafeSelectAllYield">All</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="volSafeSelectNoneYield">None</button>
                             </div>
                         </div>
-                        <div class="col-md-6" id="volSafeStandYieldSection" style="display:none;">
-                            <label class="form-label fw-semibold">📈 STAND / POLYGON YIELD *</label>
-                            <div class="checkbox-group" id="volSafeStandYieldCheckboxes" style="max-height:140px;"></div>
-                            <div class="btn-group-custom">
+<div class="btn-group-custom">
                                 <button type="button" class="btn btn-sm btn-outline-primary" id="volSafeSelectAllStandYield">All</button>
                                 <button type="button" class="btn btn-sm btn-outline-secondary" id="volSafeSelectNoneStandYield">None</button>
                             </div>
