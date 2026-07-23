@@ -822,10 +822,25 @@
                         <strong id="reportCapHint">~60</strong> STRATA curves per panel for browser stability.
                     </small>
                 </div>
+
+                <div class="border rounded p-2 mb-2 bg-light" id="reportFuCapBox">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="reportLimitFus" value="1">
+                        <label class="form-check-label small" for="reportLimitFus">
+                            Limit report to <strong id="reportFuCapLabel">10</strong> Forest Units
+                            <span class="text-muted">(optional · faster / older browsers)</span>
+                        </label>
+                    </div>
+                    <small class="text-muted d-block mt-1">
+                        <strong>Default (unchecked):</strong> include <em>all</em> selected FUs (e.g. FSF’s 22 in one report).
+                        Per-panel STRATA sampling remains the main stability guard — not FU count.
+                    </small>
+                </div>
                 
                 <small class="text-muted d-block">
-                    💡 <strong>Filtered:</strong> Uses your sidebar selections (after Apply) — can be denser than Full if you Select All on SE.<br>
-                    💡 <strong>Full:</strong> Auto-selects all FUs / yields / species; GLSL SE uses the density option above. Volume + biomass both included when both CSVs are loaded.
+                    💡 <strong>Active module only:</strong> Report uses the open tab (Volume or Biomass) — never merges both. Volume and biomass curves use different methodologies; keep them in separate reports.<br>
+                    💡 <strong>Filtered:</strong> Uses that module’s sidebar selections (after Apply) — can be denser than Full if you Select All on SE.<br>
+                    💡 <strong>Full:</strong> Auto-selects all FUs / yields / species for the active module; GLSL SE uses the density option above. All FUs are included unless the limit box above is checked.
                 </small>
             </div>
             
@@ -888,34 +903,17 @@
                     Prefer filtering first in Excel Power Query when possible.
                 </p>
             </div>
-            
-            <!-- Report Generation Loading Overlay -->
-            <div id="reportLoadingOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 9999; backdrop-filter: blur(5px);">
-                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white;">
-                    <div class="spinner-border text-success" role="status" style="width: 4rem; height: 4rem; border-width: 0.4rem; margin-bottom: 2rem;">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <h3 style="color: white; margin-bottom: 1rem; font-weight: 600;">🎄 Generating Report...</h3>
-                    <p id="reportProgress" style="color: #adb5bd; font-size: 1.1rem; margin-bottom: 0.5rem;">Initializing...</p>
-                    <p style="color: #6c757d; font-size: 0.9rem; margin-top: 1rem;">⏱️ This may take 10-30 seconds for large datasets</p>
-                    <div style="margin-top: 2rem;">
-                        <div class="progress" style="width: 400px; height: 8px; background-color: rgba(255, 255, 255, 0.1);">
-                            <div id="reportProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <!-- Column Mapping Info -->
             <div id="columnMappingAlert" class="alert alert-info alert-column-mapping" role="alert" style="display: none;">
                 <strong>📋 Column Mapping:</strong> <span id="columnMappingText">Detecting columns...</span>
             </div>
             
-            <!-- Volume overview + volume-native per-FU panels (species NMV / structure — not biomass A–H) -->
+            <!-- Volume overview + official A–H per-FU panels (volume CSV only) -->
             <div class="plot-container" style="display: none;" id="plotContainer">
                 <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
                     <h5 class="mb-0 text-primary">📈 Overview — all selected Forest Units</h5>
-                    <small class="text-muted">Age vs NMV/GMV/GTV/BA · Per-FU volume panels below · Biomass A–H is on the <strong>Biomass</strong> tab</small>
+                    <small class="text-muted">Age vs NMV/GMV/GTV/BA · Per-FU volume A–H below · Biomass A–K is on the <strong>Biomass</strong> tab</small>
                 </div>
                 <div id="plot" style="width:100%; height:600px; min-height:600px;"></div>
                 <div id="volumeDashboardHost" aria-live="polite"></div>
@@ -956,7 +954,7 @@
                     <small class="text-muted" id="biomassPlotMeta"></small>
                 </div>
                 <div id="biomassPlot" style="width:100%; height:600px; min-height:600px;"></div>
-                <!-- Per-FU A–H: Biomass · structure · Log (biomass module home) -->
+                <!-- Per-FU A–K official grid (same layout as biomass report) -->
                 <div id="bioDashboardHost" aria-live="polite"></div>
             </div>
             
@@ -966,7 +964,7 @@
         </div>
     </div>
     
-    <!-- Loading Spinner -->
+    <!-- Loading Spinner (document-level — not inside Volume/Biomass tabs) -->
     <div id="loadingSpinner" class="spinner-overlay" style="display: none;">
         <div class="spinner-content">
             <div class="spinner-border text-primary mb-3" role="status">
@@ -974,6 +972,27 @@
             </div>
             <h5 id="loadingSpinnerTitle">Processing data...</h5>
             <p class="text-muted mb-0" id="loadingSpinnerDetail">This may take a moment for large files</p>
+        </div>
+    </div>
+
+    <!--
+      Report progress overlay MUST live outside tab panes (#nav-volume / #nav-biomass).
+      When nested inside #nav-volume, Bootstrap hides that pane on the Biomass tab and
+      the fixed overlay never appears for biomass reports (volume still looked fine).
+    -->
+    <div id="reportLoadingOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 20000; backdrop-filter: blur(5px);">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white; max-width: 90vw;">
+            <div class="spinner-border text-success" role="status" style="width: 4rem; height: 4rem; border-width: 0.4rem; margin-bottom: 2rem;">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <h3 id="reportLoadingTitle" style="color: white; margin-bottom: 1rem; font-weight: 600;">🎄 Generating Report...</h3>
+            <p id="reportProgress" style="color: #adb5bd; font-size: 1.1rem; margin-bottom: 0.5rem;">Initializing...</p>
+            <p style="color: #6c757d; font-size: 0.9rem; margin-top: 1rem;">⏱️ Large multi-FU reports (volume A–H or biomass A–K) can take several minutes</p>
+            <div style="margin-top: 2rem; display: flex; justify-content: center;">
+                <div class="progress" style="width: min(400px, 85vw); height: 10px; background-color: rgba(255, 255, 255, 0.15);">
+                    <div id="reportProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -3658,26 +3677,27 @@
 
         // ============================================
         // PHASE 3 — PER-FU MULTI-PANEL DASHBOARD
-        // A–B Biomass | C–D NMV | E–I structure | J Log_* multi-series
+        // Biomass official grid A–K (same order in app + report)
+        // STRATA foreground · POLYGON thin background when selected
         // ============================================
 
         /** Performance guardrails for interactive multi-panel dashboards. */
         const DASHBOARD_MAX_FUS = 3;
-        // STAND cloud belongs on the main biomass overview — multi-panel A–H is STRATA-first
-        // (350 STAND × 6–8 panels blanked Plotly hosts: titles only, white bodies).
-        const DASHBOARD_MAX_STAND_TRACES = 0;
+        // POLYGON as thin background on BOTH panels (rough-idea cloud; main overview stays above)
+        const DASHBOARD_MAX_STAND_TRACES = 80;
         const DASHBOARD_MAX_STRATA_TRACES = 48;
         const DASHBOARD_PANEL_HEIGHT = 380;
         const DASHBOARD_PANEL_WIDE_HEIGHT = 420;
 
         /**
-         * Report generation caps — full FSF files (20+ FUs × 8 panels × Plotly PNG)
-         * previously froze/crashed the tab (esp. with F12 open).
-         * Raised slightly so dense GLSL FUs (e.g. HDSL1) keep more SE diversity
-         * while remaining browser-safe. Even sampling still applies when over cap.
+         * Report generation caps.
+         * FU count is no longer hard-capped by default (FSF has ~22 units; a fixed 10
+         * forced multi-batch reports). Optional 10-FU limit is a user checkbox.
+         * Real browser safety comes from per-panel STRATA sampling + minimal STAND traces.
          */
-        const REPORT_MAX_FUS = 10;
-        const REPORT_MAX_STAND_TRACES = 0;   // structure panels: STRATA only (huge win)
+        const REPORT_OPTIONAL_FU_CAP = 10;   // only when #reportLimitFus is checked
+        const REPORT_SOFT_WARN_FUS = 25;     // confirm when more FUs than this (time, not hard fail)
+        const REPORT_MAX_STAND_TRACES = 80;  // POLYGON background sample on BOTH panels
         const REPORT_MAX_STRATA_TRACES = 60; // SE even-sample cap per panel (was 36)
         const REPORT_MAX_LOG_SERIES = 10;   // Log_XX series; each SE key × log is capped overall
         const REPORT_PNG_W = 700;
@@ -3687,16 +3707,90 @@
         const REPORT_MAX_STAND_CLOUD_IDS = 150;
         const REPORT_QUIET = true; // suppress per-panel console noise during report
 
-        // Keep sidebar hint in sync with live constants
+        /** @deprecated use getReportFuCap() — kept as alias for any external refs */
+        const REPORT_MAX_FUS = REPORT_OPTIONAL_FU_CAP;
+
+        /**
+         * Active report FU limit. Infinity = all selected/all FUs (default).
+         * Optional checkbox restores the old 10-FU safety cap.
+         */
+        function getReportFuCap() {
+            const el = document.getElementById('reportLimitFus');
+            if (el && el.checked) {
+                const n = Number(REPORT_OPTIONAL_FU_CAP);
+                return (Number.isFinite(n) && n > 0) ? n : 10;
+            }
+            return Infinity;
+        }
+
+        function isReportFuCapEnabled() {
+            return Number.isFinite(getReportFuCap());
+        }
+
+        /**
+         * Slice FU list per current cap; returns { list, total, cap, skipped, limited }.
+         */
+        function applyReportFuCap(fuList) {
+            const list = Array.isArray(fuList) ? fuList.slice() : [];
+            const total = list.length;
+            const cap = getReportFuCap();
+            if (!Number.isFinite(cap) || total <= cap) {
+                return { list, total, cap: Number.isFinite(cap) ? cap : null, skipped: [], limited: false };
+            }
+            return {
+                list: list.slice(0, cap),
+                total,
+                cap,
+                skipped: list.slice(cap),
+                limited: true
+            };
+        }
+
+        /** Estimate how many FUs a report will try to render (before optional cap). */
+        function estimateReportFuCount(reportScope, isFullReport) {
+            if (reportScope === 'biomass') {
+                const checked = document.querySelectorAll('.bio-yyc-checkbox:checked').length;
+                const all = document.querySelectorAll('.bio-yyc-checkbox').length;
+                if (isFullReport) return all || (typeof uniqueBioYYCs !== 'undefined' ? uniqueBioYYCs.length : 0) || checked;
+                return checked || (typeof uniqueBioYYCs !== 'undefined' ? uniqueBioYYCs.length : 0);
+            }
+            const checked = document.querySelectorAll('.yfu-checkbox:checked').length;
+            const all = document.querySelectorAll('.yfu-checkbox').length;
+            if (isFullReport) return all || checked;
+            return checked;
+        }
+
+        /**
+         * Soft time warning only (not a hard cap). Returns false if user cancels.
+         */
+        function confirmLargeFuReportIfNeeded(reportScope, isFullReport) {
+            if (isReportFuCapEnabled()) return true;
+            const n = estimateReportFuCount(reportScope, isFullReport);
+            if (!n || n <= REPORT_SOFT_WARN_FUS) return true;
+            return confirm(
+                `This ${isFullReport ? 'Full' : 'Filtered'} report will include about ${n} Forest Units ` +
+                `(module: ${reportScope === 'biomass' ? 'Biomass' : 'Volume'}).\n\n` +
+                `That is fine for most machines (FSF-sized runs are supported), but generation can take several minutes ` +
+                `and produce a large HTML file.\n\n` +
+                `Tip: check “Limit report to ${REPORT_OPTIONAL_FU_CAP} Forest Units” for a smaller batch, ` +
+                `or keep going for one complete report.\n\nContinue?`
+            );
+        }
+
+        // Keep sidebar hints in sync with live constants
         try {
             const capHint = document.getElementById('reportCapHint');
             if (capHint) capHint.textContent = '~' + REPORT_MAX_STRATA_TRACES;
+            const fuCapLabel = document.getElementById('reportFuCapLabel');
+            if (fuCapLabel) fuCapLabel.textContent = String(REPORT_OPTIONAL_FU_CAP);
         } catch (e) { /* ignore */ }
 
         const DASHBOARD_METRIC_CAPS = {
             biomass: BIOMASS_METRIC_CAP,
+            biomassComponents: BIOMASS_METRIC_CAP,
             nmv: 5000,
             nmvSpecies: 5000,
+            gtv: 8000,
             maxDbh: 200,
             dbhq: 200,
             stems: 20000,
@@ -3706,140 +3800,192 @@
         };
 
         /**
-         * Biomass tab / biomass-report catalog (A–H). Do not use for volume SE10 files.
-         * multiColKind: 'log' for multi-Y Log_XX series
+         * Biomass tab / biomass-report catalog (official A–K).
+         * Same defs drive in-app per-FU grid and HTML report (no separate Detail section).
+         * Data source: biomass CSV only (includes recalculated volume columns).
+         * type BOTH = STRATA foreground + POLYGON thin background when selected.
+         * type STRATA = STRATA only (empty if only POLYGON is selected).
          */
         const DASHBOARD_PANEL_DEFS = [
             {
                 id: 'A', letter: 'A',
-                title: 'Biomass vs Age (STRATA)',
-                type: 'STRATA', metric: 'biomass',
-                yLabel: 'Biomass (Mg/ha)',
-                colKeys: ['bioTotalBiomass'],
-                colHints: ['Biomass', 'TotalBiomass', 'TOTAL_BIOMASS']
+                title: 'NMV vs Age',
+                type: 'BOTH', metric: 'nmv',
+                yLabel: 'NMV (m³/ha)',
+                colKeys: ['netMerchVolume'],
+                colHints: ['NMV', 'nmv', 'NetMerchVolume'],
+                sourceModule: 'biomass'
             },
             {
                 id: 'B', letter: 'B',
-                title: 'Biomass vs Age (STAND/POLYGON)',
-                type: 'STAND', metric: 'biomass',
-                yLabel: 'Biomass (Mg/ha)',
-                colKeys: ['bioTotalBiomass'],
-                colHints: ['Biomass', 'TotalBiomass', 'TOTAL_BIOMASS']
+                title: 'NMV Total & by Species vs Age',
+                type: 'STRATA', metric: 'nmvSpecies',
+                yLabel: 'NMV (m³/ha)',
+                multiCol: true,
+                multiColKind: 'nmvTotalAndSpecies',
+                sourceModule: 'biomass'
             },
             {
                 id: 'C', letter: 'C',
-                title: 'MaxDBH vs Age',
-                type: 'BOTH', metric: 'maxDbh',
-                yLabel: 'MaxDBH (cm)',
-                colKeys: ['maxDbh'],
-                colHints: ['MaxDBH', 'MAXDBH', 'Max_DBH', 'max_dbh']
+                title: 'Basal Area vs Age',
+                type: 'BOTH', metric: 'ba',
+                yLabel: 'BA (m²/ha)',
+                colKeys: ['basalArea'],
+                colHints: ['BA', 'ba', 'BasalArea'],
+                sourceModule: 'biomass'
             },
             {
                 id: 'D', letter: 'D',
+                title: 'Height (CDHT / HT) vs Age',
+                type: 'BOTH', metric: 'cdht',
+                yLabel: 'Height (m)',
+                colKeys: ['cdht'],
+                colHints: ['CDHT', 'cdht', 'HT', 'Height', 'DomHT'],
+                sourceModule: 'biomass'
+            },
+            {
+                id: 'E', letter: 'E',
+                title: 'GTV vs Age',
+                type: 'BOTH', metric: 'gtv',
+                yLabel: 'GTV (m³/ha)',
+                colKeys: ['grossTotalVolume'],
+                colHints: ['GTV', 'gtv', 'GrossTotalVolume'],
+                sourceModule: 'biomass'
+            },
+            {
+                id: 'F', letter: 'F',
+                title: 'Stems vs Age',
+                type: 'BOTH', metric: 'stems',
+                yLabel: 'Stems / ha',
+                colKeys: ['stems'],
+                colHints: ['STEMS', 'stems', 'SPH', 'StemsHa'],
+                sourceModule: 'biomass'
+            },
+            {
+                id: 'G', letter: 'G',
                 title: 'DBHQ vs Age',
                 type: 'BOTH', metric: 'dbhq',
                 yLabel: 'DBHQ (cm)',
                 colKeys: ['dbhq'],
-                colHints: ['DBHQ', 'dbhq', 'QMD']
-            },
-            {
-                id: 'E', letter: 'E',
-                title: 'STEMS vs Age',
-                type: 'BOTH', metric: 'stems',
-                yLabel: 'Stems / ha',
-                colKeys: ['stems'],
-                colHints: ['STEMS', 'stems', 'SPH', 'StemsHa']
-            },
-            {
-                id: 'F', letter: 'F',
-                title: 'CDHT vs Age',
-                type: 'BOTH', metric: 'cdht',
-                yLabel: 'Height (m)',
-                colKeys: ['cdht'],
-                colHints: ['CDHT', 'cdht', 'HT', 'Height', 'DomHT']
-            },
-            {
-                id: 'G', letter: 'G',
-                title: 'Basal Area (BA) vs Age',
-                type: 'BOTH', metric: 'ba',
-                yLabel: 'BA (m²/ha)',
-                colKeys: ['basalArea'],
-                colHints: ['BA', 'ba', 'BasalArea']
+                colHints: ['DBHQ', 'dbhq', 'QMD'],
+                sourceModule: 'biomass'
             },
             {
                 id: 'H', letter: 'H',
+                title: 'GMV · GTV · NMV vs Age',
+                type: 'STRATA', metric: 'nmv',
+                yLabel: 'Volume (m³/ha)',
+                multiCol: true,
+                multiColKind: 'volumeStack',
+                sourceModule: 'biomass'
+            },
+            {
+                id: 'I', letter: 'I',
+                title: 'Biomass vs Age',
+                type: 'BOTH', metric: 'biomass',
+                yLabel: 'Biomass (Mg/ha)',
+                colKeys: ['bioTotalBiomass'],
+                colHints: ['Biomass', 'TotalBiomass', 'TOTAL_BIOMASS'],
+                sourceModule: 'biomass'
+            },
+            {
+                id: 'J', letter: 'J',
                 title: 'Log Quality Volumes vs Age',
                 type: 'BOTH', metric: 'log',
                 yLabel: 'Log volume (m³/ha)',
                 multiCol: true,
                 multiColKind: 'log',
-                wide: true
+                sourceModule: 'biomass'
+            },
+            {
+                id: 'K', letter: 'K',
+                title: 'Biomass Components vs Age',
+                type: 'STRATA', metric: 'biomassComponents',
+                yLabel: 'Biomass (Mg/ha)',
+                multiCol: true,
+                multiColKind: 'bioComponents',
+                wide: true,
+                sourceModule: 'biomass'
             }
         ];
 
         /**
-         * Volume tab / volume-report catalog (native metrics for SE10-style files).
-         * Species NMV = bare codes BE, BF, … after NMV (not Log_XX / Biomass).
-         * Structure panels are STRATA-first (same performance lesson as interactive A–H).
+         * Volume tab / volume-report catalog (official A–H).
+         * Same first 4 rows as biomass A–H (no biomass/log/components).
+         * Data source: volume CSV only. STRATA foreground · POLYGON thin background.
          */
         const VOLUME_PANEL_DEFS = [
             {
-                id: 'V1', letter: '1',
-                title: 'NMV vs Age (STRATA)',
-                type: 'STRATA', metric: 'nmv',
+                id: 'A', letter: 'A',
+                title: 'NMV vs Age',
+                type: 'BOTH', metric: 'nmv',
                 yLabel: 'NMV (m³/ha)',
                 colKeys: ['netMerchVolume'],
-                colHints: ['NMV', 'nmv', 'NetMerchVolume']
+                colHints: ['NMV', 'nmv', 'NetMerchVolume'],
+                sourceModule: 'volume'
             },
             {
-                id: 'V2', letter: '2',
-                title: 'NMV by Species vs Age',
+                id: 'B', letter: 'B',
+                title: 'NMV Total & by Species vs Age',
                 type: 'STRATA', metric: 'nmvSpecies',
-                yLabel: 'Species NMV (m³/ha)',
+                yLabel: 'NMV (m³/ha)',
                 multiCol: true,
-                multiColKind: 'bareSpecies',
-                wide: true
+                multiColKind: 'nmvTotalAndSpecies',
+                sourceModule: 'volume'
             },
             {
-                id: 'V3', letter: '3',
-                title: 'GTV · GMV · NMV vs Age',
+                id: 'C', letter: 'C',
+                title: 'Basal Area vs Age',
+                type: 'BOTH', metric: 'ba',
+                yLabel: 'BA (m²/ha)',
+                colKeys: ['basalArea'],
+                colHints: ['BA', 'ba', 'BasalArea'],
+                sourceModule: 'volume'
+            },
+            {
+                id: 'D', letter: 'D',
+                title: 'Height (CDHT / HT) vs Age',
+                type: 'BOTH', metric: 'cdht',
+                yLabel: 'Height (m)',
+                colKeys: ['cdht'],
+                colHints: ['CDHT', 'cdht', 'HT', 'Height', 'DomHT'],
+                sourceModule: 'volume'
+            },
+            {
+                id: 'E', letter: 'E',
+                title: 'GTV vs Age',
+                type: 'BOTH', metric: 'gtv',
+                yLabel: 'GTV (m³/ha)',
+                colKeys: ['grossTotalVolume'],
+                colHints: ['GTV', 'gtv', 'GrossTotalVolume'],
+                sourceModule: 'volume'
+            },
+            {
+                id: 'F', letter: 'F',
+                title: 'Stems vs Age',
+                type: 'BOTH', metric: 'stems',
+                yLabel: 'Stems / ha',
+                colKeys: ['stems'],
+                colHints: ['STEMS', 'stems', 'SPH', 'StemsHa'],
+                sourceModule: 'volume'
+            },
+            {
+                id: 'G', letter: 'G',
+                title: 'DBHQ vs Age',
+                type: 'BOTH', metric: 'dbhq',
+                yLabel: 'DBHQ (cm)',
+                colKeys: ['dbhq'],
+                colHints: ['DBHQ', 'dbhq', 'QMD'],
+                sourceModule: 'volume'
+            },
+            {
+                id: 'H', letter: 'H',
+                title: 'GMV · GTV · NMV vs Age',
                 type: 'STRATA', metric: 'nmv',
                 yLabel: 'Volume (m³/ha)',
                 multiCol: true,
                 multiColKind: 'volumeStack',
-                wide: true
-            },
-            {
-                id: 'V4', letter: '4',
-                title: 'DBHQ vs Age',
-                type: 'STRATA', metric: 'dbhq',
-                yLabel: 'DBHQ (cm)',
-                colKeys: ['dbhq'],
-                colHints: ['DBHQ', 'dbhq', 'QMD']
-            },
-            {
-                id: 'V5', letter: '5',
-                title: 'STEMS vs Age',
-                type: 'STRATA', metric: 'stems',
-                yLabel: 'Stems / ha',
-                colKeys: ['stems'],
-                colHints: ['STEMS', 'stems', 'SPH', 'StemsHa']
-            },
-            {
-                id: 'V6', letter: '6',
-                title: 'Height (HT / CDHT) vs Age',
-                type: 'STRATA', metric: 'cdht',
-                yLabel: 'Height (m)',
-                colKeys: ['cdht'],
-                colHints: ['HT', 'CDHT', 'cdht', 'Height', 'DomHT']
-            },
-            {
-                id: 'V7', letter: '7',
-                title: 'Basal Area (BA) vs Age',
-                type: 'STRATA', metric: 'ba',
-                yLabel: 'BA (m²/ha)',
-                colKeys: ['basalArea'],
-                colHints: ['BA', 'ba', 'BasalArea']
+                sourceModule: 'volume'
             }
         ];
 
@@ -3915,6 +4061,52 @@
                 if (h) found.push(h);
             });
             return found;
+        }
+
+        /**
+         * Total NMV + species breakdown (NMV_XX preferred, else bare BE/BF… after NMV).
+         * Used by biomass panel B (STRATA only).
+         */
+        function detectNmvTotalAndSpeciesColumns(headers) {
+            const nmv = findHeaderByCandidates(headers, ['NMV', 'nmv', 'NetMerchVolume', 'Net_Merch_Volume']);
+            let species = detectNmvSpeciesColumns(headers);
+            if (!species.length) species = detectBareSpeciesNmvColumns(headers);
+            const out = [];
+            if (nmv) out.push(nmv);
+            species.forEach(s => {
+                if (s && out.indexOf(s) < 0) out.push(s);
+            });
+            return out;
+        }
+
+        /**
+         * Biomass component columns: Wood, Bark, Branches, Foliage, Total Biomass.
+         */
+        function detectBioComponentColumns(headers, cmap) {
+            cmap = cmap || bioColumnMap || {};
+            const specs = [
+                { mapped: cmap.bioWood, hints: ['Wood', 'WOOD', 'wood'] },
+                { mapped: cmap.bioBark, hints: ['Bark', 'BARK', 'bark'] },
+                { mapped: cmap.bioBranches, hints: ['Branches', 'BRANCHES', 'branches'] },
+                { mapped: cmap.bioFoliage, hints: ['Foliage', 'FOLIAGE', 'foliage'] },
+                { mapped: cmap.bioTotalBiomass, hints: ['Biomass', 'TotalBiomass', 'TOTAL_BIOMASS', 'Total_Biomass'] }
+            ];
+            const found = [];
+            specs.forEach(sp => {
+                const hints = sp.mapped ? [sp.mapped].concat(sp.hints) : sp.hints;
+                const h = findHeaderByCandidates(headers, hints);
+                if (h && found.indexOf(h) < 0) found.push(h);
+            });
+            return found;
+        }
+
+        /** STRATA is required; POLYGON alone is background only. */
+        function dashboardPanelRequiresStrata(def) {
+            return !def || def.type === 'STRATA' || def.type === 'BOTH';
+        }
+
+        function dashboardStrataRequiredEmptyReason(def) {
+            return 'STRATA required for this panel. POLYGON alone is background only — check STRATA (or STRATA + POLYGON), then Apply.';
         }
 
         function findHeaderFlexible(headers, names) {
@@ -4191,6 +4383,10 @@
                         let lineColor = color;
                         let lineDash = dash;
                         let name = label;
+                        // Emphasize total NMV on panel B (nmvTotalAndSpecies)
+                        const isTotalNmvCol = def.multiColKind === 'nmvTotalAndSpecies' &&
+                            /^nmv$/i.test(headerCompact(col));
+
                         if (multiSpeciesMode) {
                             if (seStyle) {
                                 name = `${label} · ${colLabel}`;
@@ -4198,12 +4394,18 @@
                                 lineDash = seStyle.dash;
                             } else {
                                 name = colLabel;
-                                lineColor = speciesPalette[ci % speciesPalette.length];
+                                lineColor = isTotalNmvCol
+                                    ? '#111111'
+                                    : speciesPalette[ci % speciesPalette.length];
                                 lineDash = 'solid';
                             }
                         } else if (yColsUse.length > 1) {
                             name = `${label} · ${colLabel}`;
                         }
+
+                        const lineWidth = isTotalNmvCol
+                            ? (seStyle ? 3.2 : 3.5)
+                            : (seStyle ? 2.2 : (multiSpeciesMode ? 2.5 : 3));
 
                         traces.push({
                             x: cleaned.ages,
@@ -4215,7 +4417,7 @@
                             showlegend: true,
                             line: {
                                 color: lineColor,
-                                width: seStyle ? 2.2 : (multiSpeciesMode ? 2.5 : 3),
+                                width: lineWidth,
                                 dash: lineDash
                             },
                             marker: { size: seStyle ? 3 : 4, color: lineColor },
@@ -4237,7 +4439,10 @@
          * Prefer the Apply-filtered FU slice (usually bio rows), then bioData, then volume CSV.
          * Never resolve metric name against volume headers only when the slice is biomass.
          */
-        function resolveBiomassPanelSource(def, fu, volumeFuRows) {
+        function resolveBiomassPanelSource(def, fu, volumeFuRows, opts) {
+            opts = opts || {};
+            const bioOnly = opts.bioOnly !== false; // default: biomass CSV only (official design)
+
             function filterByType(rows, cmap, typeWanted) {
                 if (!rows || !rows.length) return [];
                 const typeCol = cmap && cmap.curveType;
@@ -4249,12 +4454,13 @@
                     if (!typeCol) return [];
                     return rows.filter(r => isStandType(cellByHeader(r, typeCol)));
                 }
+                // BOTH / default: keep all typed rows
                 return rows.slice();
             }
 
             function metricFrom(headers, cmapBase) {
                 const cmap = enrichCmapForSe(
-                    Object.assign({}, columnMap || {}, bioColumnMap || {}, cmapBase || {}),
+                    Object.assign({}, bioColumnMap || {}, columnMap || {}, cmapBase || {}),
                     headers
                 );
                 const yCol = resolveDashboardMetricCol(def, cmap, headers) ||
@@ -4278,7 +4484,7 @@
                 if (yCol) {
                     const rows = filterByType(volumeFuRows, cmap, def.type);
                     if (rows.length) {
-                        return { rows, yCols: [yCol], cmap, source: 'filtered FU slice' };
+                        return { rows, yCols: [yCol], cmap, source: 'filtered biomass FU slice' };
                     }
                 }
             }
@@ -4310,8 +4516,8 @@
                 }
             }
 
-            // 3) Volume CSV (only if it actually has Biomass-like columns)
-            if (csvData && csvData.length) {
+            // 3) Volume CSV only if explicitly allowed (not for official biomass A–K)
+            if (!bioOnly && csvData && csvData.length) {
                 const headers = Object.keys(csvData[0] || {});
                 const { yCol, cmap } = metricFrom(headers, columnMap);
                 if (yCol) {
@@ -4348,6 +4554,11 @@
                 <div class="fu-dashboard__grid"></div>
             `;
             return section;
+        }
+
+        /** Meta line for official biomass FU title: STRATA: n · POLYGON: n */
+        function formatBioFuDashboardMeta(nStrata, nPolygon) {
+            return `STRATA: ${nStrata != null ? nStrata : 0} · POLYGON: ${nPolygon != null ? nPolygon : 0}`;
         }
 
         function renderPanelEmpty(hostEl, title, message) {
@@ -4416,25 +4627,70 @@
             return idx.get(fuU) || [];
         }
 
-        function headersForDashboardRows(rows) {
+        function headersForDashboardRows(rows, sourceModule) {
             if (rows && rows.length) return Object.keys(rows[0]);
+            if (sourceModule === 'biomass') {
+                if (bioData && bioData.length) return Object.keys(bioData[0]);
+                return [];
+            }
+            if (sourceModule === 'volume') {
+                if (csvData && csvData.length) return Object.keys(csvData[0]);
+                return [];
+            }
             if (csvData && csvData.length) return Object.keys(csvData[0]);
             if (bioData && bioData.length) return Object.keys(bioData[0]);
             return [];
         }
 
         function prepareDashboardPanelData(def, fu, volumeFuRows) {
-            // Prefer Apply-filtered slice; else O(1) FU index (never re-scan full table per panel)
+            const bioOnly = def.sourceModule === 'biomass';
+            const volOnly = def.sourceModule === 'volume';
+
+            // Prefer Apply-filtered FU slice; never cross-mix volume/biomass CSVs for official grids
             let rows = collectRowsForDashboardFu(fu, volumeFuRows);
-            const headersProbe = headersForDashboardRows(rows);
-            const needsVolumeMetrics = def.metric !== 'biomass';
+            if (bioOnly && (!volumeFuRows || !volumeFuRows.length)) {
+                // Re-slice from biomass table only (not volume index)
+                if (bioData && bioData.length && bioColumnMap) {
+                    const headers = Object.keys(bioData[0] || {});
+                    const fuCol = bioColumnMap.forestUnit ||
+                        findHeaderByCandidates(headers, ['yYC', 'yFU', 'PLANFU', 'SFU']);
+                    rows = fuCol
+                        ? bioData.filter(r => String(cellByHeader(r, fuCol) ?? '').trim() === String(fu).trim())
+                        : bioData.slice();
+                } else {
+                    rows = [];
+                }
+            }
+            if (volOnly && (!volumeFuRows || !volumeFuRows.length)) {
+                if (csvData && csvData.length && columnMap) {
+                    const headers = Object.keys(csvData[0] || {});
+                    const fuCol = columnMap.forestUnit || columnMap.polygonID ||
+                        findHeaderByCandidates(headers, ['yFU', 'yYC', 'PLANFU', 'SFU']);
+                    rows = fuCol
+                        ? csvData.filter(r => String(cellByHeader(r, fuCol) ?? '').trim() === String(fu).trim())
+                        : csvData.slice();
+                } else {
+                    rows = [];
+                }
+            }
+
+            const headersProbe = headersForDashboardRows(rows, def.sourceModule);
+            const needsMetricCols = def.metric !== 'biomass';
+
+            function multiColsForKind(kind, hdrs, cmapHint) {
+                if (kind === 'nmvSpecies') return detectNmvSpeciesColumns(hdrs);
+                if (kind === 'bareSpecies') return detectBareSpeciesNmvColumns(hdrs);
+                if (kind === 'nmvTotalAndSpecies') return detectNmvTotalAndSpeciesColumns(hdrs);
+                if (kind === 'volumeStack') return detectVolumeStackColumns(hdrs);
+                if (kind === 'bioComponents') return detectBioComponentColumns(hdrs, cmapHint || bioColumnMap);
+                return detectLogColumns(hdrs);
+            }
 
             // One cheap fallback if filtered slice lacks the metric header entirely
-            if (needsVolumeMetrics && rows.length) {
+            // (volume-only: never pull biomass rows; biomass-only handled above)
+            if (needsMetricCols && rows.length && !bioOnly && !volOnly) {
                 const needCols = def.multiCol
-                    ? (def.multiColKind === 'nmvSpecies'
-                        ? detectNmvSpeciesColumns(headersProbe)
-                        : detectLogColumns(headersProbe))
+                    ? multiColsForKind(def.multiColKind || 'log', headersProbe, bioColumnMap)
                     : (findHeaderByCandidates(headersProbe, def.colHints || []) ? [true] : []);
                 if (!needCols.length) {
                     const richer = collectRowsForDashboardFu(fu, null);
@@ -4442,19 +4698,47 @@
                 }
             }
 
-            const headersVol = headersForDashboardRows(rows);
-            const cmapMerged = Object.assign({}, columnMap || {}, bioColumnMap || {});
+            const headersVol = headersForDashboardRows(rows, def.sourceModule);
+            const cmapMerged = bioOnly
+                ? Object.assign({}, bioColumnMap || {}, columnMap || {})
+                : volOnly
+                    ? Object.assign({}, columnMap || {})
+                    : Object.assign({}, columnMap || {}, bioColumnMap || {});
+
+            // STRATA required: POLYGON alone cannot populate official panels
+            if (dashboardPanelRequiresStrata(def) && rows.length) {
+                const typeCol = cmapMerged.curveType ||
+                    findHeaderByCandidates(headersVol, ['TYPE', 'Type', 'type']);
+                if (typeCol) {
+                    const hasStrata = rows.some(r => isStrataType(cellByHeader(r, typeCol)));
+                    if (!hasStrata) {
+                        return { ok: false, emptyReason: dashboardStrataRequiredEmptyReason(def) };
+                    }
+                }
+            }
 
             if (def.metric === 'biomass') {
-                const src = resolveBiomassPanelSource(def, fu, volumeFuRows && volumeFuRows.length ? volumeFuRows : rows);
+                const src = resolveBiomassPanelSource(def, fu, volumeFuRows && volumeFuRows.length ? volumeFuRows : rows, {
+                    bioOnly: true
+                });
                 if (src.missing || !src.rows || !src.rows.length) {
                     const hasBioCol = !!(bioColumnMap && (bioColumnMap.bioTotalBiomass || bioColumnMap.bioWood));
                     return {
                         ok: false,
                         emptyReason: hasBioCol
                             ? `No ${def.type || 'biomass'} rows for FU "${fu}" under current filters (check STRATA/STAND, YIELD, GLSL).`
-                            : 'No Biomass column found. Load FSF_Volume_Biomas_Curves (or similar) on the Biomass tab.'
+                            : 'No Biomass column found. Load a biomass yield-curve CSV on the Biomass tab.'
                     };
+                }
+                // STRATA required even for biomass BOTH/STRATA when only POLYGON rows remain
+                if (dashboardPanelRequiresStrata(def)) {
+                    const typeCol = src.cmap && src.cmap.curveType;
+                    if (typeCol) {
+                        const hasStrata = src.rows.some(r => isStrataType(cellByHeader(r, typeCol)));
+                        if (!hasStrata) {
+                            return { ok: false, emptyReason: dashboardStrataRequiredEmptyReason(def) };
+                        }
+                    }
                 }
                 return {
                     ok: true,
@@ -4469,30 +4753,42 @@
             if (!rows.length) {
                 return {
                     ok: false,
-                    emptyReason: `No rows for Forest Unit "${fu}" in volume or biomass tables (check filters / yFU).`
+                    emptyReason: bioOnly
+                        ? `No biomass rows for Forest Unit "${fu}" (check filters / yYC).`
+                        : volOnly
+                            ? `No volume rows for Forest Unit "${fu}" (check filters / yFU).`
+                            : `No rows for Forest Unit "${fu}" in volume or biomass tables (check filters / yFU).`
                 };
             }
 
             if (def.multiCol) {
                 const kind = def.multiColKind || 'log';
-                function colsFor(hdrs) {
-                    if (kind === 'nmvSpecies') return detectNmvSpeciesColumns(hdrs);
-                    if (kind === 'bareSpecies') return detectBareSpeciesNmvColumns(hdrs);
-                    if (kind === 'volumeStack') return detectVolumeStackColumns(hdrs);
-                    return detectLogColumns(hdrs);
+                let cols = multiColsForKind(kind, headersVol, cmapMerged);
+                // Scan table headers if row keys incomplete — never cross modules
+                if (!cols.length && bioOnly && bioData && bioData[0]) {
+                    cols = multiColsForKind(kind, Object.keys(bioData[0]), bioColumnMap);
                 }
-                let cols = colsFor(headersVol);
-                // Also scan csvData/bioData headers if row keys incomplete
-                if (!cols.length && csvData && csvData[0]) cols = colsFor(Object.keys(csvData[0]));
-                if (!cols.length && bioData && bioData[0]) cols = colsFor(Object.keys(bioData[0]));
+                if (!cols.length && volOnly && csvData && csvData[0]) {
+                    cols = multiColsForKind(kind, Object.keys(csvData[0]), columnMap);
+                }
+                if (!cols.length && !bioOnly && !volOnly && csvData && csvData[0]) {
+                    cols = multiColsForKind(kind, Object.keys(csvData[0]), columnMap);
+                }
+                if (!cols.length && !bioOnly && !volOnly && bioData && bioData[0]) {
+                    cols = multiColsForKind(kind, Object.keys(bioData[0]), bioColumnMap);
+                }
                 cols = filterActiveMetricColumns(cols, rows);
                 if (!cols.length) {
                     const emptyMsg = kind === 'nmvSpecies'
                         ? 'No NMV_XX species columns with data for this FU.'
                         : kind === 'bareSpecies'
                             ? 'No bare species NMV columns (BE, BF, … after NMV) with data for this FU.'
+                            : kind === 'nmvTotalAndSpecies'
+                                ? 'No total NMV and/or species NMV columns with data for this FU.'
                             : kind === 'volumeStack'
                                 ? 'No GTV/GMV/NMV columns with data for this FU.'
+                            : kind === 'bioComponents'
+                                ? 'No biomass component columns (Wood/Bark/Branches/Foliage/Biomass) with data for this FU.'
                                 : 'No Log_XX columns with data for this FU (headers Log_BF … Log_SW, spaces/tabs OK).';
                     return { ok: false, emptyReason: emptyMsg };
                 }
@@ -4501,8 +4797,12 @@
                     ? ` · ${cols.length} NMV_XX series`
                     : kind === 'bareSpecies'
                         ? ` · ${cols.length} species series`
+                        : kind === 'nmvTotalAndSpecies'
+                            ? ` · total NMV + ${Math.max(0, cols.length - 1)} species`
                         : kind === 'volumeStack'
                             ? ` · ${cols.join(' · ')}`
+                        : kind === 'bioComponents'
+                            ? ` · ${cols.length} components`
                             : ` · ${cols.length} Log_XX series`;
                 return {
                     ok: true,
@@ -4516,7 +4816,6 @@
 
             // Always enrich GLSL SE fields from row headers (fixes MaxDBH/DBHQ zigzag:
             // missing silsys on cmap collapsed all SE series into one "FU - PRSNT" line).
-            // Prefer bioColumnMap when volume map lacks structure concepts.
             const cmapBase = cmapMerged;
             const cmapUse = enrichCmapForSe(cmapBase, headersVol);
 
@@ -4525,11 +4824,19 @@
                 const hint = (def.colHints || []).join(', ');
                 let tip = '';
                 if (def.metric === 'maxDbh') {
-                    tip = ' Volume SE10 files often have no MaxDBH — use a biomass/structure CSV, or load FSF_Volume_Biomas_Curves.';
+                    tip = ' MaxDBH is not part of the official biomass A–K grid.';
                 } else if (def.metric === 'log') {
                     tip = ' Need Log_XX columns (not bare BE/BF species codes).';
                 } else if (def.metric === 'cdht') {
                     tip = ' Looking for CDHT or HT.';
+                } else if (def.metric === 'gtv') {
+                    tip = volOnly
+                        ? ' Looking for GTV on the volume CSV.'
+                        : ' Looking for GTV on the biomass CSV.';
+                } else if (bioOnly) {
+                    tip = ' Metric must exist on the biomass CSV (not the volume module file).';
+                } else if (volOnly) {
+                    tip = ' Metric must exist on the volume CSV (not the biomass module file).';
                 }
                 return {
                     ok: false,
@@ -4589,7 +4896,7 @@
                 return { png: null, reason: prep.emptyReason || 'prep failed' };
             }
 
-            // Report: STRATA-only + tight caps (STAND clouds were the main crash source)
+            // Report: STRATA foreground + optional POLYGON background (capped)
             // Detect SE in prep rows → allow denser strata sampling for selection systems
             let seDense = false;
             try {
@@ -4601,6 +4908,10 @@
                 ? sizeOpts.maxStrataTraces
                 : (seDense ? Math.max(REPORT_MAX_STRATA_TRACES, 36) : REPORT_MAX_STRATA_TRACES);
 
+            const defaultStandCap = (def.type === 'STAND' || def.type === 'BOTH')
+                ? REPORT_MAX_STAND_TRACES
+                : 0;
+
             const built = buildDashboardPanelTraces(prep.rows, def, {
                 cmap: prep.cmap,
                 yCols: prep.yCols,
@@ -4608,7 +4919,7 @@
                 styleCtx: prep.styleCtx,
                 maxStandTraces: sizeOpts.maxStandTraces != null
                     ? sizeOpts.maxStandTraces
-                    : REPORT_MAX_STAND_TRACES,
+                    : defaultStandCap,
                 maxStrataTraces: strataCap,
                 maxLogSeries: sizeOpts.maxLogSeries != null
                     ? sizeOpts.maxLogSeries
@@ -4652,7 +4963,7 @@
         }
 
         /**
-         * @param {Array} [panelDefs] defaults to biomass DASHBOARD_PANEL_DEFS (A–H).
+         * @param {Array} [panelDefs] defaults to biomass DASHBOARD_PANEL_DEFS (A–K).
          *   Volume tab/report pass VOLUME_PANEL_DEFS so biomass catalog is never mixed in.
          */
         function renderFuDashboardPanels(fu, fuStrata, fuStand, sectionEl, preferredCmap, panelDefs) {
@@ -4700,7 +5011,7 @@
                     return;
                 }
 
-                // Interactive: denser SE sampling; STAND traces off (main plot has the cloud)
+                // Interactive: denser SE sampling; POLYGON as thin background when type BOTH
                 let seDense = false;
                 try {
                     const cm = prep.cmap || columnMap;
@@ -4708,10 +5019,9 @@
                         isSelectionSilSys(cellStr(r, cm.silsys))));
                 } catch (e) { /* ignore */ }
 
-                // Panel B is STAND-only — allow a modest stand sample so B is not always empty
-                const standCap = (def.type === 'STAND')
+                const standCap = (def.type === 'STAND' || def.type === 'BOTH')
                     ? Math.min(80, DASHBOARD_MAX_STAND_TRACES || 80)
-                    : DASHBOARD_MAX_STAND_TRACES;
+                    : 0;
 
                 const built = buildDashboardPanelTraces(prep.rows, def, {
                     cmap: prep.cmap,
@@ -4728,18 +5038,18 @@
                 if (!built.traces.length) {
                     const extra = (built.notes || []).join(' ');
                     let hint = extra || 'No curves after filtering/sanitization.';
-                    if (def.type === 'STAND' && (!fuStand || !fuStand.length)) {
-                        hint = 'No STAND/POLYGON rows — check STAND on the biomass filters, then Apply.';
-                    } else if (def.type === 'STRATA' && (!fuStrata || !fuStrata.length)) {
-                        hint = 'No STRATA rows under current filters.';
+                    if (dashboardPanelRequiresStrata(def) && (!fuStrata || !fuStrata.length)) {
+                        hint = dashboardStrataRequiredEmptyReason(def);
+                    } else if (def.type === 'STAND' && (!fuStand || !fuStand.length)) {
+                        hint = 'No STAND/POLYGON rows — check POLYGON on the biomass filters, then Apply.';
                     }
                     renderPanelEmpty(hostEl, def.title, hint);
                     return;
                 }
 
                 const seNote = seDense ? ' · SE: colour=SI, dash=CUT/AGS' : '';
-                const standNote = (def.type === 'BOTH' || def.type === 'STAND') && standCap === 0
-                    ? ' · STRATA only (STAND cloud on main plot)'
+                const standNote = (def.type === 'BOTH' && standCap > 0 && fuStand && fuStand.length)
+                    ? ' · POLYGON background'
                     : '';
                 const w = Math.max(hostEl.clientWidth || 0, 280);
                 hostEl.style.width = w + 'px';
@@ -4785,7 +5095,7 @@
         }
 
         /**
-         * Render up to DASHBOARD_MAX_FUS Forest Unit dashboards (8 panels each)
+         * Render up to DASHBOARD_MAX_FUS Forest Unit dashboards (A–K official grid)
          * on the Biomass tab. Primary rows = biomass Apply filters; structure/Log
          * can fall back to volume CSV via ensureDashboardFuIndex when columns missing.
          */
@@ -4820,21 +5130,20 @@
             const toRender = fus.slice(0, DASHBOARD_MAX_FUS);
             const skipped = fus.length - toRender.length;
 
-            let banner = `<strong>Per-FU dashboards (Biomass tab)</strong> — ${DASHBOARD_PANEL_DEFS.length} panels (A–B Biomass · C–G structure · H Log_XX) · ` +
+            let banner = `<strong>Per-FU dashboards (Biomass tab)</strong> — official grid <strong>A–K</strong> ` +
+                `(NMV · species · BA · HT · GTV · stems · DBHQ · volumes · biomass · logs · components) · ` +
                 `showing <strong>${toRender.length}</strong> of <strong>${fus.length}</strong> Forest Unit(s)` +
-                ` · structure panels use <strong>STRATA</strong> (STAND cloud stays on the main plot above)`;
+                ` · STRATA foreground · POLYGON thin background when selected · biomass CSV only` +
+                ` · same layout as the Biomass report`;
             if (skipped > 0) {
                 banner += ` · ⚠️ ${skipped} FU(s) not rendered (cap ${DASHBOARD_MAX_FUS} — narrow yYC selection)`;
             }
-            if (csvData && csvData.length) {
-                banner += ' · Structure/Log can use volume CSV when biomass file lacks those columns';
-            }
             host.innerHTML = `<div class="dashboard-banner">${banner}</div>`;
 
-            console.log(`🌿 Biomass A–H dashboards: rendering ${toRender.join(', ')} (${fus.length} total FUs)`);
+            console.log(`🌿 Biomass A–K dashboards: rendering ${toRender.join(', ')} (${fus.length} total FUs)`);
 
             // Prefer bioColumnMap for SE identity; enrich from actual row headers
-            const baseMap = Object.assign({}, columnMap || {}, bioColumnMap || {}, useMap);
+            const baseMap = Object.assign({}, bioColumnMap || {}, columnMap || {}, useMap);
 
             toRender.forEach(fu => {
                 const fuStrata = (strataCurves || []).filter(r =>
@@ -4845,10 +5154,10 @@
                 const nStand = new Set(fuStand.map(r =>
                     String(cellByHeader(r, baseMap.polygonID || baseMap.standId) ?? r.ID ?? r.StandID ?? '').trim()
                 )).size;
-                const meta = `STRATA curves: ${nStrata} · STAND/POLYGON: ${nStand}`;
+                const meta = formatBioFuDashboardMeta(nStrata, nStand);
                 const section = mountFuDashboardSection(fu, meta);
                 host.appendChild(section);
-                renderFuDashboardPanels(fu, fuStrata, fuStand, section, baseMap);
+                renderFuDashboardPanels(fu, fuStrata, fuStand, section, baseMap, DASHBOARD_PANEL_DEFS);
             });
 
             // Resize after layout settles
@@ -4862,8 +5171,7 @@
         }
 
         /**
-         * Volume-native per-FU panels (species NMV, GTV/GMV/NMV, DBHQ, STEMS, HT, BA).
-         * Does NOT use biomass A–H catalog — that stays on the Biomass tab only.
+         * Volume official A–H per-FU panels (same first 4 rows as biomass; volume CSV only).
          */
         function renderVolumePerFuDashboards(strataCurves, standCurves, yFUCol) {
             const host = document.getElementById('volumeDashboardHost');
@@ -4891,16 +5199,17 @@
 
             const toRender = fus.slice(0, DASHBOARD_MAX_FUS);
             const skipped = fus.length - toRender.length;
-            let banner = `<strong>Per-FU volume panels</strong> — NMV · species NMV · GTV/GMV/NMV · DBHQ · STEMS · HT · BA · ` +
+            let banner = `<strong>Per-FU dashboards (Volume tab)</strong> — official grid <strong>A–H</strong> ` +
+                `(NMV · species · BA · HT · GTV · stems · DBHQ · volumes) · ` +
                 `showing <strong>${toRender.length}</strong> of <strong>${fus.length}</strong> Forest Unit(s)` +
-                ` · <strong>STRATA</strong> series (STAND cloud is on the overview plot)`;
+                ` · STRATA foreground · POLYGON thin background when selected · volume CSV only` +
+                ` · same layout as the Volume report (biomass A–K is on the Biomass tab)`;
             if (skipped > 0) {
                 banner += ` · ⚠️ ${skipped} FU(s) not rendered (cap ${DASHBOARD_MAX_FUS})`;
             }
-            banner += ' · Biomass A–H panels are on the <strong>Biomass</strong> tab';
             host.innerHTML = `<div class="dashboard-banner">${banner}</div>`;
 
-            console.log(`📊 Volume panels: rendering ${toRender.join(', ')}`);
+            console.log(`📊 Volume A–H panels: rendering ${toRender.join(', ')}`);
 
             toRender.forEach(fu => {
                 const fuStrata = (strataCurves || []).filter(r =>
@@ -4911,11 +5220,11 @@
                 const nStand = new Set(fuStand.map(r =>
                     String(cellByHeader(r, columnMap.polygonID) ?? r.ID ?? '').trim()
                 )).size;
-                const meta = `STRATA curves: ${nStrata} · STAND/POLYGON: ${nStand}`;
+                const meta = formatBioFuDashboardMeta(nStrata, nStand);
                 const section = mountFuDashboardSection(fu, meta);
                 host.appendChild(section);
-                // STRATA-first: pass stand rows empty for structure speed (overview has STAND)
-                renderFuDashboardPanels(fu, fuStrata, [], section, columnMap, VOLUME_PANEL_DEFS);
+                // Pass STRATA + POLYGON so BOTH panels can draw thin polygon background
+                renderFuDashboardPanels(fu, fuStrata, fuStand, section, columnMap, VOLUME_PANEL_DEFS);
             });
 
             setTimeout(() => {
@@ -6365,34 +6674,41 @@
                 return {};
             }
 
-            const totalFus = selectedYieldCurveFUs.length;
-            const fusToRender = selectedYieldCurveFUs.slice(0, REPORT_MAX_FUS);
-            if (totalFus > REPORT_MAX_FUS) {
+            const capped = applyReportFuCap(selectedYieldCurveFUs);
+            const fusToRender = capped.list;
+            const totalFus = capped.total;
+            if (capped.limited) {
                 console.warn(
-                    `⚠️ Report FU cap: rendering ${REPORT_MAX_FUS} of ${totalFus} Forest Units ` +
-                    `(${fusToRender.join(', ')}) to avoid browser crash. Narrow yFU selection for others.`
+                    `⚠️ Optional report FU cap: rendering ${capped.cap} of ${totalFus} Forest Units ` +
+                    `(${fusToRender.join(', ')}). Uncheck “Limit report to ${REPORT_OPTIONAL_FU_CAP} Forest Units” for all.`
                 );
             }
-            console.log(`📊 Report volume dashboards: ${fusToRender.length}/${totalFus} FUs × ${VOLUME_PANEL_DEFS.length} panels`);
+            console.log(
+                `📊 Report volume dashboards: ${fusToRender.length}/${totalFus} FUs × ${VOLUME_PANEL_DEFS.length} panels` +
+                (capped.limited ? ` (optional cap ${capped.cap})` : ' (no FU cap)')
+            );
             
             const dashboards = {};
             dashboards._meta = {
                 catalog: 'volume',
-                fuCap: REPORT_MAX_FUS,
+                fuCap: capped.cap, // null when unlimited
+                fuCapOptional: isReportFuCapEnabled(),
                 fusRequested: totalFus,
                 fusRendered: fusToRender.slice(),
-                fusSkipped: selectedYieldCurveFUs.slice(REPORT_MAX_FUS)
+                fusSkipped: capped.skipped.slice()
             };
             
+            const nVolFu = Math.max(1, fusToRender.length);
             for (let i = 0; i < fusToRender.length; i++) {
                 const fu = fusToRender[i];
+                // Keep bar moving during the long per-FU PNG loop (40% → 78%)
+                const pct = 40 + ((i + 1) / nVolFu) * 38;
                 try {
-                    const progressEl = document.getElementById('reportProgress');
-                    if (progressEl) {
-                        progressEl.textContent =
-                            `🎨 Volume dashboard ${i + 1}/${fusToRender.length}: ${fu}` +
-                            (totalFus > REPORT_MAX_FUS ? ` (cap ${REPORT_MAX_FUS}/${totalFus} FUs)` : '');
-                    }
+                    updateProgress(
+                        `🎨 Volume dashboard ${i + 1}/${fusToRender.length}: ${fu}` +
+                        (capped.limited ? ` (cap ${capped.cap}/${totalFus} FUs)` : ` (${totalFus} FUs)`),
+                        pct
+                    );
                 } catch (e) { /* ignore */ }
                 dashboards[fu] = await generateDashboardForFU(fu);
                 await yieldToBrowser();
@@ -6469,11 +6785,10 @@
         }
         
         /**
-         * Volume-report multi-panel PNGs for one Forest Unit.
-         * Uses VOLUME_PANEL_DEFS only (species NMV / structure) — never biomass A–H.
+         * Volume-report multi-panel PNGs for one Forest Unit (official A–H, volume CSV only).
          */
         async function generateDashboardForFU(forestUnit) {
-            console.log(`📊 Creating volume multi-panel dashboard for ${forestUnit}...`);
+            console.log(`📊 Creating volume A–H dashboard for ${forestUnit}...`);
 
             const yFUCol = columnMap.forestUnit || columnMap.polygonID;
             const fuTarget = String(forestUnit).trim().toUpperCase();
@@ -6507,7 +6822,7 @@
             ).size;
 
             console.log(`  ✅ FU ${forestUnit}: ${fuStrataCurves.length} STRATA rows (${nStrata} curves), ` +
-                `${fuStandCurves.length} STAND rows (${nStand} curves), raw≈${fuRawCount}`);
+                `${fuStandCurves.length} POLYGON rows (${nStand} curves), raw≈${fuRawCount}`);
 
             const panels = {
                 fu: forestUnit,
@@ -6519,7 +6834,6 @@
             };
             panelDefs.forEach(d => { panels[d.id] = null; });
 
-            // STRATA-only for report speed (STAND cloud can be 10k+ curves/FU)
             const strataForPanels = fuStrataCurves;
 
             for (let i = 0; i < panelDefs.length; i++) {
@@ -6532,15 +6846,29 @@
                     }
                 } catch (e) { /* ignore */ }
 
+                if (dashboardPanelRequiresStrata(def) && (!fuStrataCurves || !fuStrataCurves.length)) {
+                    panels[def.id] = null;
+                    panels.panelMeta[def.id] = {
+                        title: def.title,
+                        letter: def.letter,
+                        wide: !!def.wide,
+                        ok: false,
+                        reason: dashboardStrataRequiredEmptyReason(def)
+                    };
+                    continue;
+                }
+
                 const strataSlice = (def.type === 'STAND') ? [] : strataForPanels;
                 const standSlice = (def.type === 'STAND' || def.type === 'BOTH')
-                    ? fuStandCurves.slice(0, Math.min(80, REPORT_MAX_STAND_CLOUD_IDS))
+                    ? fuStandCurves
                     : [];
 
                 const exported = await exportDashboardPanelPng(
                     def, forestUnit, strataSlice, standSlice,
                     {
-                        maxStandTraces: REPORT_MAX_STAND_TRACES,
+                        maxStandTraces: (def.type === 'STAND' || def.type === 'BOTH')
+                            ? Math.min(80, REPORT_MAX_STAND_TRACES)
+                            : 0,
                         maxStrataTraces: REPORT_MAX_STRATA_TRACES,
                         maxLogSeries: REPORT_MAX_LOG_SERIES
                     }
@@ -6561,7 +6889,7 @@
             }
 
             const okCount = panelDefs.filter(d => panels[d.id]).length;
-            console.log(`  📊 ${forestUnit}: ${okCount}/${panelDefs.length} volume panels OK`);
+            console.log(`  📊 ${forestUnit}: ${okCount}/${panelDefs.length} volume A–H panels OK`);
             return panels;
         }
         
@@ -7583,23 +7911,18 @@
         function renderReportEightPanelGridHTML(fu, panels, panelDefsOverride) {
             panels = panels || {};
             const meta = panels.panelMeta || {};
-            // Prefer explicit defs, then catalog on panels, then biomass A–H default
+            // Prefer explicit defs, then catalog on panels (both volume + biomass use A… letters now)
             let defs = panelDefsOverride;
             if (!defs || !defs.length) {
                 if (panels.catalog === 'volume' || (panels.panelMeta && panels._catalog === 'volume')) {
                     defs = VOLUME_PANEL_DEFS;
+                } else if (panels.catalog === 'biomass') {
+                    defs = DASHBOARD_PANEL_DEFS;
                 } else if (typeof DASHBOARD_PANEL_DEFS !== 'undefined' && DASHBOARD_PANEL_DEFS.length) {
                     defs = DASHBOARD_PANEL_DEFS;
                 } else {
                     defs = VOLUME_PANEL_DEFS;
                 }
-            }
-            // If panels only have volume ids (V1…) pick volume catalog
-            if (defs === DASHBOARD_PANEL_DEFS && panels.V1 !== undefined && panels.A === undefined) {
-                defs = VOLUME_PANEL_DEFS;
-            }
-            if (defs === VOLUME_PANEL_DEFS && panels.A !== undefined && panels.V1 === undefined) {
-                defs = DASHBOARD_PANEL_DEFS;
             }
 
             let html = `
@@ -7795,7 +8118,7 @@
     </div>
     
     <h2>📊 Forest Unit Volume Dashboards</h2>
-    <p style="color:#666; font-size:14px;">NMV · species NMV · GTV/GMV/NMV · DBHQ · STEMS · HT · BA (STRATA). Biomass A–H is in the biomass report section.</p>
+    <p style="color:#666; font-size:14px;">Volume A–H: NMV · species · BA · HT · GTV · stems · DBHQ · GMV/GTV/NMV (STRATA + POLYGON background). Biomass A–K is in the biomass report section.</p>
 `;
             
             // Add volume panel grid per Forest Unit
@@ -7875,7 +8198,16 @@
             const table1 = data.table1 || [];
             const table2 = data.table2 || [];
             const table3 = data.table3 || [];
-            const isBiomassOnly = !!(data.biomassOnly || (hasBioData && !hasVolumeData));
+            // Option A: report is always one module (active tab). Never merge volume+biomass
+            // even when both CSVs are loaded (different volume methodologies).
+            const reportScope = (data.reportScope === 'biomass' || data.reportScope === 'volume')
+                ? data.reportScope
+                : (data.biomassOnly ? 'biomass' : (data.volumeOnly ? 'volume'
+                    : ((hasBioData && !hasVolumeData) ? 'biomass' : 'volume')));
+            const isBiomassOnly = reportScope === 'biomass' || !!data.biomassOnly;
+            const isVolumeOnly = reportScope === 'volume' || !!data.volumeOnly;
+            const includeVolume = reportScope === 'volume';
+            const includeBiomass = reportScope === 'biomass';
             const isFullReport = !!data.isFullReport;
             const seModeLabel = data.seMode === 'all'
                 ? 'All AGSFRC × SI combinations'
@@ -8015,7 +8347,7 @@
 </head>
 <body>
     <div class="report-header">
-        <h1>🌲 ${metadata.fmuName} - ${isBiomassOnly ? 'Biomass Analysis Report' : 'Forest Yield Analysis Report'}</h1>
+        <h1>🌲 ${metadata.fmuName} - ${isBiomassOnly ? 'Biomass Analysis Report' : 'Volume Analysis Report'}</h1>
         <div class="ontario-logo" style="font-size: 1.8em; display: flex; align-items: center; gap: 8px;">
             <span style="color: #006400;">Ministry of Natural Resources</span>
             <span style="font-size: 1.4em;">🎅</span>
@@ -8033,7 +8365,9 @@
         </div>
         <div class="metadata-row">
             <span class="metadata-label">Report Scope:</span>
-            <span>${isBiomassOnly ? 'Biomass only' : (hasBioData ? 'Volume + Biomass' : 'Volume')}</span>
+            <span>${isBiomassOnly
+                ? 'Biomass module only (volume CSV excluded — different methodology)'
+                : 'Volume module only (biomass CSV excluded — different methodology)'}</span>
         </div>
         ${metadata.analystName ? `
         <div class="metadata-row">
@@ -8057,12 +8391,15 @@
         ${seModeLabel ? `<p><strong>GLSL SE density:</strong> ${seModeLabel}</p>` : ''}
         ` : '<p style="margin-top: 0;"><strong>Report type:</strong> Filtered Report (sidebar selections after Apply)</p>'}
         <p class="small" style="color:#555; margin-bottom: 12px;">
-            Chart performance caps (browser stability): up to <strong>${REPORT_MAX_FUS}</strong> Forest Units per module,
-            ~<strong>${REPORT_MAX_STRATA_TRACES}</strong> STRATA curves sampled per panel
+            Forest Units: <strong>${(data.dashboards && data.dashboards._meta && data.dashboards._meta.fuCap != null)
+                ? ('optional cap ' + data.dashboards._meta.fuCap)
+                : 'all selected / all FUs (default — no hard FU cap)'}</strong>.
+            Per-panel stability: ~<strong>${REPORT_MAX_STRATA_TRACES}</strong> STRATA curves sampled per panel
             (even SI/CUT/AGS sample when more exist — dense units like HDSL1 will not draw every SE curve).
+            STAND/polygon series stay minimal in reports.
         </p>
 
-        ${hasVolumeData ? `
+        ${includeVolume ? `
         <h4 style="color: #0d6efd; margin-top: 15px; margin-bottom: 10px;">📊 Yield Curve Selections <span style="font-size: 0.85em; color: #666;">(for volume dashboards)</span></h4>
         <p><strong>Forest Units:</strong> ${yieldCurveFUs}</p>
         <p><strong>Yield Classes:</strong> ${yieldCurveYields}</p>
@@ -8081,49 +8418,55 @@
         <p><strong>Leading Species:</strong> ${rawDataSpecies}</p>
         <p><strong>Age Range:</strong> ${ageRange} years</p>
         ` : '<p style="margin-top: 20px; color: #666; font-style: italic;">📋 Raw data not uploaded — volume summary tables may be empty</p>'}
-        ` : '<p style="color: #666; font-style: italic;">📊 Volume yield curves not loaded for this report</p>'}
+        ` : '<p style="color: #666; font-style: italic;">📊 Volume module not included in this report (active tab was Biomass)</p>'}
 
-        ${hasBioData ? `
+        ${includeBiomass ? `
         <h4 style="color: #198754; margin-top: 20px; margin-bottom: 10px;">🌿 Biomass Selections</h4>
         <p><strong>Forest Units (yYC):</strong> ${bioYYCs}</p>
         <p><strong>YIELD Scenarios:</strong> ${bioYields}</p>
         <p><strong>Leading Species:</strong> ${bioSpecies}</p>
-        ` : ''}
+        ` : (includeVolume ? '<p style="color: #666; font-style: italic; margin-top: 12px;">🌿 Biomass module not included in this report (active tab was Volume)</p>' : '')}
     </div>
     `;
             
-            // Volume-native Forest Unit dashboards (not biomass A–H)
-            if (data.dashboards && Object.keys(data.dashboards).filter(k => k !== '_meta').length > 0) {
+            // Volume official A–H Forest Unit dashboards (volume CSV only)
+            if (includeVolume && data.dashboards && Object.keys(data.dashboards).filter(k => k !== '_meta').length > 0) {
                 const dMeta = data.dashboards._meta || {};
-                const isVolCatalog = dMeta.catalog === 'volume' || data.volumeOnly ||
+                const isVolCatalog = dMeta.catalog === 'volume' || data.volumeOnly || isVolumeOnly ||
                     (data.dashboards && Object.values(data.dashboards).some(p => p && p.catalog === 'volume'));
                 html += isVolCatalog ? `
-    <h2>📊 Forest Unit Volume Dashboards</h2>
+    <h2>📊 Forest Unit Volume Dashboards (A–H)</h2>
     <p style="color: #666; font-style: italic; margin-bottom: 8px;">
-        NMV · species NMV (BE/BF/…) · GTV/GMV/NMV · DBHQ · STEMS · HT · BA.
-        STRATA series only (fast). Biomass A–H panels appear in the Biomass section when a biomass CSV is loaded.
+        Official volume grid: NMV · NMV by species · BA · Height · GTV · Stems · DBHQ · GMV/GTV/NMV.
+        STRATA foreground · POLYGON thin background when selected. Volume CSV only (same order as Biomass rows 1–4).
+        Generate a separate Biomass report from the Biomass tab for A–K (includes biomass &amp; logs).
     </p>
     ` : `
     <h2>🎯 Forest Unit Dashboards</h2>
     <p style="color: #666; font-style: italic; margin-bottom: 8px;">Per-FU multi-panel charts for this report.</p>
     `;
-                if (dMeta.fuCap || dMeta.fusRequested) {
+                if (dMeta.fusRequested != null || (dMeta.fusRendered && dMeta.fusRendered.length)) {
+                    const nRendered = (dMeta.fusRendered && dMeta.fusRendered.length) ||
+                        Object.keys(data.dashboards).filter(k => k !== '_meta').length;
+                    const capLabel = dMeta.fuCap != null
+                        ? `optional cap ${dMeta.fuCap}`
+                        : 'no FU cap';
                     html += `
     <p style="color: #666; font-size: 0.9rem; margin-bottom: 12px;">
-        Volume FUs in this report: <strong>${(dMeta.fusRendered && dMeta.fusRendered.length) || Object.keys(data.dashboards).filter(k => k !== '_meta').length}</strong>
-        of <strong>${dMeta.fusRequested != null ? dMeta.fusRequested : '—'}</strong>
-        (cap ${dMeta.fuCap != null ? dMeta.fuCap : REPORT_MAX_FUS}).
+        Volume FUs in this report: <strong>${nRendered}</strong>
+        of <strong>${dMeta.fusRequested != null ? dMeta.fusRequested : nRendered}</strong>
+        (${capLabel}).
         STRATA series per panel sampled to ~${REPORT_MAX_STRATA_TRACES} curves when denser.
     </p>`;
                 }
                 if (dMeta.fusSkipped && dMeta.fusSkipped.length) {
                     html += `
     <p style="color:#856404; background:#fff3cd; border:1px solid #ffc107; border-radius:6px; padding:10px 12px; font-size:13px;">
-        <strong>Performance cap:</strong> dashboards rendered for
+        <strong>Optional FU limit applied:</strong> dashboards rendered for
         <strong>${(dMeta.fusRendered || []).join(', ')}</strong>
         (${dMeta.fusRendered ? dMeta.fusRendered.length : 0} of ${dMeta.fusRequested || '?'} FUs).
         Skipped: ${(dMeta.fusSkipped || []).join(', ')}.
-        Narrow your Forest Unit selection and re-run for skipped units.
+        Uncheck “Limit report to ${REPORT_OPTIONAL_FU_CAP} Forest Units” and re-run to include all units.
     </p>`;
                 }
 
@@ -8142,7 +8485,7 @@
             📊 Forest Unit: ${fu}
         </h3>
         <p style="color:#666; font-size:13px; margin: 6px 0 18px 0;">
-            STRATA curves: <strong>${metaStrata}</strong> · STAND/POLYGON: <strong>${metaStand}</strong> · Raw inventory rows: <strong>${metaRaw}</strong>
+            STRATA: <strong>${metaStrata}</strong> · POLYGON: <strong>${metaStand}</strong> · Raw inventory rows: <strong>${metaRaw}</strong>
         </p>
         ${renderReportEightPanelGridHTML(fu, panels, gridDefs)}
     </div>
@@ -8150,8 +8493,8 @@
                 }
             }
             
-            // Volume executive summary tables — skip when biomass-only / no volume rows
-            if (hasVolumeData || table1.length > 0 || table2.length > 0 || table3.length > 0) {
+            // Volume executive summary tables — volume-scoped reports only
+            if (includeVolume && (hasVolumeData || table1.length > 0 || table2.length > 0 || table3.length > 0)) {
                 html += `
     <h2>📊 Executive Summary Tables</h2>
     
@@ -8273,14 +8616,19 @@
             html += `
     <div class="summary-box" style="margin-top: 50px;">
         <h3 style="margin-top: 0;">📝 Report Summary</h3>
+        <p><strong>Report module:</strong> ${isBiomassOnly ? 'Biomass' : 'Volume'} (active tab at generation)</p>
+        ${includeVolume ? `
         <p><strong>Total Raw Data Records:</strong> ${rawData ? rawData.length.toLocaleString() : '0 (not uploaded)'}</p>
         <p><strong>Volume STRATA Curves:</strong> ${strataCurves ? strataCurves.length.toLocaleString() : 0} data points</p>
         <p><strong>Volume STAND Curves:</strong> ${standCurves ? standCurves.length.toLocaleString() : 0} data points</p>
+        ` : ''}
+        ${includeBiomass ? `
         <p><strong>Biomass Records:</strong> ${bioData ? bioData.length.toLocaleString() : '0 (not uploaded)'}</p>
+        ` : ''}
         <p><strong>Generated by:</strong> Ontario SLYM Cutter (Release: Fireball)</p>
     </div>
     
-    ${data.bioDashboardsHtml || ''}
+    ${includeBiomass ? (data.bioDashboardsHtml || '') : ''}
     
     <hr style="margin-top: 50px;">
     <p style="text-align: center; color: #666; font-size: 12px;">
@@ -8295,10 +8643,52 @@
             return html;
         }
         
-        // Helper function to update progress
+        // Helper function to update report overlay (message + progress bar)
         function updateProgress(message, percent) {
-            document.getElementById('reportProgress').textContent = message;
-            document.getElementById('reportProgressBar').style.width = percent + '%';
+            const msgEl = document.getElementById('reportProgress');
+            const barEl = document.getElementById('reportProgressBar');
+            if (msgEl && message != null) msgEl.textContent = message;
+            if (barEl && percent != null && Number.isFinite(Number(percent))) {
+                const p = Math.max(0, Math.min(100, Number(percent)));
+                barEl.style.width = p + '%';
+                barEl.setAttribute('aria-valuenow', String(Math.round(p)));
+            }
+        }
+
+        /** Show report overlay and reset bar to 0%. Always re-parent to <body> so tab switches cannot hide it. */
+        function showReportLoadingOverlay(initialMessage) {
+            let overlay = document.getElementById('reportLoadingOverlay');
+            if (!overlay) {
+                console.error('❌ reportLoadingOverlay missing from DOM');
+                return;
+            }
+            // Ensure overlay is not trapped inside a hidden Bootstrap tab pane
+            if (overlay.parentElement !== document.body) {
+                document.body.appendChild(overlay);
+            }
+            overlay.style.display = 'block';
+            overlay.style.visibility = 'visible';
+            overlay.style.opacity = '1';
+            overlay.style.zIndex = '20000';
+            const titleEl = document.getElementById('reportLoadingTitle');
+            if (titleEl) {
+                const msg = initialMessage || '';
+                titleEl.textContent = msg.indexOf('Biomass') >= 0 || msg.indexOf('🌿') >= 0
+                    ? '🌿 Generating Biomass Report...'
+                    : '🎄 Generating Report...';
+            }
+            updateProgress(initialMessage || 'Initializing...', 0);
+            // Force a paint so the overlay is visible before long synchronous work
+            try {
+                void overlay.offsetHeight;
+            } catch (e) { /* ignore */ }
+        }
+
+        function hideReportLoadingOverlay() {
+            const overlay = document.getElementById('reportLoadingOverlay');
+            if (overlay) {
+                overlay.style.display = 'none';
+            }
         }
 
         // ============================================
@@ -8348,22 +8738,55 @@
 
         // Main report generation function
         // ============================================
+        // REPORT SCOPE (Option A) — active Volume/Biomass tab only
+        // Volume and biomass inputs share many columns but use different
+        // methodologies; never merge both modules into one report.
+        // ============================================
+        function getActiveReportModule() {
+            const bioTab = document.getElementById('nav-biomass-tab');
+            if (bioTab && bioTab.classList.contains('active')) return 'biomass';
+            const volTab = document.getElementById('nav-volume-tab');
+            if (volTab && volTab.classList.contains('active')) return 'volume';
+            // Fallback: which filter panel is visible
+            const bioFilt = document.getElementById('biomassFilters');
+            if (bioFilt && bioFilt.style.display !== 'none' && bioFilt.offsetParent !== null) {
+                return 'biomass';
+            }
+            return 'volume';
+        }
+
+        function resolveReportScope(metadata) {
+            const raw = (metadata && metadata.reportScope) || getActiveReportModule();
+            return raw === 'biomass' ? 'biomass' : 'volume';
+        }
+
+        // ============================================
         // GENERATE FULL REPORT (bypasses all filters)
         // ============================================
         async function generateFullReport(metadata) {
             const seMode = (metadata && metadata.seMode) || getFullReportSeMode();
-            console.log(`📊 Generating FULL report (SE mode=${seMode})...`);
+            const reportScope = resolveReportScope(metadata);
+            const wantVolume  = reportScope === 'volume';
+            const wantBiomass = reportScope === 'biomass';
+            console.log(`📊 Generating FULL report (module=${reportScope}, SE mode=${seMode})...`);
             
-            // Show loading overlay
-            document.getElementById('reportLoadingOverlay').style.display = 'block';
+            showReportLoadingOverlay(
+                wantBiomass ? '🌿 Initializing biomass Full Report...' : '📊 Initializing volume Full Report...'
+            );
+            await new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 30)));
             
             const hasVolume  = !!(csvData && csvData.length > 0);
             const hasBiomass = !!(bioData && bioData.length > 0);
-            console.log(`📊 Full Report inputs — volume: ${hasVolume ? csvData.length : 0}, biomass: ${hasBiomass ? bioData.length : 0}, seMode: ${seMode}`);
+            console.log(`📊 Full Report inputs — scope: ${reportScope}, volume loaded: ${hasVolume ? csvData.length : 0}, biomass loaded: ${hasBiomass ? bioData.length : 0}, seMode: ${seMode}`);
 
-            if (!hasVolume && !hasBiomass) {
-                document.getElementById('reportLoadingOverlay').style.display = 'none';
-                alert('No data loaded. Please upload a Volume CSV or a Biomass CSV first.');
+            if (wantVolume && !hasVolume) {
+                hideReportLoadingOverlay();
+                alert('Volume report: no Volume yield-curve CSV loaded. Switch to the Biomass tab for a biomass report, or upload a Volume CSV.');
+                return;
+            }
+            if (wantBiomass && !hasBiomass) {
+                hideReportLoadingOverlay();
+                alert('Biomass report: no Biomass CSV loaded. Switch to the Volume tab for a volume report, or upload a Biomass CSV.');
                 return;
             }
             
@@ -8412,8 +8835,8 @@
                 let table3 = [];
                 let dashboards = {};
 
-                // ── Volume path (optional) ──────────────────────────────────
-                if (hasVolume) {
+                // ── Volume path (active Volume tab only) ────────────────────
+                if (wantVolume && hasVolume) {
                     updateProgress('🔍 Auto-selecting curve types...', 10);
                     await new Promise(resolve => setTimeout(resolve, 50));
                     if (typeStrataEl) typeStrataEl.checked = true;
@@ -8466,17 +8889,19 @@
                     await new Promise(resolve => setTimeout(resolve, 50));
                     dashboards = await generateDashboardsForSelectedFUs();
                     console.log(`📊 Generated volume dashboards for ${Object.keys(dashboards).length} Forest Units`);
+                } else if (wantVolume) {
+                    throw new Error('Volume Full Report requires a loaded Volume yield-curve CSV.');
                 } else {
-                    console.log('ℹ️ No volume CSV loaded — skipping volume tables/dashboards');
-                    updateProgress('ℹ️ Volume data not loaded — generating biomass-only report...', 40);
-                    await new Promise(resolve => setTimeout(resolve, 100));
+                    console.log('ℹ️ Full Report scope=biomass — skipping volume tables/dashboards (even if volume CSV is loaded)');
+                    updateProgress('🌿 Biomass Full Report — volume module excluded...', 10);
+                    await new Promise(resolve => setTimeout(resolve, 60));
                 }
                 
-                // ── Biomass path (optional) ─────────────────────────────────
+                // ── Biomass path (active Biomass tab only) ──────────────────
                 let bioDashboardsHtml = '';
-                if (hasBiomass) {
+                if (wantBiomass && hasBiomass) {
                     // Full report: select ALL biomass filters so every yYC is included
-                    updateProgress('🌿 Auto-selecting all Biomass filters...', 78);
+                    updateProgress('🌿 Auto-selecting all Biomass filters...', 12);
                     await new Promise(resolve => setTimeout(resolve, 50));
                     if (bioTypeStrataEl) bioTypeStrataEl.checked = true;
                     if (bioTypeStandEl) bioTypeStandEl.checked = true;
@@ -8488,21 +8913,31 @@
                     }
                     console.log(`✅ Selected Biomass filters for full report (GLSL SE mode=${seMode})`);
 
-                    updateProgress('🌿 Generating Biomass dashboards...', 85);
+                    updateProgress('🌿 Generating Biomass A–K dashboards (all FUs)...', 18);
                     await new Promise(resolve => setTimeout(resolve, 50));
-                    // Always generate full biomass A–H when bio is loaded (volume no longer emits A–H)
                     const bioDashboards = await generateBiomassDashboardsForSelectedFUs({
-                        skipStandardPanels: false
+                        skipStandardPanels: false,
+                        progressMin: 18,
+                        progressMax: 86
                     });
+                    updateProgress('🌿 Assembling biomass report sections...', 88);
+                    await new Promise(resolve => setTimeout(resolve, 40));
                     bioDashboardsHtml = buildBiomassReportHTML(metadata, bioDashboards);
                     console.log(`🌿 Biomass report FUs: ${Object.keys(bioDashboards).filter(k => k !== '_meta').length}`);
+                } else if (wantBiomass) {
+                    throw new Error('Biomass Full Report requires a loaded Biomass CSV.');
+                } else {
+                    console.log('ℹ️ Full Report scope=volume — skipping biomass dashboards (even if biomass CSV is loaded)');
                 }
 
-                if ((!table1 || table1.length === 0) &&
+                if (wantVolume &&
+                    (!table1 || table1.length === 0) &&
                     (!table2 || table2.length === 0) &&
-                    (!dashboards || Object.keys(dashboards).length === 0) &&
-                    !bioDashboardsHtml) {
-                    throw new Error('Nothing to report — no volume curves and no biomass panels were generated.');
+                    (!dashboards || Object.keys(dashboards).length === 0)) {
+                    throw new Error('Nothing to report — no volume curves/tables were generated for the Volume Full Report.');
+                }
+                if (wantBiomass && !bioDashboardsHtml) {
+                    throw new Error('Nothing to report — no biomass panels were generated for the Biomass Full Report.');
                 }
 
                 // Build HTML report
@@ -8516,8 +8951,9 @@
                     isFullReport: true,
                     seMode,
                     bioDashboardsHtml,
-                    volumeOnly: hasVolume && !hasBiomass,
-                    biomassOnly: hasBiomass && !hasVolume
+                    reportScope,
+                    volumeOnly: wantVolume,
+                    biomassOnly: wantBiomass
                 });
                 
                 // Save report — user picks folder via Save As dialog (or Downloads fallback)
@@ -8525,7 +8961,8 @@
                 await new Promise(resolve => setTimeout(resolve, 50));
 
                 const seTag = seMode === 'all' ? 'AllSE' : 'SEGrid';
-                const fullReportName = `SLYM_FullReport_${seTag}_${metadata.fmuName.replace(/\s+/g, '_')}_${metadata.planYear}.html`;
+                const modTag = wantBiomass ? 'Biomass' : 'Volume';
+                const fullReportName = `SLYM_FullReport_${modTag}_${seTag}_${metadata.fmuName.replace(/\s+/g, '_')}_${metadata.planYear}.html`;
                 const saved = await saveReportToFile(reportHTML, fullReportName);
 
                 if (saved) {
@@ -8583,8 +9020,7 @@
                     console.log('✅ Filter state restored (interactive plots were never rendered - resources saved!)');
                 }, 100);
                 
-                // Hide loading overlay
-                document.getElementById('reportLoadingOverlay').style.display = 'none';
+                hideReportLoadingOverlay();
             }
         }
 
@@ -8622,21 +9058,34 @@
         // ORIGINAL GENERATE REPORT (uses filters)
         // ============================================
         async function generateReport(metadata) {
-            console.log('📊 Generating report...');
+            const reportScope = resolveReportScope(metadata);
+            const wantVolume  = reportScope === 'volume';
+            const wantBiomass = reportScope === 'biomass';
+            console.log(`📊 Generating filtered report (module=${reportScope})...`);
             
-            // Show loading overlay
-            document.getElementById('reportLoadingOverlay').style.display = 'block';
+            showReportLoadingOverlay(
+                wantBiomass ? '🌿 Initializing biomass report...' : '📊 Initializing volume report...'
+            );
+            // Let the browser paint the overlay before heavy work (especially biomass A–K PNG loop)
+            await new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 30)));
 
             const hasVolume  = !!(csvData && csvData.length > 0);
             const hasBiomass = !!(bioData && bioData.length > 0);
             
             try {
+                if (wantVolume && !hasVolume) {
+                    throw new Error('Volume report: no Volume yield-curve CSV loaded. Switch to the Biomass tab or upload a Volume CSV.');
+                }
+                if (wantBiomass && !hasBiomass) {
+                    throw new Error('Biomass report: no Biomass CSV loaded. Switch to the Volume tab or upload a Biomass CSV.');
+                }
+
                 let table1 = [];
                 let table2 = [];
                 let table3 = [];
                 let dashboards = {};
 
-                if (hasVolume) {
+                if (wantVolume && hasVolume) {
                     // Calculate summary tables
                     updateProgress('📋 Calculating summary tables...', 10);
                     await new Promise(resolve => setTimeout(resolve, 50));
@@ -8654,35 +9103,45 @@
                     updateProgress('🎨 Generating Forest Unit dashboards...', 40);
                     await new Promise(resolve => setTimeout(resolve, 50));
                     dashboards = await generateDashboardsForSelectedFUs();
-                    console.log(`📊 Generated dashboards for ${Object.keys(dashboards).length} Forest Units`);
-                } else {
-                    console.log('ℹ️ No volume CSV loaded — skipping volume tables/dashboards');
-                    updateProgress('ℹ️ Volume data not loaded — biomass-only report...', 30);
-                    await new Promise(resolve => setTimeout(resolve, 50));
+                    console.log(`📊 Generated volume dashboards for ${Object.keys(dashboards).length} Forest Units`);
+                } else if (wantBiomass) {
+                    console.log('ℹ️ Filtered Report scope=biomass — skipping volume tables/dashboards');
+                    updateProgress('🌿 Preparing biomass-only report...', 8);
+                    await new Promise(resolve => setTimeout(resolve, 40));
+                    updateProgress('🌿 Reading biomass filters (yYC / YIELD / GLSL)...', 15);
+                    await new Promise(resolve => setTimeout(resolve, 40));
                 }
                 
-                // Generate biomass dashboards if biomass data is loaded
+                // Biomass dashboards only when Biomass tab is active
                 let bioDashboardsHtml = '';
-                if (hasBiomass) {
-                    updateProgress('🌿 Generating Biomass dashboards...', 60);
-                    await new Promise(resolve => setTimeout(resolve, 50));
-                    // Volume panels are volume-native only — always emit full biomass A–H when bio loaded
+                if (wantBiomass && hasBiomass) {
+                    updateProgress('🌿 Generating Biomass A–K dashboards...', 20);
+                    await new Promise(resolve => setTimeout(resolve, 40));
                     const bioDashboards = await generateBiomassDashboardsForSelectedFUs({
-                        skipStandardPanels: false
+                        skipStandardPanels: false,
+                        progressMin: 20,
+                        progressMax: 82
                     });
+                    updateProgress('🌿 Assembling biomass report sections...', 85);
+                    await new Promise(resolve => setTimeout(resolve, 40));
                     bioDashboardsHtml = buildBiomassReportHTML(metadata, bioDashboards);
                     console.log(`🌿 Biomass report FUs: ${Object.keys(bioDashboards).filter(k => k !== '_meta').length}`);
+                } else if (wantVolume) {
+                    console.log('ℹ️ Filtered Report scope=volume — skipping biomass dashboards');
                 }
 
-                if ((!table1 || table1.length === 0) &&
+                if (wantVolume &&
+                    (!table1 || table1.length === 0) &&
                     (!table2 || table2.length === 0) &&
-                    (!dashboards || Object.keys(dashboards).length === 0) &&
-                    !bioDashboardsHtml) {
-                    throw new Error('Nothing to report. Load volume and/or biomass data, and select filters.');
+                    (!dashboards || Object.keys(dashboards).length === 0)) {
+                    throw new Error('Nothing to report for Volume. Apply volume filters and ensure curves match the selection.');
+                }
+                if (wantBiomass && !bioDashboardsHtml) {
+                    throw new Error('Nothing to report for Biomass. Apply biomass filters and ensure panels can be generated.');
                 }
 
                 // Build HTML report
-                updateProgress('📄 Building HTML report...', 80);
+                updateProgress('📄 Building HTML report...', wantBiomass ? 90 : 88);
                 await new Promise(resolve => setTimeout(resolve, 50));
                 const reportHTML = buildReportHTML(metadata, {
                     table1,
@@ -8690,14 +9149,17 @@
                     table3,
                     dashboards,
                     bioDashboardsHtml,
-                    biomassOnly: hasBiomass && !hasVolume
+                    reportScope,
+                    volumeOnly: wantVolume,
+                    biomassOnly: wantBiomass
                 });
                 
                 // Save report — user picks folder via Save As dialog (or Downloads fallback)
-                updateProgress('💾 Saving report...', 95);
+                updateProgress('💾 Saving report...', 96);
                 await new Promise(resolve => setTimeout(resolve, 50));
 
-                const filteredReportName = `SLYM_Report_${metadata.fmuName.replace(/\s+/g, '_')}_${metadata.planYear}.html`;
+                const modTag = wantBiomass ? 'Biomass' : 'Volume';
+                const filteredReportName = `SLYM_Report_${modTag}_${metadata.fmuName.replace(/\s+/g, '_')}_${metadata.planYear}.html`;
                 const saved = await saveReportToFile(reportHTML, filteredReportName);
 
                 if (saved) {
@@ -8718,8 +9180,7 @@
                 console.error('❌ Report generation error:', error);
                 alert('❌ Error generating report: ' + error.message);
             } finally {
-                // Hide loading overlay
-                document.getElementById('reportLoadingOverlay').style.display = 'none';
+                hideReportLoadingOverlay();
             }
         }
         
@@ -8742,54 +9203,94 @@
             if (btnGenerateReport) {
                 console.log('✅ Found btnGenerateReport, attaching listener');
                 btnGenerateReport.addEventListener('click', function() {
+                    const reportScope = getActiveReportModule();
                     const hasVolumeCurves = csvData && csvData.length > 0;
                     const hasBiomassData  = bioData  && bioData.length  > 0;
-                    if (!hasVolumeCurves && !hasBiomassData) {
-                        alert('No data loaded. Please upload a Volume CSV or a Biomass CSV first.');
+
+                    if (reportScope === 'volume' && !hasVolumeCurves) {
+                        alert('Volume tab is active, but no Volume yield-curve CSV is loaded.\n\nUpload a Volume CSV, or switch to the Biomass tab to generate a biomass-only report.');
+                        return;
+                    }
+                    if (reportScope === 'biomass' && !hasBiomassData) {
+                        alert('Biomass tab is active, but no Biomass CSV is loaded.\n\nUpload a Biomass CSV, or switch to the Volume tab to generate a volume-only report.');
                         return;
                     }
 
-                    // Volume-specific filter validation (skip when biomass-only)
+                    // Volume-specific filter validation (Volume-scoped report only)
                     let filteredStrata = [], filteredStand = [], selectedYieldCurveFUs = [];
-                    if (hasVolumeCurves && strataCurves && strataCurves.length > 0) {
+                    if (reportScope === 'volume') {
                         selectedYieldCurveFUs = Array.from(document.querySelectorAll('.yfu-checkbox:checked')).map(cb => cb.value);
-                        if (selectedYieldCurveFUs.length === 0 && !hasBiomassData) {
+                        if (selectedYieldCurveFUs.length === 0) {
                             alert('Please select at least one Forest Unit in the Yield Curves section.');
                             return;
                         }
-                        filteredStrata = getFilteredStrataCurves();
-                        filteredStand  = getFilteredStandCurves();
-                        if (filteredStrata.length === 0 && !hasBiomassData) {
-                            alert('Current filters produce 0 STRATA records. Please adjust and try again.');
-                            return;
-                        }
-                    }
-                    
-                    // Check raw data and scatter plot status (OPTIONAL - for informative messages)
-                    const messages = [];
-                    
-                    // Soft warning only when user asked for STAND but none matched
-                    const standRequested = !!(document.getElementById('typeStand') && document.getElementById('typeStand').checked);
-                    const standMissing = hasVolumeCurves && standRequested &&
-                        (!standCurves || standCurves.length === 0 || filteredStand.length === 0);
-                    if (standMissing) {
-                        messages.push('⚠️ STAND/POLYGON is checked but no STAND curves match current filters.\n\nThe report will be STRATA-only (STAND sections omitted). Uncheck STAND or expand Yield / LEADSPC / GLSL filters.');
-                    }
-                    
-                    if (!rawData || rawData.length === 0) {
-                        messages.push('ℹ️ No raw data (CSV file) uploaded. Scatter plots will not be included in the report.');
-                    } else {
-                        const selectedScatterFUs = Array.from(document.querySelectorAll('.scatter-planfu-checkbox:checked')).map(cb => cb.value);
-                        
-                        if (selectedScatterFUs.length === 0) {
-                            messages.push('ℹ️ No Forest Units selected in Scatter Plot section. Scatter plots will be included for ALL Forest Units from the Yield Curve section (if other scatter plot filters are selected).');
-                        } else {
-                            // Check if scatter FUs match yield curve FUs
-                            const mismatchedFUs = selectedYieldCurveFUs.filter(fu => !selectedScatterFUs.includes(fu));
-                            if (mismatchedFUs.length > 0) {
-                                messages.push(`ℹ️ Scatter Plot Forest Units do not match Yield Curve selections.\n   Yield Curve FUs: ${selectedYieldCurveFUs.join(', ')}\n   Scatter Plot FUs: ${selectedScatterFUs.join(', ')}\n\n   Report will include yield curves and scatter plots for matching Forest Units only.`);
+                        if (strataCurves && strataCurves.length > 0) {
+                            filteredStrata = getFilteredStrataCurves();
+                            filteredStand  = getFilteredStandCurves();
+                            if (filteredStrata.length === 0) {
+                                alert('Current filters produce 0 STRATA records. Please adjust and try again.');
+                                return;
                             }
                         }
+                    }
+
+                    // Biomass-scoped: require at least one yYC when checkboxes exist
+                    if (reportScope === 'biomass') {
+                        const bioYycBoxes = document.querySelectorAll('.bio-yyc-checkbox');
+                        if (bioYycBoxes.length > 0) {
+                            const selectedBioYyc = Array.from(document.querySelectorAll('.bio-yyc-checkbox:checked')).map(cb => cb.value);
+                            if (selectedBioYyc.length === 0) {
+                                alert('Please select at least one Forest Unit (yYC) in the Biomass filters, then Apply.');
+                                return;
+                            }
+                        }
+                    }
+                    
+                    // Check raw data and scatter plot status (OPTIONAL - volume report only)
+                    const messages = [];
+                    
+                    if (reportScope === 'volume') {
+                        // Soft warning only when user asked for STAND but none matched
+                        const standRequested = !!(document.getElementById('typeStand') && document.getElementById('typeStand').checked);
+                        const standMissing = hasVolumeCurves && standRequested &&
+                            (!standCurves || standCurves.length === 0 || filteredStand.length === 0);
+                        if (standMissing) {
+                            messages.push('⚠️ STAND/POLYGON is checked but no STAND curves match current filters.\n\nThe report will be STRATA-only (STAND sections omitted). Uncheck STAND or expand Yield / LEADSPC / GLSL filters.');
+                        }
+                        
+                        if (!rawData || rawData.length === 0) {
+                            messages.push('ℹ️ No raw data (CSV file) uploaded. Scatter plots will not be included in the report.');
+                        } else {
+                            const selectedScatterFUs = Array.from(document.querySelectorAll('.scatter-planfu-checkbox:checked')).map(cb => cb.value);
+                            
+                            if (selectedScatterFUs.length === 0) {
+                                messages.push('ℹ️ No Forest Units selected in Scatter Plot section. Scatter plots will be included for ALL Forest Units from the Yield Curve section (if other scatter plot filters are selected).');
+                            } else {
+                                // Check if scatter FUs match yield curve FUs
+                                const mismatchedFUs = selectedYieldCurveFUs.filter(fu => !selectedScatterFUs.includes(fu));
+                                if (mismatchedFUs.length > 0) {
+                                    messages.push(`ℹ️ Scatter Plot Forest Units do not match Yield Curve selections.\n   Yield Curve FUs: ${selectedYieldCurveFUs.join(', ')}\n   Scatter Plot FUs: ${selectedScatterFUs.join(', ')}\n\n   Report will include yield curves and scatter plots for matching Forest Units only.`);
+                                }
+                            }
+                        }
+                    }
+
+                    messages.push(
+                        reportScope === 'biomass'
+                            ? '🌿 This report will include the Biomass module only (volume CSV is ignored even if loaded).'
+                            : '📊 This report will include the Volume module only (biomass CSV is ignored even if loaded).'
+                    );
+
+                    const fuEst = estimateReportFuCount(reportScope, false);
+                    const fuCapOn = isReportFuCapEnabled();
+                    if (fuCapOn && fuEst > REPORT_OPTIONAL_FU_CAP) {
+                        messages.push(
+                            `ℹ️ Optional FU limit is ON: only the first ${REPORT_OPTIONAL_FU_CAP} of ~${fuEst} Forest Units will be rendered.`
+                        );
+                    } else if (!fuCapOn) {
+                        messages.push(
+                            `ℹ️ All selected Forest Units will be included (~${fuEst || '?'}). No hard 10-FU cap.`
+                        );
                     }
                     
                     // Show informative messages if any
@@ -8799,14 +9300,21 @@
                             return;
                         }
                     }
+
+                    if (!confirmLargeFuReportIfNeeded(reportScope, false)) return;
                     
-                    console.log(`Validation passed: ${filteredStrata.length} STRATA, ${filteredStand.length} STAND volume${hasBiomassData ? ` + ${bioData.length} biomass` : ''} records`);
+                    console.log(`Validation passed: filtered report scope=${reportScope}` +
+                        (reportScope === 'volume'
+                            ? ` — ${filteredStrata.length} STRATA, ${filteredStand.length} STAND`
+                            : ` — ${(bioData && bioData.length) || 0} biomass records`) +
+                        ` — ~${fuEst} FUs` + (fuCapOn ? ` (cap ${REPORT_OPTIONAL_FU_CAP})` : ' (uncapped)'));
                     
                     // Ensure filtered path (not leftover Full Report flags)
                     const form = document.getElementById('reportMetadataForm');
                     if (form) {
                         form.dataset.fullReport = 'false';
                         form.dataset.seMode = '';
+                        form.dataset.reportScope = reportScope;
                     }
 
                     // Show metadata modal
@@ -8822,20 +9330,30 @@
             if (btnGenerateFullReport) {
                 console.log('✅ Found btnGenerateFullReport, attaching listener');
                 btnGenerateFullReport.addEventListener('click', function() {
-                    if ((!csvData || csvData.length === 0) && (!bioData || bioData.length === 0)) {
-                        alert('Please upload a Volume yield curve CSV or a Biomass CSV first!');
+                    const reportScope = getActiveReportModule();
+                    const hasVolumeCurves = csvData && csvData.length > 0;
+                    const hasBiomassData  = bioData  && bioData.length  > 0;
+
+                    if (reportScope === 'volume' && !hasVolumeCurves) {
+                        alert('Volume tab is active, but no Volume yield-curve CSV is loaded.\n\nUpload a Volume CSV, or switch to the Biomass tab for a biomass Full Report.');
+                        return;
+                    }
+                    if (reportScope === 'biomass' && !hasBiomassData) {
+                        alert('Biomass tab is active, but no Biomass CSV is loaded.\n\nUpload a Biomass CSV, or switch to the Volume tab for a volume Full Report.');
                         return;
                     }
 
                     const seMode = getFullReportSeMode();
-                    console.log(`Full Report validation passed: ${(csvData||[]).length} volume, ${(bioData||[]).length} biomass records, seMode=${seMode}`);
+                    console.log(`Full Report validation passed: scope=${reportScope}, volume=${(csvData||[]).length}, biomass=${(bioData||[]).length}, seMode=${seMode}`);
 
-                    // Warn when user opts into all SE combinations on GLSL data
-                    if (seMode === 'all' && ((typeof isGlslVolume !== 'undefined' && isGlslVolume) ||
-                                            (typeof isGlslBiomass !== 'undefined' && isGlslBiomass))) {
+                    // Warn when user opts into all SE combinations on GLSL data for the active module
+                    const glslRelevant = (reportScope === 'volume' && typeof isGlslVolume !== 'undefined' && isGlslVolume) ||
+                        (reportScope === 'biomass' && typeof isGlslBiomass !== 'undefined' && isGlslBiomass);
+                    if (seMode === 'all' && glslRelevant) {
                         const ok = confirm(
                             '⚡ Full Report · All AGSFRC × SI\n\n' +
-                            'This includes every GLSL SE combination in the filtered data.\n' +
+                            `Active module: ${reportScope === 'biomass' ? 'Biomass' : 'Volume'} only.\n` +
+                            'This includes every GLSL SE combination in the filtered data for that module.\n' +
                             'Dense forest units (e.g. HDSL1) can make generation slow and charts still sample ' +
                             `~${REPORT_MAX_STRATA_TRACES} STRATA curves per panel.\n\n` +
                             'For a lighter report, cancel and choose “Representative AGS/SI grid”.\n\n' +
@@ -8843,11 +9361,26 @@
                         );
                         if (!ok) return;
                     }
+
+                    const fuEst = estimateReportFuCount(reportScope, true);
+                    const fuCapOn = isReportFuCapEnabled();
+                    let scopeNote = reportScope === 'biomass'
+                        ? '🌿 Full Report will include the Biomass module only (volume CSV ignored).'
+                        : '📊 Full Report will include the Volume module only (biomass CSV ignored).';
+                    if (fuCapOn) {
+                        scopeNote += `\n\nOptional FU limit is ON: first ${REPORT_OPTIONAL_FU_CAP} of ~${fuEst} Forest Units.`;
+                    } else {
+                        scopeNote += `\n\nAll Forest Units will be included (~${fuEst || '?'}). No hard 10-FU cap.`;
+                    }
+                    if (!confirm(scopeNote + '\n\nContinue?')) return;
+
+                    if (!confirmLargeFuReportIfNeeded(reportScope, true)) return;
                     
-                    // Mark full report + SE mode for confirm handler
+                    // Mark full report + SE mode + module scope for confirm handler
                     const form = document.getElementById('reportMetadataForm');
                     form.dataset.fullReport = 'true';
                     form.dataset.seMode = seMode;
+                    form.dataset.reportScope = reportScope;
 
                     // Show metadata modal
                     const metadataModal = new bootstrap.Modal(document.getElementById('reportMetadataModal'));
@@ -8880,32 +9413,52 @@
                     // Close modal
                     bootstrap.Modal.getInstance(document.getElementById('reportMetadataModal')).hide();
                     
-                    // Check if this is a full report
+                    // Check if this is a full report; lock module scope from button click
                     const formEl = document.getElementById('reportMetadataForm');
                     const isFullReport = formEl.dataset.fullReport === 'true';
                     const seMode = formEl.dataset.seMode || getFullReportSeMode();
+                    const reportScope = (formEl.dataset.reportScope === 'biomass' || formEl.dataset.reportScope === 'volume')
+                        ? formEl.dataset.reportScope
+                        : getActiveReportModule();
+
+                    // Show progress immediately (before modal close delay) so biomass path never looks frozen
+                    showReportLoadingOverlay(
+                        reportScope === 'biomass'
+                            ? (isFullReport ? '🌿 Starting biomass Full Report...' : '🌿 Starting biomass report...')
+                            : (isFullReport ? '📊 Starting volume Full Report...' : '📊 Starting volume report...')
+                    );
                     
                     // Small delay to allow modal to close smoothly
                     setTimeout(async () => {
-                        // Generate appropriate report type
+                        // Generate appropriate report type (active module only)
+                        try {
                         if (isFullReport) {
                             await generateFullReport({
                                 fmuName,
                                 planYear,
                                 analystName,
                                 reportPurpose,
-                                seMode
+                                seMode,
+                                reportScope
                             });
                             // Clear the flags
                             formEl.dataset.fullReport = 'false';
                             formEl.dataset.seMode = '';
+                            formEl.dataset.reportScope = '';
                         } else {
                             await generateReport({
                                 fmuName,
                                 planYear,
                                 analystName,
-                                reportPurpose
+                                reportPurpose,
+                                reportScope
                             });
+                            formEl.dataset.reportScope = '';
+                        }
+                        } catch (genErr) {
+                            console.error('❌ Report generation failed:', genErr);
+                            hideReportLoadingOverlay();
+                            alert('❌ Error generating report: ' + (genErr && genErr.message ? genErr.message : String(genErr)));
                         }
                         
                         // Re-enable button for next use
@@ -8981,6 +9534,15 @@
                 bioBark:         findBioHeader(headers, ['Bark', 'BARK']),
                 bioBranches:     findBioHeader(headers, ['Branches', 'BRANCHES']),
                 bioFoliage:      findBioHeader(headers, ['Foliage', 'FOLIAGE']),
+                // Volume / structure on biomass CSV (official A–K)
+                netMerchVolume:  findBioHeader(headers, ['NMV', 'nmv', 'NetMerchVolume']),
+                grossMerchVolume: findBioHeader(headers, ['GMV', 'gmv', 'GrossMerchVolume']),
+                grossTotalVolume: findBioHeader(headers, ['GTV', 'gtv', 'GrossTotalVolume']),
+                basalArea:       findBioHeader(headers, ['BA', 'ba', 'BasalArea']),
+                stems:           findBioHeader(headers, ['STEMS', 'stems', 'SPH', 'StemsHa']),
+                dbhq:            findBioHeader(headers, ['DBHQ', 'dbhq', 'QMD']),
+                cdht:            findBioHeader(headers, ['CDHT', 'cdht', 'HT', 'Height', 'DomHT']),
+                maxDbh:          findBioHeader(headers, ['MaxDBH', 'MAXDBH', 'Max_DBH']),
                 polygonID:       null
             };
             map.polygonID = map.standId;
@@ -10213,11 +10775,21 @@
                 silsys:          findBioHeader(headers, ['SILSYS', 'SILVSYS', 'SilSys']),
                 cut:             findBioHeader(headers, ['CUT', 'Cut', 'PREV_CUT']),
                 agsfrc:          findBioHeader(headers, ['AGSFRC', 'AgsFrc', 'AGS_FRC']),
+                // Biomass components
                 bioTotalBiomass: findBioHeader(headers, ['Biomass', 'TotalBiomass', 'TOTAL_BIOMASS']),
                 bioWood:         findBioHeader(headers, ['Wood', 'WOOD']),
                 bioBark:         findBioHeader(headers, ['Bark', 'BARK']),
                 bioBranches:     findBioHeader(headers, ['Branches', 'BRANCHES']),
                 bioFoliage:      findBioHeader(headers, ['Foliage', 'FOLIAGE']),
+                // Volume / structure (recalculated on biomass CSV — official A–K grid)
+                netMerchVolume:  findBioHeader(headers, ['NMV', 'nmv', 'NetMerchVolume']),
+                grossMerchVolume: findBioHeader(headers, ['GMV', 'gmv', 'GrossMerchVolume']),
+                grossTotalVolume: findBioHeader(headers, ['GTV', 'gtv', 'GrossTotalVolume']),
+                basalArea:       findBioHeader(headers, ['BA', 'ba', 'BasalArea']),
+                stems:           findBioHeader(headers, ['STEMS', 'stems', 'SPH', 'StemsHa']),
+                dbhq:            findBioHeader(headers, ['DBHQ', 'dbhq', 'QMD']),
+                cdht:            findBioHeader(headers, ['CDHT', 'cdht', 'HT', 'Height', 'DomHT']),
+                maxDbh:          findBioHeader(headers, ['MaxDBH', 'MAXDBH', 'Max_DBH']),
                 polygonID:       null
             };
             bioColumnMap.polygonID = bioColumnMap.standId;
@@ -10755,11 +11327,11 @@
                 if (meta) {
                     meta.textContent = `Filtered: ${strataCurveCount} STRATA · ${standCurveCount} STAND · plotted series: 0`;
                 }
-                // Still build A–H panels when filtered rows exist (structure may plot even if overview empty)
+                // Still build A–K panels when filtered rows exist (structure may plot even if overview empty)
                 try {
                     renderBiomassPerFuDashboards(filteredStrata, filteredStand, fuCol, bioColumnMap);
                 } catch (dashErr) {
-                    console.error('🌿 A–H dashboards failed:', dashErr);
+                    console.error('🌿 A–K dashboards failed:', dashErr);
                 }
                 return;
             }
@@ -10793,7 +11365,7 @@
 
             scheduleBiomassPlotly(traces, layout, config);
 
-            // Per-FU A–H multi-panel (Biomass tab home) — after overview
+            // Per-FU A–K multi-panel (Biomass tab home) — after overview
             try {
                 renderBiomassPerFuDashboards(
                     filteredStrata,
@@ -10802,7 +11374,7 @@
                     bioColumnMap
                 );
             } catch (dashErr) {
-                console.error('🌿 A–H dashboards failed:', dashErr);
+                console.error('🌿 A–K dashboards failed:', dashErr);
             }
         }
 
@@ -11494,8 +12066,13 @@
             opts = opts || {};
             if (!bioData || bioData.length === 0) return {};
             const skipStandard = !!opts.skipStandardPanels;
+            // Progress bar range while building A–K panels (same overlay as volume reports)
+            const progressMin = opts.progressMin != null ? Number(opts.progressMin) : 20;
+            const progressMax = opts.progressMax != null ? Number(opts.progressMax) : 85;
+            const progressSpan = Math.max(1, progressMax - progressMin);
+
             console.log('🌿 Generating biomass report panels' +
-                (skipStandard ? ' (detail extras only)' : ' (A–H + extras)') + '...');
+                (skipStandard ? ' (detail extras only)' : ' (A–K grid)') + '...');
 
             clearDashboardFuIndex();
             ensureDashboardFuIndex();
@@ -11508,19 +12085,41 @@
                 .filter(Boolean);
             if (yycList.length === 0) yycList = uniqueBioYYCs.slice();
 
-            const totalYyc = yycList.length;
-            yycList = yycList.slice(0, REPORT_MAX_FUS);
-            if (totalYyc > REPORT_MAX_FUS) {
-                console.warn(`⚠️ Biomass FU cap: ${REPORT_MAX_FUS} of ${totalYyc} units for report stability`);
+            const bioCapped = applyReportFuCap(yycList);
+            yycList = bioCapped.list;
+            if (bioCapped.limited) {
+                console.warn(
+                    `⚠️ Optional biomass FU cap: ${bioCapped.cap} of ${bioCapped.total} units. ` +
+                    `Uncheck “Limit report to ${REPORT_OPTIONAL_FU_CAP} Forest Units” for all.`
+                );
             }
+            console.log(
+                `🌿 Biomass report FUs: ${yycList.length}/${bioCapped.total}` +
+                (bioCapped.limited ? ` (optional cap ${bioCapped.cap})` : ' (no FU cap)')
+            );
+
+            dashboards._meta = {
+                catalog: 'biomass',
+                fuCap: bioCapped.cap,
+                fuCapOptional: isReportFuCapEnabled(),
+                fusRequested: bioCapped.total,
+                fusRendered: yycList.slice(),
+                fusSkipped: bioCapped.skipped.slice()
+            };
+
+            const nFu = Math.max(1, yycList.length);
+            const nPanels = Math.max(1, DASHBOARD_PANEL_DEFS.length);
 
             for (let i = 0; i < yycList.length; i++) {
                 const yYC = yycList[i];
+                const fuBase = progressMin + (i / nFu) * progressSpan;
+                const fuSpan = progressSpan / nFu;
                 try {
-                    const progressEl = document.getElementById('reportProgress');
-                    if (progressEl) {
-                        progressEl.textContent = `🌿 Biomass ${i + 1}/${yycList.length}: ${yYC}`;
-                    }
+                    updateProgress(
+                        `🌿 Biomass dashboard ${i + 1}/${yycList.length}: ${yYC}` +
+                        (bioCapped.limited ? ` (cap ${bioCapped.cap}/${bioCapped.total})` : ''),
+                        fuBase
+                    );
                 } catch (e) { /* ignore */ }
 
                 // Expand empty yield/GLSL dims for report when checkboxes empty
@@ -11569,37 +12168,49 @@
 
                 dashboards[yYC] = {
                     fu: yYC,
+                    catalog: 'biomass',
                     strataCount: nStrata,
                     standCount: nStand,
                     rawCount: 0,
-                    standTrajectories: null,
-                    strataComponents: null,
-                    speciesNMV: null,
-                    strataMultiSE: null,
                     panelMeta: {}
                 };
                 DASHBOARD_PANEL_DEFS.forEach(d => { dashboards[yYC][d.id] = null; });
 
                 try {
-                    // Standard A–H only when biomass-only (volume path already did them)
+                    // Official A–K grid only (same as in-app; no separate Detail section)
                     if (!skipStandard) {
                         for (let pi = 0; pi < DASHBOARD_PANEL_DEFS.length; pi++) {
                             const def = DASHBOARD_PANEL_DEFS[pi];
                             try {
-                                const progressEl = document.getElementById('reportProgress');
-                                if (progressEl) {
-                                    progressEl.textContent =
-                                        `🌿 ${yYC}: ${def.letter} (${pi + 1}/${DASHBOARD_PANEL_DEFS.length})`;
-                                }
+                                const panelPct = fuBase + ((pi + 1) / nPanels) * fuSpan;
+                                updateProgress(
+                                    `🌿 ${yYC}: ${def.letter} (${pi + 1}/${DASHBOARD_PANEL_DEFS.length}) ${def.title}`,
+                                    panelPct
+                                );
                             } catch (e) { /* ignore */ }
-                            const standSlice = (def.id === 'B') ? fuStand : [];
+
+                            // STRATA required — POLYGON alone yields empty panels with clear reason
+                            if (dashboardPanelRequiresStrata(def) && (!fuStrata || !fuStrata.length)) {
+                                dashboards[yYC][def.id] = null;
+                                dashboards[yYC].panelMeta[def.id] = {
+                                    title: def.title,
+                                    letter: def.letter,
+                                    ok: false,
+                                    reason: dashboardStrataRequiredEmptyReason(def)
+                                };
+                                continue;
+                            }
+
                             const strataSlice = (def.type === 'STAND') ? [] : fuStrata;
+                            const standSlice = (def.type === 'STAND' || def.type === 'BOTH')
+                                ? fuStand
+                                : [];
                             const exported = await exportDashboardPanelPng(
                                 def, yYC, strataSlice, standSlice,
                                 {
-                                    maxStandTraces: def.id === 'B'
-                                        ? Math.min(80, REPORT_MAX_STAND_CLOUD_IDS)
-                                        : REPORT_MAX_STAND_TRACES
+                                    maxStandTraces: (def.type === 'STAND' || def.type === 'BOTH')
+                                        ? Math.min(80, REPORT_MAX_STAND_TRACES)
+                                        : 0
                                 }
                             );
                             dashboards[yYC][def.id] = exported && exported.png ? exported.png : null;
@@ -11613,33 +12224,8 @@
                         }
                     }
 
-                    // Detail extras (capped) — never plot tens of thousands of STAND lines
-                    const standIds = new Set(
-                        fuStand.map(r => String(r[bioColumnMap.standId || bioColumnMap.polygonID] ?? '').trim())
-                    );
-                    if (standIds.size > 0 && standIds.size <= REPORT_MAX_STAND_CLOUD_IDS) {
-                        dashboards[yYC].standTrajectories =
-                            await generateBioPanel_StandTrajectories(yYC, fuStand);
-                    } else if (standIds.size > REPORT_MAX_STAND_CLOUD_IDS) {
-                        console.warn(
-                            `  ⚠️ ${yYC}: skipped STAND cloud (${standIds.size} stands > cap ${REPORT_MAX_STAND_CLOUD_IDS})`
-                        );
-                    }
-                    await yieldToBrowser();
-                    if (fuStrata.length > 0) {
-                        dashboards[yYC].strataComponents =
-                            await generateBioPanel_StrataComponents(yYC, fuStrata);
-                        await yieldToBrowser();
-                        dashboards[yYC].strataMultiSE =
-                            await generateBioPanel_StrataMultiSE(yYC, fuStrata);
-                        await yieldToBrowser();
-                        dashboards[yYC].speciesNMV =
-                            await generateBioPanel_SpeciesNMV(yYC, fuStrata);
-                    }
-
-                    const extraOk = ['standTrajectories', 'strataComponents', 'strataMultiSE', 'speciesNMV']
-                        .filter(k => dashboards[yYC][k]).length;
-                    console.log(`  ✅ ${yYC}: bio extras ${extraOk} · STRATA ${nStrata} · STAND ${nStand}`);
+                    const okPanels = DASHBOARD_PANEL_DEFS.filter(d => dashboards[yYC][d.id]).length;
+                    console.log(`  ✅ ${yYC}: A–K ${okPanels}/${DASHBOARD_PANEL_DEFS.length} · STRATA ${nStrata} · POLYGON ${nStand}`);
                 } catch (err) {
                     console.error(`  ❌ ${yYC} biomass panels failed:`, err && err.message);
                 }
@@ -11725,20 +12311,19 @@
         🌿 Biomass Analysis
     </h2>
     <p style="color:#666; font-size:14px; margin-bottom:12px;">
-        Biomass estimates from the SLYM Biomass module (Mg/ha). Each Forest Unit includes the standardized
-        <strong>A–H dashboard</strong> (same catalog as the interactive app) plus optional detail panels
-        (STAND cloud, multi-SE selection curves, components, species NMV).
+        Official per-FU dashboard <strong>A–K</strong> from the Biomass module CSV (includes recalculated volume metrics).
+        Same panel order and titles as the interactive Biomass tab. STRATA is foreground; POLYGON is a thin background when selected.
     </p>
     <p style="color:#666; font-size:13px; margin-top:0;">
-        GLSL SE: colour = SI, dash = CUT/AGS. Panel “SE selection curves” shows multiple SE series (capped);
-        species NMV still uses one representative SE curve for readability.
+        GLSL SE: colour = SI, dash = CUT/AGS. MaxDBH is not part of this grid (per SLYM author).
+        No separate Detail section — components and species NMV live in the main grid (B, K).
     </p>`;
 
             for (const [yYC, panels] of Object.entries(bioDashboards)) {
-                const hasAH = DASHBOARD_PANEL_DEFS.some(d => panels[d.id]);
-                const hasExtra = panels.standTrajectories || panels.strataComponents ||
-                    panels.strataMultiSE || panels.speciesNMV;
-                if (!hasAH && !hasExtra) continue;
+                if (yYC === '_meta') continue;
+                if (!panels || typeof panels !== 'object') continue;
+                const hasAK = DASHBOARD_PANEL_DEFS.some(d => panels[d.id]);
+                if (!hasAK) continue;
 
                 const metaStrata = panels.strataCount != null ? panels.strataCount : '—';
                 const metaStand = panels.standCount != null ? panels.standCount : '—';
@@ -11749,65 +12334,17 @@
             🌿 Forest Unit: ${yYC}
         </h3>
         <p style="color:#666; font-size:13px; margin:6px 0 16px 0;">
-            STRATA curves: <strong>${metaStrata}</strong> · STAND/POLYGON: <strong>${metaStand}</strong>
-        </p>`;
-
-                // A–H grid (shared renderer with volume reports)
-                if (hasAH) {
-                    html += `
-        <h4 style="color:#198754; margin:16px 0 8px 0;">Standard dashboard (A–H)</h4>
-        ${renderReportEightPanelGridHTML(yYC, panels)}`;
-                }
-
-                // Detail extras
-                if (hasExtra) {
-                    html += `
-        <h4 style="color:#198754; margin:28px 0 8px 0; page-break-after:avoid;">Detail panels</h4>`;
-                }
-
-                if (panels.standTrajectories) {
-                    html += `
-        <div style="margin-bottom:30px; page-break-inside:avoid;">
-            <h4 style="color:#198754; margin-top:0; page-break-after:avoid;">STAND Curves — Total Biomass vs Age</h4>
-            <p style="color:#666; font-size:12px; margin-bottom:8px;">Each thin line = one individual stand polygon.</p>
-            <img src="${panels.standTrajectories}" alt="${yYC} Stand Trajectories" style="width:100%; max-width:1400px;">
-        </div>`;
-                }
-
-                if (panels.strataMultiSE) {
-                    html += `
-        <div style="margin-bottom:30px; page-break-inside:avoid;">
-            <h4 style="color:#6f42c1; margin-top:0; page-break-after:avoid;">STRATA — GLSL SE selection curves (Total Biomass)</h4>
-            <p style="color:#666; font-size:12px; margin-bottom:8px;">
-                Multiple selection-system series (SI colour · CUT/AGS dash). Capped for report size.
-            </p>
-            <img src="${panels.strataMultiSE}" alt="${yYC} SE multi curves" style="width:100%; max-width:1400px;">
-        </div>`;
-                }
-
-                if (panels.strataComponents || panels.speciesNMV) {
-                    html += `<div style="display:flex; gap:20px; margin-bottom:30px; page-break-inside:avoid; flex-wrap:wrap;">`;
-                    if (panels.strataComponents) {
-                        html += `
-            <div style="flex:1; min-width:280px;">
-                <h4 style="color:#8B4513; margin-top:0; page-break-after:avoid;">STRATA — Biomass Components vs Age</h4>
-                <img src="${panels.strataComponents}" alt="${yYC} Components" style="width:100%;">
-            </div>`;
-                    }
-                    if (panels.speciesNMV) {
-                        html += `
-            <div style="flex:1; min-width:280px;">
-                <h4 style="color:#0d6efd; margin-top:0; page-break-after:avoid;">STRATA — Species NMV Breakdown</h4>
-                <p style="color:#666; font-size:11px; margin:0 0 6px 0;">One representative SE curve when GLSL SE is present.</p>
-                <img src="${panels.speciesNMV}" alt="${yYC} Species NMV" style="width:100%;">
-            </div>`;
-                    }
-                    html += `</div>`;
-                }
-
-                html += `</div>`;
+            STRATA: <strong>${metaStrata}</strong> · POLYGON: <strong>${metaStand}</strong>
+        </p>
+        <h4 style="color:#198754; margin:16px 0 8px 0;">Per-FU dashboard (A–K)</h4>
+        ${renderReportEightPanelGridHTML(yYC, panels, DASHBOARD_PANEL_DEFS)}
+    </div>`;
             }
-            return html;
+
+            return html + `
+    <p style="color:#666; font-size:12px; margin-top:24px;">
+        Generated by Ontario SLYM Cutter · Biomass module A–K grid
+    </p>`;
         }
     </script>
 
